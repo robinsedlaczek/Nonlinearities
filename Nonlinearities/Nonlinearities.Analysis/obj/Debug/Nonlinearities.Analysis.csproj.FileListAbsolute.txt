@@ -1,0 +1,5 @@
+F:\Git Repositories\Nonlinearities\Nonlinearities.Analysis\bin\Debug\Nonlinearities.Analysis.dll
+F:\Git Repositories\Nonlinearities\Nonlinearities.Analysis\bin\Debug\Nonlinearities.Analysis.pdb
+F:\Git Repositories\Nonlinearities\Nonlinearities.Analysis\obj\Debug\Nonlinearities.Analysis.csprojResolveAssemblyReference.cache
+F:\Git Repositories\Nonlinearities\Nonlinearities.Analysis\obj\Debug\Nonlinearities.Analysis.dll
+F:\Git Repositories\Nonlinearities\Nonlinearities.Analysis\obj\Debug\Nonlinearities.Analysis.pdb
