@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nonlinearities.Analysis
 {
-    public class Class1
+    public class DataAnalyzer
     {
     }
 }
