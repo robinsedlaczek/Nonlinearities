@@ -1,0 +1,7 @@
+F:\Development\Uni\Nonlinearities\Libraries\CSMatIO\src\bin\Debug\csmatio.dll
+F:\Development\Uni\Nonlinearities\Libraries\CSMatIO\src\bin\Debug\csmatio.pdb
+F:\Development\Uni\Nonlinearities\Libraries\CSMatIO\src\bin\Debug\csmatio.xml
+F:\Development\Uni\Nonlinearities\Libraries\CSMatIO\src\bin\Debug\zlib.net.dll
+F:\Development\Uni\Nonlinearities\Libraries\CSMatIO\src\obj\Debug\csmatio.csprojResolveAssemblyReference.cache
+F:\Development\Uni\Nonlinearities\Libraries\CSMatIO\src\obj\Debug\csmatio.dll
+F:\Development\Uni\Nonlinearities\Libraries\CSMatIO\src\obj\Debug\csmatio.pdb

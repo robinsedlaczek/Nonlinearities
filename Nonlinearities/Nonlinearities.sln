@@ -3,6 +3,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nonlinearities.Analysis", "Nonlinearities.Analysis\Nonlinearities.Analysis.csproj", "{4E84A1FA-5806-486F-B1E2-15C4B8A7FDD6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "csmatio", "Libraries\CSMatIO\src\csmatio.csproj", "{D6EB17BF-9074-484F-9950-E06169A3C39D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nonlinearities.Tests", "Nonlinearities.Tests\Nonlinearities.Tests.csproj", "{9BFDD7CB-CD86-4B9E-AA79-B913684D398D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +17,14 @@ Global
 		{4E84A1FA-5806-486F-B1E2-15C4B8A7FDD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E84A1FA-5806-486F-B1E2-15C4B8A7FDD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E84A1FA-5806-486F-B1E2-15C4B8A7FDD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6EB17BF-9074-484F-9950-E06169A3C39D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6EB17BF-9074-484F-9950-E06169A3C39D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6EB17BF-9074-484F-9950-E06169A3C39D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6EB17BF-9074-484F-9950-E06169A3C39D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BFDD7CB-CD86-4B9E-AA79-B913684D398D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BFDD7CB-CD86-4B9E-AA79-B913684D398D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BFDD7CB-CD86-4B9E-AA79-B913684D398D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BFDD7CB-CD86-4B9E-AA79-B913684D398D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

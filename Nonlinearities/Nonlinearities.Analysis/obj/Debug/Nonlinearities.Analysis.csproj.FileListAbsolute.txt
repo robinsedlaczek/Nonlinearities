@@ -3,3 +3,12 @@ F:\Git Repositories\Nonlinearities\Nonlinearities.Analysis\bin\Debug\Nonlinearit
 F:\Git Repositories\Nonlinearities\Nonlinearities.Analysis\obj\Debug\Nonlinearities.Analysis.csprojResolveAssemblyReference.cache
 F:\Git Repositories\Nonlinearities\Nonlinearities.Analysis\obj\Debug\Nonlinearities.Analysis.dll
 F:\Git Repositories\Nonlinearities\Nonlinearities.Analysis\obj\Debug\Nonlinearities.Analysis.pdb
+F:\Development\Uni\Nonlinearities\Nonlinearities.Analysis\bin\Debug\Nonlinearities.Analysis.dll
+F:\Development\Uni\Nonlinearities\Nonlinearities.Analysis\bin\Debug\Nonlinearities.Analysis.pdb
+F:\Development\Uni\Nonlinearities\Nonlinearities.Analysis\obj\Debug\Nonlinearities.Analysis.csprojResolveAssemblyReference.cache
+F:\Development\Uni\Nonlinearities\Nonlinearities.Analysis\obj\Debug\Nonlinearities.Analysis.dll
+F:\Development\Uni\Nonlinearities\Nonlinearities.Analysis\obj\Debug\Nonlinearities.Analysis.pdb
+F:\Development\Uni\Nonlinearities\Nonlinearities.Analysis\bin\Debug\csmatio.dll
+F:\Development\Uni\Nonlinearities\Nonlinearities.Analysis\bin\Debug\zlib.net.dll
+F:\Development\Uni\Nonlinearities\Nonlinearities.Analysis\bin\Debug\csmatio.pdb
+F:\Development\Uni\Nonlinearities\Nonlinearities.Analysis\bin\Debug\csmatio.xml

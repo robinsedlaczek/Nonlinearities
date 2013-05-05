@@ -1,0 +1,11 @@
+F:\Development\Uni\Nonlinearities\Nonlinearities.Tests\bin\Debug\Nonlinearities.Tests.dll
+F:\Development\Uni\Nonlinearities\Nonlinearities.Tests\bin\Debug\Nonlinearities.Tests.pdb
+F:\Development\Uni\Nonlinearities\Nonlinearities.Tests\bin\Debug\Nonlinearities.Analysis.dll
+F:\Development\Uni\Nonlinearities\Nonlinearities.Tests\bin\Debug\csmatio.dll
+F:\Development\Uni\Nonlinearities\Nonlinearities.Tests\bin\Debug\zlib.net.dll
+F:\Development\Uni\Nonlinearities\Nonlinearities.Tests\bin\Debug\Nonlinearities.Analysis.pdb
+F:\Development\Uni\Nonlinearities\Nonlinearities.Tests\bin\Debug\csmatio.pdb
+F:\Development\Uni\Nonlinearities\Nonlinearities.Tests\bin\Debug\csmatio.xml
+F:\Development\Uni\Nonlinearities\Nonlinearities.Tests\obj\Debug\Nonlinearities.Tests.csprojResolveAssemblyReference.cache
+F:\Development\Uni\Nonlinearities\Nonlinearities.Tests\obj\Debug\Nonlinearities.Tests.dll
+F:\Development\Uni\Nonlinearities\Nonlinearities.Tests\obj\Debug\Nonlinearities.Tests.pdb
