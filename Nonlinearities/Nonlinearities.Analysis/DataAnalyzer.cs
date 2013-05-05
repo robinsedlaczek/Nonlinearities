@@ -8,5 +8,6 @@ namespace Nonlinearities.Analysis
 {
     public class DataAnalyzer
     {
+
     }
 }
