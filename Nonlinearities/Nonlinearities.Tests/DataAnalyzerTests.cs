@@ -10,8 +10,11 @@ namespace Nonlinearities.Tests
         [TestMethod]
         public void TestOpenFile()
         {
-            var analyzer = new DataAnalyzer();
+            var stimuli = DataLoader.GetStimuli();
+            var spikes = DataLoader.GetSpikes();
 
+            
         }
     }
 }
+.
