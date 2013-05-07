@@ -12,17 +12,26 @@ namespace Nonlinearities.Analysis
     {
         public DataAnalyzer()
         {
-            var reader = new MatFileReader(@"F:\Development\Uni\Nonlinearities\Data\Long Experiment\msq1D.mat");
 
-            var stimuli = ((MLDouble)reader.GetMLArray("msq1D")).GetArray();
+        }
 
-            reader = new MatFileReader(@"F:\Development\Uni\Nonlinearities\Data\Long Experiment\spksV6.mat");
+        public static List<double[][]> GetSpikes()
+        {
+            var reader = new MatFileReader(@"..\..\..\Data\Long Experiment\spksV6.mat");
 
-            var spikes1 = ((MLDouble)reader.Data[0]).GetArray();
-            var spikes2 = ((MLDouble)reader.Data[1]).GetArray();
-            var spikes3 = ((MLDouble)reader.Data[2]).GetArray();
-            var spikes4 = ((MLDouble)reader.Data[3]).GetArray();
-            
+            return new List<double[][]>()
+            {
+                ((MLDouble)reader.Data[0]).GetArray(),
+                ((MLDouble)reader.Data[1]).GetArray(),
+                ((MLDouble)reader.Data[2]).GetArray(),
+                ((MLDouble)reader.Data[3]).GetArray()
+            };
+        }
+
+        public static double[][] GetStimuli()
+        {
+            var reader = new MatFileReader(@"..\..\..\Data\Long Experiment\msq1D.mat");
+            return ((MLDouble)reader.GetMLArray("msq1D")).GetArray();
         }
 
     }

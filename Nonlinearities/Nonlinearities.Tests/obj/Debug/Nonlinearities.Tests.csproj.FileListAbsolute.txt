@@ -9,3 +9,14 @@ F:\Development\Uni\Nonlinearities\Nonlinearities.Tests\bin\Debug\csmatio.xml
 F:\Development\Uni\Nonlinearities\Nonlinearities.Tests\obj\Debug\Nonlinearities.Tests.csprojResolveAssemblyReference.cache
 F:\Development\Uni\Nonlinearities\Nonlinearities.Tests\obj\Debug\Nonlinearities.Tests.dll
 F:\Development\Uni\Nonlinearities\Nonlinearities.Tests\obj\Debug\Nonlinearities.Tests.pdb
+F:\Git Repositories\Nonlinearities\Nonlinearities.Tests\bin\Debug\Nonlinearities.Tests.dll
+F:\Git Repositories\Nonlinearities\Nonlinearities.Tests\bin\Debug\Nonlinearities.Tests.pdb
+F:\Git Repositories\Nonlinearities\Nonlinearities.Tests\bin\Debug\Nonlinearities.Analysis.dll
+F:\Git Repositories\Nonlinearities\Nonlinearities.Tests\bin\Debug\csmatio.dll
+F:\Git Repositories\Nonlinearities\Nonlinearities.Tests\bin\Debug\zlib.net.dll
+F:\Git Repositories\Nonlinearities\Nonlinearities.Tests\bin\Debug\Nonlinearities.Analysis.pdb
+F:\Git Repositories\Nonlinearities\Nonlinearities.Tests\bin\Debug\csmatio.pdb
+F:\Git Repositories\Nonlinearities\Nonlinearities.Tests\bin\Debug\csmatio.xml
+F:\Git Repositories\Nonlinearities\Nonlinearities.Tests\obj\Debug\Nonlinearities.Tests.csprojResolveAssemblyReference.cache
+F:\Git Repositories\Nonlinearities\Nonlinearities.Tests\obj\Debug\Nonlinearities.Tests.dll
+F:\Git Repositories\Nonlinearities\Nonlinearities.Tests\obj\Debug\Nonlinearities.Tests.pdb

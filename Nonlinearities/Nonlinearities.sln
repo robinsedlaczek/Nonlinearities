@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "csmatio", "Libraries\CSMatI
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nonlinearities.Tests", "Nonlinearities.Tests\Nonlinearities.Tests.csproj", "{9BFDD7CB-CD86-4B9E-AA79-B913684D398D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nonlinearities.Gui", "Nonlinearities.Gui\Nonlinearities.Gui.csproj", "{8553BAC9-BCB9-4B95-A55B-3E08BC5C9682}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{9BFDD7CB-CD86-4B9E-AA79-B913684D398D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9BFDD7CB-CD86-4B9E-AA79-B913684D398D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9BFDD7CB-CD86-4B9E-AA79-B913684D398D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8553BAC9-BCB9-4B95-A55B-3E08BC5C9682}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8553BAC9-BCB9-4B95-A55B-3E08BC5C9682}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8553BAC9-BCB9-4B95-A55B-3E08BC5C9682}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8553BAC9-BCB9-4B95-A55B-3E08BC5C9682}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

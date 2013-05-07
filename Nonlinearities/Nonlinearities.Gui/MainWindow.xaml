@@ -8,7 +8,9 @@
             <RowDefinition Height="50"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        
+
+        <Button x:Name="LoadStimuliDataButton" Content="Load Stimuli Data" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" Grid.Row="0" Padding="10,5" Click="OnLoadStimuliDataButtonClick"/>
+
         <TabControl Grid.Row="1">
             <TabItem Header="Stimuli">
                 <Grid Background="#FFE5E5E5">
@@ -16,10 +18,10 @@
                         <RowDefinition/>
                         <RowDefinition Height="30"/>
                     </Grid.RowDefinitions>
-                    <StackPanel Orientation="Horizontal" Background="LightGray" Grid.Row="1"/>
+                    <Grid x:Name="StimuliDisplayGrid" Grid.Row="0"/>
+                    <Slider x:Name="StimuliSlider" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.Row="1" ValueChanged="OnStimuliSliderValueChanged"/>
                 </Grid>
             </TabItem>
         </TabControl>
-
     </Grid>
 </Window>

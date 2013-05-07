@@ -12,3 +12,7 @@ F:\Development\Uni\Nonlinearities\Nonlinearities.Analysis\bin\Debug\csmatio.dll
 F:\Development\Uni\Nonlinearities\Nonlinearities.Analysis\bin\Debug\zlib.net.dll
 F:\Development\Uni\Nonlinearities\Nonlinearities.Analysis\bin\Debug\csmatio.pdb
 F:\Development\Uni\Nonlinearities\Nonlinearities.Analysis\bin\Debug\csmatio.xml
+F:\Git Repositories\Nonlinearities\Nonlinearities.Analysis\bin\Debug\csmatio.dll
+F:\Git Repositories\Nonlinearities\Nonlinearities.Analysis\bin\Debug\zlib.net.dll
+F:\Git Repositories\Nonlinearities\Nonlinearities.Analysis\bin\Debug\csmatio.pdb
+F:\Git Repositories\Nonlinearities\Nonlinearities.Analysis\bin\Debug\csmatio.xml
