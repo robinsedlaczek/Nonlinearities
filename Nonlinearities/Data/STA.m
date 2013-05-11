@@ -18,21 +18,22 @@ stimuli = msq1D;
 spikesOfAllCells = spks4;
 
 %% Calculate STA
-frameInterval = 1/59.721395;	% frameInterval = 0.016744 ms
+frameInterval = 1/59.721395;									% frameInterval = 0.016744 ms
 framesOfInterest = round(spikesOfAllCells / frameInterval);		% define which cell to use (frames that triggered spikes)
 STA = mean(stimuli(framesOfInterest, :));
 
 
 %% Spatiotemporal Receptive Field
-strflen = 12; 
-vspkbins = framesOfInterest(find(framesOfInterest>strflen+1)); 
+length = 12; 
+framesForGraph = framesOfInterest(find(framesOfInterest > length + 1)); 
 stimuliDimension = size(stimuli, 2)
-
-strf = zeros(strflen,stimuliDimension); 
-for itime=1:strflen; 
-    strf(itime,:) = mean(stimuli(vspkbins-itime,:)); 
+zeros = zeros(length, stimuliDimension);
+ 
+for time = 1 : length; 
+    zeros(time, :) = mean(stimuli(framesForGraph - time, :)); 
 end; 
 
-imagesc(strf); colormap(gray)
+imagesc(zeros); 
+colormap(gray)
 
 
