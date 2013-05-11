@@ -11,23 +11,29 @@
 # recordings in spksV6.mat and rspksV6.mat
 
 clear all; 
-dt = 1/59.721395;
 load msq1D.mat; load imsq1D.mat;  load spksV6.mat;
-stimdim  = size(msq1D,2)
 
-%% define which cell to use
-tspkbins = round(spks4/dt);
+%% Define some Names
+stimuli = msq1D;
+spikesOfAllCells = spks4;
 
-%% spike triggered average
-STA = mean(msq1D(tspkbins,:));
+%% Calculate STA
+frameInterval = 1/59.721395;									% frameInterval = 0.016744 ms
+framesOfInterest = round(spikesOfAllCells / frameInterval);		% define which cell to use (frames that triggered spikes)
+STA = mean(stimuli(framesOfInterest, :));
 
-%% spatiotemporal receptive field
-strflen = 12; 
-vspkbins = tspkbins(find(tspkbins>strflen+1)); 
 
-strf = zeros(strflen,stimdim); 
-for itime=1:strflen; 
-    strf(itime,:) = mean(msq1D(vspkbins-itime,:)); 
+%% Spatiotemporal Receptive Field
+length = 12; 
+framesForGraph = framesOfInterest(find(framesOfInterest > length + 1)); 
+stimuliDimension = size(stimuli, 2)
+zeros = zeros(length, stimuliDimension);
+ 
+for time = 1 : length; 
+    zeros(time, :) = mean(stimuli(framesForGraph - time, :)); 
 end; 
 
-imagesc(strf); colormap(gray)
+imagesc(zeros); 
+colormap(gray)
+
+

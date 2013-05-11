@@ -39,8 +39,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataAnalyzer.cs" />
+    <Compile Include="DataLoader.cs" />
+    <Compile Include="Math.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RoundStrategy.cs" />
+    <Compile Include="STA.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Libraries\CSMatIO\src\csmatio.csproj">

@@ -30,7 +30,7 @@ namespace Nonlinearities.Gui
 
         private void OnLoadStimuliDataButtonClick(object sender, RoutedEventArgs e)
         {
-            _stimuli = DataAnalyzer.GetStimuli();
+            _stimuli = DataLoader.GetStimuli();
             var columns = _stimuli[0].Length;
 
             for (int index = 0; index < columns; index++)
