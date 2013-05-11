@@ -9,13 +9,35 @@ namespace Nonlinearities.Analysis
 {
     public static class Math
     {
+        public static double[][][] Copy(double[][][] source)
+        {
+            var result = new double[source.Length][][];
+
+            for (var indexA = 0; indexA < source.Length; indexA++ )
+            {
+                result[indexA] = new double[source[indexA].Length][];
+
+                for (var indexB = 0; indexB < source[indexA].Length; indexB++)
+                {
+                    result[indexA][indexB] = new double[source[indexA][indexB].Length];
+
+                    for (var indexC=0; indexC< source[indexA][indexB].Length; indexC++)
+                    {
+                        result[indexA][indexB][indexC] = source[indexA][indexB][indexC];
+                    }
+                }
+            }
+
+            return result;
+        }
+
         public static double[][][] Divide(double[][][] devident, double divisor)
         {
             if (divisor == 0)
                 throw new DivideByZeroException("The devisor must not equal 0.");
 
             var stopwatch = Stopwatch.StartNew();
-            var result = devident.Clone() as double[][][];
+            var result = Copy(devident);
 
             for (var indexA = 0; indexA < devident.Length; indexA++)
             {
@@ -37,7 +59,7 @@ namespace Nonlinearities.Analysis
         public static double[][][] Round(double[][][] matrix)
         {
             var stopwatch = Stopwatch.StartNew();
-            var result = matrix.Clone() as double[][][];
+            var result = Copy(matrix);
 
             for (var indexA = 0; indexA < matrix.Length; indexA++)
             {
@@ -59,7 +81,7 @@ namespace Nonlinearities.Analysis
         public static double[][][] Floor(double[][][] matrix)
         {
             var stopwatch = Stopwatch.StartNew();
-            var result = matrix.Clone() as double[][][];
+            var result = Copy(matrix);
 
             for (var indexA = 0; indexA < matrix.Length; indexA++)
             {
@@ -81,7 +103,7 @@ namespace Nonlinearities.Analysis
         public static double[][][] Ceiling(double[][][] matrix)
         {
             var stopwatch = Stopwatch.StartNew();
-            var result = matrix.Clone() as double[][][];
+            var result = Copy(matrix);
 
             for (var indexA = 0; indexA < matrix.Length; indexA++)
             {
@@ -100,7 +122,7 @@ namespace Nonlinearities.Analysis
             return result;
         }
 
-        public static double[] Subtract(double[] a, double[] b)
+        public static double[] Subtract(double[] a, double[]b)
         {
             if (a.Length!= b.Length)
                 throw new ArgumentException("a and b must be arrays of equal length.");
