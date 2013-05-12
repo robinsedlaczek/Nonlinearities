@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 namespace Nonlinearities.Analysis
 {
     /// <summary>
-    /// This class calculates the STA for given stimuli and response spikes.
+    /// This class provides services for Spike-triggered Analysis.
     /// </summary>
-    public static class STA
+    public static class SpikeTriggeredAnalysis
     {
         /// <summary>
-        /// This service calculates the STA for given stimuli data and response spikes data.
+        /// This service calculates the spike-triggered average for given stimuli data and response spikes data.
         /// </summary>
         /// <param name="stimuli">
         /// The stimuli that triggered spikes as 2-dimensional array with:
@@ -31,7 +31,7 @@ namespace Nonlinearities.Analysis
         /// 2. spikeTriggeredStimuliEnsemble = round(spikesOfAllCells / frameInterval);
         /// 3. STA = mean(stimuli(framesOfInterest, :));
         /// </remarks>
-        public static double[] Calculate(double[][] stimuli, double[][][] spikes, RoundStrategy roundStrategy)
+        public static double[] Average(double[][] stimuli, double[][][] spikes, RoundStrategy roundStrategy)
         {
             // 1. frameInterval = 1/59.721395 = 0.016744 ms
             var frameInterval = 1 / 59.721395; // = 0.016744 ms
@@ -64,6 +64,32 @@ namespace Nonlinearities.Analysis
             }
 
             return Math.Mean(stimuliOfInterest.ToArray<double[]>());
+        }
+
+        /// <summary>
+        /// This service calculates the spike-triggered covariance for given stimuli data and response spikes data.
+        /// </summary>
+        /// <param name="stimuli">
+        /// The stimuli that triggered spikes as 2-dimensional array with:
+        /// [?][ ] - List of stimuli frames.
+        /// [ ][?] - Stimulus data for the frame.</param>
+        /// <param name="spikes">
+        /// The detected spikes for the stimuli as 2-dimensional array with:
+        /// [?][ ][ ] - List of cells.
+        /// [ ][?][ ] - List of spike data for the cell.
+        /// [ ][ ][?] - Data item of spike data.
+        /// </param>
+        /// <returns>Returns a vector containing the STA. </returns>
+        /// <remarks>
+        /// Calculation of STA:
+        /// 
+        /// 
+        /// </remarks>
+        public static double[][] Covariance(double[][] stimuli, double[][][] spikes)
+        {
+
+
+            return null;
         }
     }
 }
