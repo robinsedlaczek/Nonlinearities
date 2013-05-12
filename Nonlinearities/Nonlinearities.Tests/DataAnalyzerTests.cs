@@ -15,18 +15,18 @@ namespace Nonlinearities.Tests
             var spikes = DataLoader.GetSpikes();
             var deviation = new double[2][];
 
-            var staRounded = SpikeTriggeredAnalysis.Average(stimuli, spikes, RoundStrategy.Round);
+            var staRounded = SpikeTriggeredAnalysis.CalculateSTA(stimuli, spikes, RoundStrategy.Round);
             var values = String.Join(", ", Array.ConvertAll(staRounded, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
             Console.WriteLine("STA (round strategy) = [" + values + "]");
             Console.WriteLine();
 
-            var staCeiled = SpikeTriggeredAnalysis.Average(stimuli, spikes, RoundStrategy.Ceiling);
+            var staCeiled = SpikeTriggeredAnalysis.CalculateSTA(stimuli, spikes, RoundStrategy.Ceiling);
             values = String.Join(", ", Array.ConvertAll(staCeiled, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
             deviation[0] = Analysis.Math.Subtract(staCeiled, staRounded);
             Console.WriteLine("STA (ceiling strategy) = [" + values + "]");
             Console.WriteLine();
 
-            var staFloored = SpikeTriggeredAnalysis.Average(stimuli, spikes, RoundStrategy.Floor);
+            var staFloored = SpikeTriggeredAnalysis.CalculateSTA(stimuli, spikes, RoundStrategy.Floor);
             values = String.Join(", ", Array.ConvertAll(staFloored, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
             deviation[1] = Analysis.Math.Subtract(staFloored, staRounded);
             Console.WriteLine("STA (floor strategy) = [" + values + "]");
@@ -35,6 +35,20 @@ namespace Nonlinearities.Tests
             var averageDeviation = Analysis.Math.Mean(deviation);
             values = String.Join(", ", Array.ConvertAll(averageDeviation, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
             Console.WriteLine("Average Deviation from Round Strategy = [" + values + "]");
+        }
+
+        [TestMethod]
+        public void TestCalculateSTC()
+        {
+            var stimuli = DataLoader.GetStimuli();
+            var spikes = DataLoader.GetSpikes();
+            var deviation = new double[2][];
+
+            var stc = SpikeTriggeredAnalysis.CalculateSTC(stimuli, spikes);
+           
+            var values = String.Join(", ", Array.ConvertAll(stc, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
+            Console.WriteLine("STC = [" + values + "]");
+            Console.WriteLine();
         }
 
         [TestMethod]
