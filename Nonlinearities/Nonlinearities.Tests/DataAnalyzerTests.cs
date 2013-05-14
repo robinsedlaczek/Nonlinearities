@@ -3,6 +3,7 @@ using System.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Nonlinearities.Analysis;
 using System.Globalization;
+using Math = Nonlinearities.Analysis.Math;
 
 namespace Nonlinearities.Tests
 {
@@ -10,18 +11,19 @@ namespace Nonlinearities.Tests
     public class DataAnalyzerTests
     {
         [TestMethod]
-        public void TestCalculateSTA()
+        public void TestCalculateSTA_DifferentRoundingStrategies()
         {
+            Console.WriteLine("Test calculation of STA with different rounding strategies. First cell from spike data is used.\n");
+
             var stimuli = DataLoader.GetStimuli();
-            var spikes = DataLoader.GetSpikes();
+            var spikes = new double[][][] { DataLoader.GetSpikes()[0] };
             var deviation = new double[2][];
 
             var stopwatch = Stopwatch.StartNew();
             var staRounded = SpikeTriggeredAnalysis.CalculateSTA(stimuli, spikes, RoundStrategy.Round);
             stopwatch.Stop();
             var values = String.Join(", ", Array.ConvertAll(staRounded, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
-            Console.WriteLine("STA (round strategy) = [" + values + "]");
-            Console.WriteLine("Duration STA calculation: " + stopwatch.ElapsedMilliseconds + " ms");
+            Console.WriteLine("STA (round strategy, duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[" + values + "]");
             Console.WriteLine();
 
             stopwatch.Restart();
@@ -29,8 +31,7 @@ namespace Nonlinearities.Tests
             stopwatch.Stop();
             values = String.Join(", ", Array.ConvertAll(staCeiled, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
             deviation[0] = Analysis.Math.Subtract(staCeiled, staRounded);
-            Console.WriteLine("STA (ceiling strategy) = [" + values + "]");
-            Console.WriteLine("Duration STA calculation: " + stopwatch.ElapsedMilliseconds + " ms");
+            Console.WriteLine("STA (ceiling strategy, duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[" + values + "]");
             Console.WriteLine();
 
             stopwatch.Restart();
@@ -38,13 +39,45 @@ namespace Nonlinearities.Tests
             stopwatch.Stop();
             values = String.Join(", ", Array.ConvertAll(staFloored, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
             deviation[1] = Analysis.Math.Subtract(staFloored, staRounded);
-            Console.WriteLine("STA (floor strategy) = [" + values + "]");
-            Console.WriteLine("Duration STA calculation: " + stopwatch.ElapsedMilliseconds + " ms");
+            Console.WriteLine("STA (floor strategy, duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[" + values + "]");
             Console.WriteLine();
 
             var averageDeviation = Analysis.Math.Mean(deviation);
             values = String.Join(", ", Array.ConvertAll(averageDeviation, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
-            Console.WriteLine("Average Deviation from Round Strategy = [" + values + "]");
+            Console.WriteLine("Average Deviation from Round Strategy = \n[" + values + "]");
+        }
+
+        [TestMethod]
+        public void TestCalculateSTA_PerCell()
+        {
+            Console.WriteLine("Test calculation of STA for each cell in spike data.\n");
+
+            var stimuli = DataLoader.GetStimuli();
+            var spikes = DataLoader.GetSpikes();
+
+            var stopwatch = Stopwatch.StartNew();
+            var sta = SpikeTriggeredAnalysis.CalculateSTA(stimuli, new double[][][] { spikes[0] }, RoundStrategy.Round);
+            stopwatch.Stop();
+            var values = String.Join(", ", Array.ConvertAll(sta, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
+            Console.WriteLine("STA (cell 1, duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[" + values + "]\n");
+
+            stopwatch.Restart();
+            sta = SpikeTriggeredAnalysis.CalculateSTA(stimuli, new double[][][] { spikes[1] }, RoundStrategy.Round);
+            stopwatch.Stop();
+            values = String.Join(", ", Array.ConvertAll(sta, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
+            Console.WriteLine("STA (cell 2, duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[" + values + "]\n");
+
+            stopwatch.Restart();
+            sta = SpikeTriggeredAnalysis.CalculateSTA(stimuli, new double[][][] { spikes[2] }, RoundStrategy.Round);
+            stopwatch.Stop();
+            values = String.Join(", ", Array.ConvertAll(sta, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
+            Console.WriteLine("STA (cell 3, duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[" + values + "]\n");
+
+            stopwatch.Restart();
+            sta = SpikeTriggeredAnalysis.CalculateSTA(stimuli, new double[][][] { spikes[3] }, RoundStrategy.Round);
+            stopwatch.Stop();
+            values = String.Join(", ", Array.ConvertAll(sta, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
+            Console.WriteLine("STA (cell 4, duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[" + values + "]\n");
         }
 
         [TestMethod]
@@ -54,40 +87,51 @@ namespace Nonlinearities.Tests
             var spikes = DataLoader.GetSpikes();
 
             var stopwatch = Stopwatch.StartNew();
-            var stc = SpikeTriggeredAnalysis.CalculateSTC(stimuli, spikes, RoundStrategy.Round);
+            var stc = SpikeTriggeredAnalysis.CalculateSTC(stimuli, new double[][][] { spikes[0] }, RoundStrategy.Round);
             stopwatch.Stop();
+            var values = string.Join("\n", Array.ConvertAll(stc, row => string.Join("\t", Array.ConvertAll(row, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)))));
+            Console.WriteLine("\nSTC (cell 1, duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[\n" + values + "\n]");
 
-            var values = Array.ConvertAll(stc,
-                                          row =>
-                                          Array.ConvertAll(row,
-                                                           value =>
-                                                           string.Format(CultureInfo.InvariantCulture, "{0:0.0000}",
-                                                                         value)));
+            stopwatch.Restart();
+            stc = SpikeTriggeredAnalysis.CalculateSTC(stimuli, new double[][][] { spikes[1] }, RoundStrategy.Round);
+            stopwatch.Stop();
+            values = string.Join("\n", Array.ConvertAll(stc, row => string.Join("\t", Array.ConvertAll(row, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)))));
+            Console.WriteLine("\nSTC (cell 2, duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[\n" + values + "\n]");
 
-            
-            Console.WriteLine("\nSTC = [");
-            foreach (var row in values)
-            {
-                foreach (var value in row)
-                    Console.Write(value + "\t");
+            stopwatch.Restart();
+            stc = SpikeTriggeredAnalysis.CalculateSTC(stimuli, new double[][][] { spikes[2] }, RoundStrategy.Round);
+            stopwatch.Stop();
+            values = string.Join("\n", Array.ConvertAll(stc, row => string.Join("\t", Array.ConvertAll(row, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)))));
+            Console.WriteLine("\nSTC (cell 3, duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[\n" + values + "\n]");
 
-                Console.WriteLine();
-            }
-            Console.Write("]");
+            stopwatch.Restart();
+            stc = SpikeTriggeredAnalysis.CalculateSTC(stimuli, new double[][][] { spikes[3] }, RoundStrategy.Round);
+            stopwatch.Stop();
+            values = string.Join("\n", Array.ConvertAll(stc, row => string.Join("\t", Array.ConvertAll(row, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)))));
+            Console.WriteLine("\nSTC (cell 4, duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[\n" + values + "\n]");
+        }
 
-            Console.WriteLine();
-            Console.WriteLine("\nDuration STC calculation: " + stopwatch.ElapsedMilliseconds + " ms");
+        [TestMethod]
+        public void TestMeanOfStimuli()
+        {
+            var stimuli = DataLoader.GetStimuli();
+
+            var stopwatch = Stopwatch.StartNew();
+            var mean = Math.Mean(stimuli);
+            stopwatch.Stop();
+            var values = String.Join(", ", Array.ConvertAll(mean, value => string.Format(CultureInfo.InvariantCulture, "{0:0.00000000}", value)));
+            Console.WriteLine("Mean(raw stimuli, duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[" + values + "]\n");
         }
 
         [TestMethod]
         public void TestFloor()
         {
-            var matrix = new double[][][] 
-            { 
-                new double[][] { new double[] { 1.1 }, new double[] { 1.2 }, new double[] { 1.7 }, new double[] { 1.8 } }, 
-                new double[][] { new double[] { 2.1 }, new double[] { 2.2 }, new double[] { 2.7 }, new double[] { 2.8 } }, 
-                new double[][] { new double[] { 6.1 }, new double[] { 6.2 }, new double[] { 6.7 }, new double[] { 6.8 } } 
-            };
+            var matrix = new double[][][]
+                {
+                    new double[][] { new[] { 1.1 }, new[] { 1.2 }, new[] { 1.7 }, new[] { 1.8 } },
+                    new double[][] { new[] { 2.1 }, new[] { 2.2 }, new[] { 2.7 }, new[] { 2.8 } },
+                    new double[][]  { new[] { 6.1 }, new[] { 6.2 }, new[] { 6.7 }, new[] { 6.8 } }
+                };
 
             Console.WriteLine("Original:");
             var strings = Array.ConvertAll(matrix, elementA => Array.ConvertAll(elementA, elementB => Array.ConvertAll(elementB, elementC => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", elementC))));

@@ -62,7 +62,7 @@ namespace Nonlinearities.Analysis
             }
 
             stopwatch.Stop();
-            Console.WriteLine("Duration Divide(): " + stopwatch.ElapsedMilliseconds + " ms");
+            // Console.WriteLine("Duration Divide(): " + stopwatch.ElapsedMilliseconds + " ms");
 
             return result;
         }
@@ -90,7 +90,7 @@ namespace Nonlinearities.Analysis
             }
 
             stopwatch.Stop();
-            Console.WriteLine("Duration Divide(): " + stopwatch.ElapsedMilliseconds + " ms");
+            // Console.WriteLine("Duration Divide(): " + stopwatch.ElapsedMilliseconds + " ms");
 
             return result;
         }
@@ -117,7 +117,7 @@ namespace Nonlinearities.Analysis
             }
 
             stopwatch.Stop();
-            Console.WriteLine("Duration Round(): " + stopwatch.ElapsedMilliseconds + " ms");
+            // Console.WriteLine("Duration Round(): " + stopwatch.ElapsedMilliseconds + " ms");
 
             return result;
         }
@@ -144,7 +144,7 @@ namespace Nonlinearities.Analysis
             }
 
             stopwatch.Stop();
-            Console.WriteLine("Duration Floor(): " + stopwatch.ElapsedMilliseconds + " ms");
+            // Console.WriteLine("Duration Floor(): " + stopwatch.ElapsedMilliseconds + " ms");
 
             return result;
         }
@@ -171,7 +171,7 @@ namespace Nonlinearities.Analysis
             }
 
             stopwatch.Stop();
-            Console.WriteLine("Duration Ceiling(): " + stopwatch.ElapsedMilliseconds + " ms");
+            // Console.WriteLine("Duration Ceiling(): " + stopwatch.ElapsedMilliseconds + " ms");
 
             return result;
         }

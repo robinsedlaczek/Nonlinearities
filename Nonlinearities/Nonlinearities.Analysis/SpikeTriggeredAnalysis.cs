@@ -42,7 +42,11 @@ namespace Nonlinearities.Analysis
         public static double[] CalculateSTA(double[][] stimuli, double[][][] spikes, RoundStrategy roundStrategy)
         {
             const double frameInterval = 1 / 59.721395; // = 0.016744 ms
-            return Math.Mean(GetSpikeTriggeredStimulusEnsemble(stimuli, spikes, frameInterval, roundStrategy));
+            var spikeTriggeredStimulusEnsemble = GetSpikeTriggeredStimulusEnsemble(stimuli, spikes, frameInterval, roundStrategy);
+
+            var sta = Math.Subtract(Math.Mean(spikeTriggeredStimulusEnsemble), Math.Mean(stimuli));
+
+            return sta;
         }
 
         /// <summary>
@@ -81,13 +85,13 @@ namespace Nonlinearities.Analysis
         {
             const double frameInterval = 1 / 59.721395; // = 0.016744 ms
             var spikeTriggeredStimulusEnsemble = GetSpikeTriggeredStimulusEnsemble(stimuli, spikes, frameInterval, roundStrategy);
-            var sta = Math.Mean(spikeTriggeredStimulusEnsemble);
+            var sta = CalculateSTA(stimuli, spikes, roundStrategy);
             var n = spikeTriggeredStimulusEnsemble.Length;
 
             var stc =
                 Math.Divide(
                     Math.Sum(
-                        Math.Subtract(spikeTriggeredStimulusEnsemble, sta).Select(stimulusReducedBySta =>
+                        Math.Subtract(spikeTriggeredStimulusEnsemble, sta).Select(stimulusReducedBySta => 
                             Math.Tensor(stimulusReducedBySta, stimulusReducedBySta)).ToArray()), 
                     n - 1);
 
