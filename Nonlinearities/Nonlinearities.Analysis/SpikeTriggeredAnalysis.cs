@@ -42,15 +42,7 @@ namespace Nonlinearities.Analysis
         public static double[] CalculateSTA(double[][] stimuli, double[][][] spikes, RoundStrategy roundStrategy)
         {
             const double frameInterval = 1 / 59.721395; // = 0.016744 ms
-
-            if (roundStrategy == RoundStrategy.Ceiling)
-                return Math.Mean(GetSpikeTriggeredStimulusEnsemble(stimuli, spikes, frameInterval, roundStrategy));
-            else if (roundStrategy == RoundStrategy.Floor)
-                return Math.Mean(GetSpikeTriggeredStimulusEnsemble(stimuli, spikes, frameInterval, roundStrategy));
-            else if (roundStrategy == RoundStrategy.Round)
-                return Math.Mean(GetSpikeTriggeredStimulusEnsemble(stimuli, spikes, frameInterval, roundStrategy));
-
-            return null;
+            return Math.Mean(GetSpikeTriggeredStimulusEnsemble(stimuli, spikes, frameInterval, roundStrategy));
         }
 
         /// <summary>
