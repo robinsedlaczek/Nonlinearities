@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Nonlinearities.Analysis
 {
@@ -30,17 +27,21 @@ namespace Nonlinearities.Analysis
         /// <returns>Returns a vector containing the STA. </returns>
         /// <remarks>
         /// Calculation of STA:
-        /// 1. frameInterval = 1/59.721395 = 0.016744 ms
-        /// 2. spikeTriggeredStimuliEnsemble = round(spikesOfAllCells / frameInterval);
-        /// 3. STA = mean(stimuli(framesOfInterest, :));
+        /// 
+        ///      N
+        /// A =  Σ  s(tn)
+        ///     n=1
+        ///     ---------
+        ///         N
+        /// 
+        /// N  = total number of spikes
+        /// s  = vector representing the stimuli
+        /// tn = time when the nth spike occurred
+        /// A  = resulting STA (spike-triggered average)
         /// </remarks>
         public static double[] CalculateSTA(double[][] stimuli, double[][][] spikes, RoundStrategy roundStrategy)
         {
-            // 1. frameInterval = 1/59.721395 = 0.016744 ms
-            var frameInterval = 1 / 59.721395; // = 0.016744 ms
-
-            // 2. spikeTriggeredStimuliEnsemble = round(spikesOfAllCells / frameInterval);
-            // 3. STA = mean(stimuli(spikeTriggeredStimuliEnsemble, :));
+            const double frameInterval = 1 / 59.721395; // = 0.016744 ms
 
             if (roundStrategy == RoundStrategy.Ceiling)
                 return Math.Mean(GetSpikeTriggeredStimulusEnsemble(stimuli, spikes, frameInterval, roundStrategy));
@@ -50,6 +51,55 @@ namespace Nonlinearities.Analysis
                 return Math.Mean(GetSpikeTriggeredStimulusEnsemble(stimuli, spikes, frameInterval, roundStrategy));
 
             return null;
+        }
+
+        /// <summary>
+        /// This service calculates the spike-triggered covariance for given stimuli data and response spikes data.
+        /// </summary>
+        /// <param name="stimuli">
+        /// The stimuli that triggered spikes as 2-dimensional array with:
+        /// [?][ ] - List of stimuli frames.
+        /// [ ][?] - Stimulus data for the frame.</param>
+        /// <param name="spikes">
+        /// The detected spikes for the stimuli as 2-dimensional array with:
+        /// [?][ ][ ] - List of cells.
+        /// [ ][?][ ] - List of spike data for the cell.
+        /// [ ][ ][?] - Time when spike occurred.
+        /// </param>
+        /// <param name="roundStrategy">
+        /// The strategy for rounding the frame numbers.
+        /// </param>
+        /// <returns>Returns a vector containing the STA. </returns>
+        /// <remarks>
+        /// Calculation of STC:
+        /// 
+        ///       N                    T
+        /// C =   Σ  [s(tn)-A][s(tn)-A]
+        ///      n=1
+        ///      -----------------------
+        ///                N-1
+        /// 
+        /// N  = total number of spikes
+        /// s  = vector representing the stimuli
+        /// tn = time when the nth spike occurred
+        /// A  = STA (spike-triggered average)
+        /// C  = resulting covariance matrix
+        /// </remarks>
+        public static double[][] CalculateSTC(double[][] stimuli, double[][][] spikes, RoundStrategy roundStrategy)
+        {
+            const double frameInterval = 1 / 59.721395; // = 0.016744 ms
+            var spikeTriggeredStimulusEnsemble = GetSpikeTriggeredStimulusEnsemble(stimuli, spikes, frameInterval, roundStrategy);
+            var sta = Math.Mean(spikeTriggeredStimulusEnsemble);
+            var n = spikeTriggeredStimulusEnsemble.Length;
+
+            var stc =
+                Math.Divide(
+                    Math.Sum(
+                        Math.Subtract(spikeTriggeredStimulusEnsemble, sta).Select(stimulusReducedBySta =>
+                            Math.Tensor(stimulusReducedBySta, stimulusReducedBySta)).ToArray()), 
+                    n - 1);
+
+            return stc;
         }
 
         /// <summary>
@@ -75,7 +125,7 @@ namespace Nonlinearities.Analysis
         private static double[][] GetSpikeTriggeredStimulusEnsemble(double[][] stimuli, double[][][] spikes, double frameInterval, RoundStrategy roundStrategy)
         {
             var spikeTriggeredStimulusEnsemble = new List<double[]>();
-            double[][][] spikesAndFrames = null;
+            var spikesAndFrames = new double[0][][];
 
             if (roundStrategy == RoundStrategy.Ceiling)
                 spikesAndFrames = Math.Ceiling(Math.Divide(spikes, frameInterval));
@@ -86,54 +136,10 @@ namespace Nonlinearities.Analysis
 
             // [RS] Take same stimulus as often as a spike was detected for this stimulus?
             //      From all cells?
-            for (var indexA = 0; indexA < spikesAndFrames.Length; indexA++)
-            {
-                for (var indexB = 0; indexB < spikesAndFrames[indexA].Length; indexB++)
-                {
-                    for (var indexC = 0; indexC < spikesAndFrames[indexA][indexB].Length; indexC++)
-                    {
-                        var frame = (int)spikesAndFrames[indexA][indexB][indexC];
-                        var stimulus = stimuli[frame];
-                        spikeTriggeredStimulusEnsemble.Add(stimulus);
-                    }
-                }
-            }
+            foreach (double[][] cell in spikesAndFrames)
+                spikeTriggeredStimulusEnsemble.AddRange(cell.Select(spike => (int) spike[0]).Select(frame => stimuli[frame]));
 
             return spikeTriggeredStimulusEnsemble.ToArray();
-        }
-
-        /// <summary>
-        /// This service calculates the spike-triggered covariance for given stimuli data and response spikes data.
-        /// </summary>
-        /// <param name="stimuli">
-        /// The stimuli that triggered spikes as 2-dimensional array with:
-        /// [?][ ] - List of stimuli frames.
-        /// [ ][?] - Stimulus data for the frame.</param>
-        /// <param name="spikes">
-        /// The detected spikes for the stimuli as 2-dimensional array with:
-        /// [?][ ][ ] - List of cells.
-        /// [ ][?][ ] - List of spike data for the cell.
-        /// [ ][ ][?] - Time when spike occurred.
-        /// </param>
-        /// <param name="roundStrategy">
-        /// The strategy for rounding the frame numbers.
-        /// </param>
-        /// <returns>Returns a vector containing the STA. </returns>
-        /// <remarks>
-        /// Calculation of STA:
-        /// 
-        /// 
-        /// </remarks>
-        public static double[][] CalculateSTC(double[][] stimuli, double[][][] spikes, RoundStrategy roundStrategy)
-        {
-            var frameInterval = 1 / 59.721395; // = 0.016744 ms
-            var spikeTriggeredStimulusEnsemble = GetSpikeTriggeredStimulusEnsemble(stimuli, spikes, frameInterval, roundStrategy);
-            var sta = Math.Mean(spikeTriggeredStimulusEnsemble);
-            
-
-
-
-            return null;
         }
     }
 }
