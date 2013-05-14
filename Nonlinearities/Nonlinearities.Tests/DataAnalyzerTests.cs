@@ -251,5 +251,10 @@ namespace Nonlinearities.Tests
                 Console.Write(item + "\t");
         }
 
+        [TestMethod]
+        public void TestSubtract()
+        {
+
+        }
     }
 }

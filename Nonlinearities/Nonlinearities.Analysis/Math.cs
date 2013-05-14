@@ -155,5 +155,37 @@ namespace Nonlinearities.Analysis
 
             return values.ToArray();
         }
+
+        public static double[][] Tensor(double[] horizontalVector, double[] verticalVector)
+        {
+            var result = new double[verticalVector.Length][];
+            
+            for (var y = 0; y < verticalVector.Length; y++ )
+            {
+                result[y] = new double[horizontalVector.Length];
+
+                for (var x = 0; x < horizontalVector.Length; x++)
+                {
+                    result[y][x] = verticalVector[y] * horizontalVector[x];
+                }
+            }
+
+            return result;
+        }
+
+        internal static double[][] Subtract(double[][] vectorList, double[] vector)
+        {
+            var result = new double[vectorList.Length][];
+
+            for (var vectorIndex =0; vectorIndex<vectorList.Length; vectorIndex++)
+            {
+                result[vectorIndex] = new double[vectorList[vectorIndex].Length];
+
+                for (var valueIndex = 0; valueIndex < vectorList[vectorIndex].Length; valueIndex++)
+                    result[vectorIndex][valueIndex] = vectorList[vectorIndex][valueIndex] - vector[valueIndex];                
+            }
+
+            return result;
+        }
     }
 }
