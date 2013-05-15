@@ -126,10 +126,13 @@ namespace Nonlinearities.Analysis
         /// The strategy for rounding the frame numbers.
         /// </param>
         /// <returns>Returns an array of the stimuli which triggered spikes. </returns>
-        private static double[][] GetSpikeTriggeredStimulusEnsemble(double[][] stimuli, double[][][] spikes, double frameInterval, int frameOffset, RoundStrategy roundStrategy)
+        private static double[][] GetSpikeTriggeredStimulusEnsemble(double[][] stimuli, double[][][] spikes, double frameInterval, double frameOffset, RoundStrategy roundStrategy)
         {
             var spikeTriggeredStimulusEnsemble = new List<double[]>();
             var spikesAndFrames = new double[0][][];
+
+            //frameOffset /= 10;
+            //spikes = Math.Filter(spikes, value => value - frameOffset > 0 ? value : value - frameOffset);
 
             if (roundStrategy == RoundStrategy.Ceiling)
                 spikesAndFrames = Math.Ceiling(Math.Divide(spikes, frameInterval));
@@ -149,11 +152,6 @@ namespace Nonlinearities.Analysis
                     if (frame > frameOffset)
                         spikeTriggeredStimulusEnsemble.Add(stimuli[frame]);
                 }
-                
-                //spikeTriggeredStimulusEnsemble.AddRange(
-                //    cell.Select(spike => 
-                //        (int)spike[0]).Select(frame => 
-                //            stimuli[frame + frameOffset]));
             }
 
             return spikeTriggeredStimulusEnsemble.ToArray();

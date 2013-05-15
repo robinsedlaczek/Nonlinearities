@@ -266,6 +266,24 @@ namespace Nonlinearities.Analysis
             return result;
         }
 
+        public static double[][][] Subtract(double[][][] matrix, double scalar)
+        {
+            var result = Copy(matrix);
+
+            for (var indexA = 0; indexA < matrix.Length; indexA++)
+            {
+                for (var indexB = 0; indexB < matrix[indexA].Length; indexB++)
+                {
+                    for (var indexC = 0; indexC < matrix[indexA][indexB].Length; indexC++)
+                    {
+                        result[indexA][indexB][indexC] = matrix[indexA][indexB][indexC] - scalar;
+                    }
+                }
+            }
+
+            return result;
+        }
+
         /// <summary>
         /// This method calculates the sum (value-by-value) of a list of matrices.
         /// </summary>
@@ -316,6 +334,24 @@ namespace Nonlinearities.Analysis
                         max = value;
                 }
             }
+        }
+
+        internal static double[][][] Filter(double[][][] matrix, Func<double, double> filter)
+        {
+            var result = Copy(matrix);
+
+            for (var indexA = 0; indexA < result.Length; indexA++)
+            {
+                for (var indexB = 0; indexB < result[indexA].Length; indexB++)
+                {
+                    for (var indexC = 0; indexC < result[indexA][indexB].Length; indexC++)
+                    {
+                        result[indexA][indexB][indexC] = filter(result[indexA][indexB][indexC]);
+                    }
+                }
+            }           
+
+            return result;
         }
     }
 }
