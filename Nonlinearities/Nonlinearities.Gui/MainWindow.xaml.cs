@@ -1,6 +1,5 @@
 ﻿using System.Windows.Threading;
 using Nonlinearities.Analysis;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -38,29 +37,82 @@ namespace Nonlinearities.Gui
             _spikes = DataLoader.GetSpikes();
 
             InitializeStimuliView();
+            InitializeReceptiveFieldPlotView();
+        }
+
+        private void InitializeReceptiveFieldPlotView()
+        {
+            var imageData = GetPlotData();
+            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+        }
+
+        private double[][] GetPlotData()
+        {
+            if (_spikes == null)
+                return null;
 
             const int offset = 15;
             var imageData = new double[offset][];
+            var spikes = new List<double[][]>();
 
-            for (var time = 0; time < 15; time++)
+            if (Cell1CheckBox.IsChecked.Value)
+                spikes.Add(_spikes[0]);
+
+            if (Cell2CheckBox.IsChecked.Value)
+                spikes.Add(_spikes[1]);
+
+            if (Cell3CheckBox.IsChecked.Value)
+                spikes.Add(_spikes[2]);
+
+            if (Cell4CheckBox.IsChecked.Value)
+                spikes.Add(_spikes[3]);
+
+            if (spikes.Count == 0)
+                return null;
+
+            for (var time = 0; time < offset; time++)
             {
-                var sta = SpikeTriggeredAnalysis.CalculateSTA(_stimuli, new double[][][] { _spikes[0] }, offset - time, RoundStrategy.Round);
+                var sta = SpikeTriggeredAnalysis.CalculateSTA(_stimuli, spikes.ToArray(), offset - time, RoundStrategy.Round);
                 imageData[time] = sta;
             }
 
-            var rect = new Rectangle
+            return imageData;
+        }
+
+        private void PlotReceptiveField(double[][] imageData, Canvas plotCanvas)
+        {
+            if (imageData == null)
+                return;
+
+            double minimum;
+            double maximum;
+            Math.MinMax(imageData, out minimum, out maximum);
+
+            var dataHeight = imageData.Length;
+            var dataWidth = imageData[0].Length;
+
+            var rasterHeight = plotCanvas.ActualHeight / dataHeight;
+            var rasterWidth = plotCanvas.ActualWidth / dataWidth;
+
+            for (var y = 0; y < dataHeight; y++)
             {
-                Stroke = Brushes.Black,
-                StrokeThickness = 2,
-                Fill = Brushes.Black,
-                Width = 150,
-                Height = 50
-            };
+                for (var x = 0; x < dataWidth; x++)
+                {
+                    var alpha = (byte)(((imageData[y][x] - minimum) * 255) / (maximum - minimum));
 
-            Canvas.SetLeft(rect, 50);
-            Canvas.SetTop(rect, 50);
+                    var rect = new Rectangle
+                    {
+                        Fill = new SolidColorBrush(Color.FromArgb(255, alpha, alpha, alpha)),
+                        Width = rasterWidth,
+                        Height = rasterHeight
+                    };
 
-            ReceptiveFieldPlotCanvas.Children.Add(rect);
+                    Canvas.SetTop(rect, y * rasterHeight);
+                    Canvas.SetLeft(rect, x * rasterWidth);
+
+                    plotCanvas.Children.Add(rect);
+                }
+            }
         }
 
         private void InitializeStimuliView()
@@ -103,7 +155,7 @@ namespace Nonlinearities.Gui
 
         private void OnAnimationTimerTick(object state)
         {
-            StimuliSlider.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(() =>
+            StimuliSlider.Dispatcher.Invoke(DispatcherPriority.Normal, new System.Action(() =>
                 {
                     if (StimuliSlider.Value <= StimuliSlider.Maximum)
                         StimuliSlider.Value++;
@@ -116,6 +168,46 @@ namespace Nonlinearities.Gui
         {
             if (_animationTimer != null)
                 _animationTimer.Change(Timeout.Infinite, Timeout.Infinite);
+        }
+
+        private void OnReceptiveFieldPlotCanvasSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            ReceptiveFieldPlotCanvas.Children.Clear();
+
+            var imageData = GetPlotData();
+            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+        }
+
+        private void OnCell1CheckBoxClicked(object sender, RoutedEventArgs e)
+        {
+            ReceptiveFieldPlotCanvas.Children.Clear();
+
+            var imageData = GetPlotData();
+            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+        }
+
+        private void OnCell2CheckBoxClicked(object sender, RoutedEventArgs e)
+        {
+            ReceptiveFieldPlotCanvas.Children.Clear();
+
+            var imageData = GetPlotData();
+            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+        }
+
+        private void OnCell3CheckBoxClicked(object sender, RoutedEventArgs e)
+        {
+            ReceptiveFieldPlotCanvas.Children.Clear();
+
+            var imageData = GetPlotData();
+            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+        }
+
+        private void OnCell4CheckBoxClicked(object sender, RoutedEventArgs e)
+        {
+            ReceptiveFieldPlotCanvas.Children.Clear();
+
+            var imageData = GetPlotData();
+            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
         }
     } 
 }

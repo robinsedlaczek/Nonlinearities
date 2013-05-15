@@ -292,5 +292,30 @@ namespace Nonlinearities.Analysis
 
             return result;
         }
+
+        /// <summary>
+        /// This method finds the minimum and maximum value in a matrix.
+        /// </summary>
+        /// <param name="matrix">The matrix to search in.</param>
+        /// <param name="max">The output parameter for the maximum value.</param>
+        /// <param name="min">The output parameter for the minimum value.</param>
+        /// <returns>Returns the smallest and the biggest value in the matrix.</returns>
+        public static void MinMax(double[][] matrix, out double min, out double max)
+        {
+            min = matrix[0][0];
+            max = matrix[0][0];
+
+            foreach (var row in matrix)
+            {
+                foreach (var value in row)
+                {
+                    if (value < min)
+                        min = value;
+
+                    if (value > max)
+                        max = value;
+                }
+            }
+        }
     }
 }

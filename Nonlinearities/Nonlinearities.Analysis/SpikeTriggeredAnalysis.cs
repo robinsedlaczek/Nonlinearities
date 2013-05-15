@@ -141,7 +141,20 @@ namespace Nonlinearities.Analysis
             // [RS] Take same stimulus as often as a spike was detected for this stimulus?
             //      From all cells?
             foreach (double[][] cell in spikesAndFrames)
-                spikeTriggeredStimulusEnsemble.AddRange(cell.Select(spike => (int)spike[0]).Select(frame => stimuli[frame + frameOffset]));
+            {
+                for (var spike = 0; spike < cell.Length; spike++)
+                {
+                    var frame = (int)cell[spike][0];
+
+                    if (frame > frameOffset)
+                        spikeTriggeredStimulusEnsemble.Add(stimuli[frame]);
+                }
+                
+                //spikeTriggeredStimulusEnsemble.AddRange(
+                //    cell.Select(spike => 
+                //        (int)spike[0]).Select(frame => 
+                //            stimuli[frame + frameOffset]));
+            }
 
             return spikeTriggeredStimulusEnsemble.ToArray();
         }
