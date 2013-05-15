@@ -26,7 +26,7 @@ STA = mean(stimuli(framesOfInterest, :));
 %% Spatiotemporal Receptive Field
 length = 12; 
 framesForGraph = framesOfInterest(find(framesOfInterest > length + 1)); 
-stimuliDimension = size(stimuli, 2)
+stimuliDimension = size(stimuli, 2)  %% = 16
 zeros = zeros(length, stimuliDimension);
  
 for time = 1 : length; 

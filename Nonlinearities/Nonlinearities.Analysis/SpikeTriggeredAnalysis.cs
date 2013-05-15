@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Nonlinearities.Analysis
@@ -21,6 +22,9 @@ namespace Nonlinearities.Analysis
         /// [ ][?][ ] - List of spike data for the cell.
         /// [ ][ ][?] - Time when spike occurred.
         /// </param>
+        /// <param name="frameOffset">
+        /// The offset of the first frame which is taken for calculations. All other frames will be behind that frame.
+        /// </param>
         /// <param name="roundStrategy">
         /// The strategy for rounding the frame numbers.
         /// </param>
@@ -39,10 +43,10 @@ namespace Nonlinearities.Analysis
         /// tn = time when the nth spike occurred
         /// A  = resulting STA (spike-triggered average)
         /// </remarks>
-        public static double[] CalculateSTA(double[][] stimuli, double[][][] spikes, RoundStrategy roundStrategy)
+        public static double[] CalculateSTA(double[][] stimuli, double[][][] spikes, int frameOffset, RoundStrategy roundStrategy)
         {
             const double frameInterval = 1 / 59.721395; // = 0.016744 ms
-            var spikeTriggeredStimulusEnsemble = GetSpikeTriggeredStimulusEnsemble(stimuli, spikes, frameInterval, roundStrategy);
+            var spikeTriggeredStimulusEnsemble = GetSpikeTriggeredStimulusEnsemble(stimuli, spikes, frameInterval, frameOffset, roundStrategy);
 
             var sta = Math.Subtract(Math.Mean(spikeTriggeredStimulusEnsemble), Math.Mean(stimuli));
 
@@ -83,9 +87,10 @@ namespace Nonlinearities.Analysis
         /// </remarks>
         public static double[][] CalculateSTC(double[][] stimuli, double[][][] spikes, RoundStrategy roundStrategy)
         {
+
             const double frameInterval = 1 / 59.721395; // = 0.016744 ms
-            var spikeTriggeredStimulusEnsemble = GetSpikeTriggeredStimulusEnsemble(stimuli, spikes, frameInterval, roundStrategy);
-            var sta = CalculateSTA(stimuli, spikes, roundStrategy);
+            var spikeTriggeredStimulusEnsemble = GetSpikeTriggeredStimulusEnsemble(stimuli, spikes, frameInterval, 0, roundStrategy);
+            var sta = CalculateSTA(stimuli, spikes, 0, roundStrategy);
             var n = spikeTriggeredStimulusEnsemble.Length;
 
             var stc =
@@ -114,11 +119,14 @@ namespace Nonlinearities.Analysis
         /// <param name="frameInterval">
         /// The presentation duration of one stimulus frame.
         /// </param>
+        /// <param name="frameOffset">
+        /// The offset of the first frame which is taken for calculations. All other frames will be behind that frame.
+        /// </param>
         /// <param name="roundStrategy">
         /// The strategy for rounding the frame numbers.
         /// </param>
         /// <returns>Returns an array of the stimuli which triggered spikes. </returns>
-        private static double[][] GetSpikeTriggeredStimulusEnsemble(double[][] stimuli, double[][][] spikes, double frameInterval, RoundStrategy roundStrategy)
+        private static double[][] GetSpikeTriggeredStimulusEnsemble(double[][] stimuli, double[][][] spikes, double frameInterval, int frameOffset, RoundStrategy roundStrategy)
         {
             var spikeTriggeredStimulusEnsemble = new List<double[]>();
             var spikesAndFrames = new double[0][][];
@@ -133,7 +141,7 @@ namespace Nonlinearities.Analysis
             // [RS] Take same stimulus as often as a spike was detected for this stimulus?
             //      From all cells?
             foreach (double[][] cell in spikesAndFrames)
-                spikeTriggeredStimulusEnsemble.AddRange(cell.Select(spike => (int) spike[0]).Select(frame => stimuli[frame]));
+                spikeTriggeredStimulusEnsemble.AddRange(cell.Select(spike => (int)spike[0]).Select(frame => stimuli[frame + frameOffset]));
 
             return spikeTriggeredStimulusEnsemble.ToArray();
         }

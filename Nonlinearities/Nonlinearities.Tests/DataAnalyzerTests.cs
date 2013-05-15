@@ -20,14 +20,14 @@ namespace Nonlinearities.Tests
             var deviation = new double[2][];
 
             var stopwatch = Stopwatch.StartNew();
-            var staRounded = SpikeTriggeredAnalysis.CalculateSTA(stimuli, spikes, RoundStrategy.Round);
+            var staRounded = SpikeTriggeredAnalysis.CalculateSTA(stimuli, spikes, 0, RoundStrategy.Round);
             stopwatch.Stop();
             var values = String.Join(", ", Array.ConvertAll(staRounded, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
             Console.WriteLine("STA (round strategy, duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[" + values + "]");
             Console.WriteLine();
 
             stopwatch.Restart();
-            var staCeiled = SpikeTriggeredAnalysis.CalculateSTA(stimuli, spikes, RoundStrategy.Ceiling);
+            var staCeiled = SpikeTriggeredAnalysis.CalculateSTA(stimuli, spikes, 0, RoundStrategy.Ceiling);
             stopwatch.Stop();
             values = String.Join(", ", Array.ConvertAll(staCeiled, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
             deviation[0] = Analysis.Math.Subtract(staCeiled, staRounded);
@@ -35,7 +35,7 @@ namespace Nonlinearities.Tests
             Console.WriteLine();
 
             stopwatch.Restart();
-            var staFloored = SpikeTriggeredAnalysis.CalculateSTA(stimuli, spikes, RoundStrategy.Floor);
+            var staFloored = SpikeTriggeredAnalysis.CalculateSTA(stimuli, spikes, 0, RoundStrategy.Floor);
             stopwatch.Stop();
             values = String.Join(", ", Array.ConvertAll(staFloored, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
             deviation[1] = Analysis.Math.Subtract(staFloored, staRounded);
@@ -56,25 +56,25 @@ namespace Nonlinearities.Tests
             var spikes = DataLoader.GetSpikes();
 
             var stopwatch = Stopwatch.StartNew();
-            var sta = SpikeTriggeredAnalysis.CalculateSTA(stimuli, new double[][][] { spikes[0] }, RoundStrategy.Round);
+            var sta = SpikeTriggeredAnalysis.CalculateSTA(stimuli, new double[][][] { spikes[0] }, 0, RoundStrategy.Round);
             stopwatch.Stop();
             var values = String.Join(", ", Array.ConvertAll(sta, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
             Console.WriteLine("STA (cell 1, duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[" + values + "]\n");
 
             stopwatch.Restart();
-            sta = SpikeTriggeredAnalysis.CalculateSTA(stimuli, new double[][][] { spikes[1] }, RoundStrategy.Round);
+            sta = SpikeTriggeredAnalysis.CalculateSTA(stimuli, new double[][][] { spikes[1] }, 0, RoundStrategy.Round);
             stopwatch.Stop();
             values = String.Join(", ", Array.ConvertAll(sta, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
             Console.WriteLine("STA (cell 2, duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[" + values + "]\n");
 
             stopwatch.Restart();
-            sta = SpikeTriggeredAnalysis.CalculateSTA(stimuli, new double[][][] { spikes[2] }, RoundStrategy.Round);
+            sta = SpikeTriggeredAnalysis.CalculateSTA(stimuli, new double[][][] { spikes[2] }, 0, RoundStrategy.Round);
             stopwatch.Stop();
             values = String.Join(", ", Array.ConvertAll(sta, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
             Console.WriteLine("STA (cell 3, duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[" + values + "]\n");
 
             stopwatch.Restart();
-            sta = SpikeTriggeredAnalysis.CalculateSTA(stimuli, new double[][][] { spikes[3] }, RoundStrategy.Round);
+            sta = SpikeTriggeredAnalysis.CalculateSTA(stimuli, new double[][][] { spikes[3] }, 0, RoundStrategy.Round);
             stopwatch.Stop();
             values = String.Join(", ", Array.ConvertAll(sta, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
             Console.WriteLine("STA (cell 4, duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[" + values + "]\n");
