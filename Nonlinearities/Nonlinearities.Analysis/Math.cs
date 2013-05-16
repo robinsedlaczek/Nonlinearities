@@ -335,23 +335,5 @@ namespace Nonlinearities.Analysis
                 }
             }
         }
-
-        internal static double[][][] Filter(double[][][] matrix, Func<double, double> filter)
-        {
-            var result = Copy(matrix);
-
-            for (var indexA = 0; indexA < result.Length; indexA++)
-            {
-                for (var indexB = 0; indexB < result[indexA].Length; indexB++)
-                {
-                    for (var indexC = 0; indexC < result[indexA][indexB].Length; indexC++)
-                    {
-                        result[indexA][indexB][indexC] = filter(result[indexA][indexB][indexC]);
-                    }
-                }
-            }           
-
-            return result;
-        }
     }
 }

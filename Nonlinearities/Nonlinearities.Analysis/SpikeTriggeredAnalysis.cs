@@ -131,9 +131,6 @@ namespace Nonlinearities.Analysis
             var spikeTriggeredStimulusEnsemble = new List<double[]>();
             var spikesAndFrames = new double[0][][];
 
-            //frameOffset /= 10;
-            //spikes = Math.Filter(spikes, value => value - frameOffset > 0 ? value : value - frameOffset);
-
             if (roundStrategy == RoundStrategy.Ceiling)
                 spikesAndFrames = Math.Ceiling(Math.Divide(spikes, frameInterval));
             else if (roundStrategy == RoundStrategy.Floor)
@@ -141,15 +138,12 @@ namespace Nonlinearities.Analysis
             else if (roundStrategy == RoundStrategy.Round)
                 spikesAndFrames = Math.Round(Math.Divide(spikes, frameInterval));
 
-            // [RS] Take same stimulus as often as a spike was detected for this stimulus?
-            //      From all cells?
             foreach (double[][] cell in spikesAndFrames)
             {
                 for (var spike = 0; spike < cell.Length; spike++)
                 {
-                    var frame = (int)cell[spike][0];
-
-                    if (frame > frameOffset)
+                    var frame = (int)(cell[spike][0] - frameOffset);
+                    if (frame > 0 && frame < stimuli.Length)
                         spikeTriggeredStimulusEnsemble.Add(stimuli[frame]);
                 }
             }

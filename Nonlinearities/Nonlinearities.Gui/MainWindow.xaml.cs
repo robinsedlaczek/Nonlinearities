@@ -51,8 +51,6 @@ namespace Nonlinearities.Gui
             if (_spikes == null)
                 return null;
 
-            const int offset = 15;
-            var imageData = new double[offset][];
             var spikes = new List<double[][]>();
 
             if (Cell1CheckBox.IsChecked.Value)
@@ -70,7 +68,11 @@ namespace Nonlinearities.Gui
             if (spikes.Count == 0)
                 return null;
 
-            for (var time = 0; time < offset; time++)
+            const int offset = 40;
+            const int maxTime = 50;
+            var imageData = new double[maxTime][];
+
+            for (var time = 0; time < maxTime; time++)
             {
                 var sta = SpikeTriggeredAnalysis.CalculateSTA(_stimuli, spikes.ToArray(), offset - time, RoundStrategy.Round);
                 imageData[time] = sta;
