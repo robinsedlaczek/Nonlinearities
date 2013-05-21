@@ -25,6 +25,7 @@ namespace Nonlinearities.Gui
         private double[][] _stimuli;
         private double[][][] _spikes;
         private Timer _animationTimer;
+        private double[][] _imageData;
 
         public MainWindow()
         {
@@ -46,39 +47,48 @@ namespace Nonlinearities.Gui
             PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
         }
 
-        private double[][] GetPlotData()
+        private double[][] GetPlotData(bool recalcData = true)
         {
             if (_spikes == null)
                 return null;
 
+            if (!recalcData)
+                return _imageData;
+
             var spikes = new List<double[][]>();
 
-            if (Cell1CheckBox.IsChecked.Value)
+            if (Cell1CheckBox.IsChecked != null && Cell1CheckBox.IsChecked.Value)
                 spikes.Add(_spikes[0]);
 
-            if (Cell2CheckBox.IsChecked.Value)
+            if (Cell2CheckBox.IsChecked != null && Cell2CheckBox.IsChecked.Value)
                 spikes.Add(_spikes[1]);
 
-            if (Cell3CheckBox.IsChecked.Value)
+            if (Cell3CheckBox.IsChecked != null && Cell3CheckBox.IsChecked.Value)
                 spikes.Add(_spikes[2]);
 
-            if (Cell4CheckBox.IsChecked.Value)
+            if (Cell4CheckBox.IsChecked != null && Cell4CheckBox.IsChecked.Value)
                 spikes.Add(_spikes[3]);
 
             if (spikes.Count == 0)
-                 return null;
+                return null;
 
-            const int offset = 12;
-            const int maxTime = 12;
-            var imageData = new double[maxTime][];
+            int offset;
+            if (!int.TryParse(OffsetTextbox.Text, out offset))
+                offset = 16;
+
+            int maxTime;
+            if (!int.TryParse(TimeTextbox.Text, out maxTime))
+                maxTime = 16;
+
+            _imageData = new double[maxTime][];
 
             for (var time = 0; time < maxTime; time++)
             {
                 var sta = SpikeTriggeredAnalysis.CalculateSTA(_stimuli, spikes.ToArray(), offset - time, RoundStrategy.Round);
-                imageData[time] = sta;
+                _imageData[time] = sta;
             }
 
-            return imageData;
+            return _imageData;
         }
 
         private void PlotReceptiveField(double[][] imageData, Canvas plotCanvas)
@@ -125,7 +135,8 @@ namespace Nonlinearities.Gui
             {
                 StimuliDisplayGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
 
-                var color = _stimuli[0][index] == -1 ? Colors.Black : Colors.White;
+                const double epsilon = 0.00001;
+                var color = System.Math.Abs(_stimuli[0][index] - -1) < epsilon ? Colors.Black : Colors.White;
                 var border = new Border() { Background = new SolidColorBrush(color) };
 
                 StimuliDisplayGrid.Children.Add(border);
@@ -142,8 +153,12 @@ namespace Nonlinearities.Gui
 
             for (int index = 0; index < stimulus.Length; index++ )
             {
-                var color = stimulus[index] == -1 ? Colors.Black : Colors.White;
-                (StimuliDisplayGrid.Children[index] as Border).Background = new SolidColorBrush(color);
+                const double epsilon = 0.00001;
+                var color = System.Math.Abs(stimulus[index] - -1) < epsilon ? Colors.Black : Colors.White;
+                var border = StimuliDisplayGrid.Children[index] as Border;
+
+                if (border != null) 
+                    border.Background = new SolidColorBrush(color);
             }
         }
 
@@ -176,7 +191,7 @@ namespace Nonlinearities.Gui
         {
             ReceptiveFieldPlotCanvas.Children.Clear();
 
-            var imageData = GetPlotData();
+            var imageData = GetPlotData(false);
             PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
         }
 
@@ -207,6 +222,24 @@ namespace Nonlinearities.Gui
         private void OnCell4CheckBoxClicked(object sender, RoutedEventArgs e)
         {
             ReceptiveFieldPlotCanvas.Children.Clear();
+
+            var imageData = GetPlotData();
+            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+        }
+
+        private void OnOffsetTextboxTextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (ReceptiveFieldPlotCanvas != null) 
+                ReceptiveFieldPlotCanvas.Children.Clear();
+
+            var imageData = GetPlotData();
+            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+        }
+
+        private void OnTimeTextboxTextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (ReceptiveFieldPlotCanvas != null) 
+                ReceptiveFieldPlotCanvas.Children.Clear();
 
             var imageData = GetPlotData();
             PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
