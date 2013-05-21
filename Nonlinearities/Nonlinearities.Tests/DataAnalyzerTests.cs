@@ -112,6 +112,19 @@ namespace Nonlinearities.Tests
         }
 
         [TestMethod]
+        public void TestCalculateEigen()
+        {
+            var stimuli = DataLoader.GetStimuli();
+            var spikes = DataLoader.GetSpikes();
+
+            var stopwatch = Stopwatch.StartNew();
+            var stc = SpikeTriggeredAnalysis.CalculateSTC(stimuli, new double[][][] { spikes[0] }, RoundStrategy.Round);
+            SpikeTriggeredAnalysis.CalculateEigenValues(stc);
+            stopwatch.Stop();
+            
+        }
+
+        [TestMethod]
         public void TestMeanOfStimuli()
         {
             var stimuli = DataLoader.GetStimuli();

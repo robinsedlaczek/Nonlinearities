@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.LinearAlgebra.Double.Factorization;
+using MathNet.Numerics.LinearAlgebra.Generic.Factorization;
 
 namespace Nonlinearities.Analysis
 {
@@ -9,6 +12,8 @@ namespace Nonlinearities.Analysis
     /// </summary>
     public static class SpikeTriggeredAnalysis
     {
+        #region Public Members
+
         /// <summary>
         /// This service calculates the spike-triggered average for given stimuli data and response spikes data.
         /// </summary>
@@ -103,6 +108,29 @@ namespace Nonlinearities.Analysis
             return stc;
         }
 
+        public static void CalculateEigenValues(double[][] matrix)
+        {
+            var rows = matrix.Length;
+            var columns = matrix[0].Length;
+            var array = new double[rows*columns];
+
+            for (var row = 0; row < rows; row++)
+            {
+                for (var column = 0; column < columns; column++)
+                    array[(row + 1)*column] = matrix[row][column];
+            }
+
+            var denseMatrix = new DenseMatrix(rows, columns, array);
+            var evd = denseMatrix.Evd();
+
+            var eigenValues = evd.EigenValues();
+            var eigenVectors = evd.EigenVectors();
+        }
+
+        #endregion
+
+        #region Private Members
+
         /// <summary>
         /// This method creates a list with all stimuli data that elicited spikes.
         /// </summary>
@@ -150,5 +178,7 @@ namespace Nonlinearities.Analysis
 
             return spikeTriggeredStimulusEnsemble.ToArray();
         }
+
+        #endregion
     }
 }
