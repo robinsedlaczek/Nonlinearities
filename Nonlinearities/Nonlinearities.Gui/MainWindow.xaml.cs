@@ -66,10 +66,10 @@ namespace Nonlinearities.Gui
                 spikes.Add(_spikes[3]);
 
             if (spikes.Count == 0)
-                return null;
+                 return null;
 
-            const int offset = 40;
-            const int maxTime = 50;
+            const int offset = 12;
+            const int maxTime = 12;
             var imageData = new double[maxTime][];
 
             for (var time = 0; time < maxTime; time++)

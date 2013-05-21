@@ -45,6 +45,10 @@
                         <CheckBox x:Name="Cell2CheckBox" Content="Cell 2" Margin="10,0,30,5" Click="OnCell2CheckBoxClicked"/>
                         <CheckBox x:Name="Cell3CheckBox" Content="Cell 3" Margin="10,0,30,5" Click="OnCell3CheckBoxClicked"/>
                         <CheckBox x:Name="Cell4CheckBox" Content="Cell 4" Margin="10,0,30,5" Click="OnCell4CheckBoxClicked"/>
+                        <Label Content="Offset:" Padding="0"/>
+                        <TextBox x:Name="OffsetTextbox"/>
+                        <Label Content="Time:" Padding="0"/>
+                        <TextBox x:Name="TimeTextbox"/>
                     </StackPanel>
 
                     <Canvas x:Name="ReceptiveFieldPlotCanvas" Grid.Column="1" Background="#FF555555" SizeChanged="OnReceptiveFieldPlotCanvasSizeChanged"/>
