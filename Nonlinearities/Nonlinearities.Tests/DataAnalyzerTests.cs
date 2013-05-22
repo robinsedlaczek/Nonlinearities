@@ -117,11 +117,14 @@ namespace Nonlinearities.Tests
             var stimuli = DataLoader.GetStimuli();
             var spikes = DataLoader.GetSpikes();
 
+            double[] eigenValues;
+            double[][] eigenVectors;
             var stopwatch = Stopwatch.StartNew();
             var stc = SpikeTriggeredAnalysis.CalculateSTC(stimuli, new double[][][] { spikes[0] }, RoundStrategy.Round);
-            SpikeTriggeredAnalysis.CalculateEigenValues(stc);
-            stopwatch.Stop();
             
+            SpikeTriggeredAnalysis.CalculateEigenValues(stc, out eigenValues, out eigenVectors);
+            
+            stopwatch.Stop();
         }
 
         [TestMethod]

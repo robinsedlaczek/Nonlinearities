@@ -108,23 +108,36 @@ namespace Nonlinearities.Analysis
             return stc;
         }
 
-        public static void CalculateEigenValues(double[][] matrix)
+        public static void CalculateEigenValues(double[][] matrix, out double[] eigenValues, out double[][] eigenVectors)
         {
             var rows = matrix.Length;
             var columns = matrix[0].Length;
-            var array = new double[rows*columns];
+            var matrix2 = new double[rows, columns];
 
             for (var row = 0; row < rows; row++)
             {
                 for (var column = 0; column < columns; column++)
-                    array[(row + 1)*column] = matrix[row][column];
+                    matrix2[row, column] = matrix[row][column];
             }
 
-            var denseMatrix = new DenseMatrix(rows, columns, array);
+            var denseMatrix = DenseMatrix.OfArray(matrix2);
             var evd = denseMatrix.Evd();
 
-            var eigenValues = evd.EigenValues();
-            var eigenVectors = evd.EigenVectors();
+            eigenValues = (from value in evd.EigenValues()
+                           select value.Real).ToArray<double>();
+
+            var tempEigenVectors = evd.EigenVectors().ToArray();
+
+            eigenVectors = new double[tempEigenVectors.GetUpperBound(0)][];
+
+            for (var vector = 0; vector < tempEigenVectors.GetUpperBound(0); vector++)
+            {
+                for (var value = 0; value < tempEigenVectors.GetUpperBound(1); value++)
+                {
+                    eigenVectors[vector] = new double[tempEigenVectors.GetUpperBound(1)];
+                    eigenVectors[vector][value] = tempEigenVectors[vector, value];
+                }
+            }
         }
 
         #endregion

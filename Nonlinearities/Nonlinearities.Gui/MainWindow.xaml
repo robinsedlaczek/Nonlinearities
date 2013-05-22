@@ -33,7 +33,7 @@
                     </Grid>
                 </Grid>
             </TabItem>
-            <TabItem Header="Receptive Field" HorizontalAlignment="Left" Margin="-2,-2,0,2">
+            <TabItem Header="Receptive Field">
                 <Grid Background="#FFE5E5E5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -53,6 +53,9 @@
 
                     <Canvas x:Name="ReceptiveFieldPlotCanvas" Grid.Column="1" Background="#FF555555" SizeChanged="OnReceptiveFieldPlotCanvasSizeChanged"/>
                 </Grid>
+            </TabItem>
+            <TabItem Header="Principal Components Analysis">
+                <Grid Background="#FFE5E5E5"/>
             </TabItem>
         </TabControl>
     </Grid>

@@ -22,8 +22,8 @@ namespace Nonlinearities.Analysis
         /// </returns>
         public static double[][][] GetSpikes()
         {
-            var reader = new MatFileReader(@"F:\Development\Uni\Nonlinearities\Data\Long Experiment\spksV6.mat");
-            //var reader = new MatFileReader(@"..\..\..\Data\Long Experiment\spksV6.mat");
+            //var reader = new MatFileReader(@"F:\Development\Uni\Nonlinearities\Data\Long Experiment\spksV6.mat");
+            var reader = new MatFileReader(@"..\..\..\Data\Long Experiment\spksV6.mat");
             var spikes = new List<double[][]>();
 
             reader.Data.ForEach(data => spikes.Add(((MLDouble)data).GetArray()));
@@ -43,8 +43,8 @@ namespace Nonlinearities.Analysis
         /// </returns>
         public static double[][] GetStimuli()
         {
-            var reader = new MatFileReader(@"F:\Development\Uni\Nonlinearities\Data\Long Experiment\msq1D.mat");
-            //var reader = new MatFileReader(@"..\..\..\Data\Long Experiment\msq1D.mat");
+            //var reader = new MatFileReader(@"F:\Development\Uni\Nonlinearities\Data\Long Experiment\msq1D.mat");
+            var reader = new MatFileReader(@"..\..\..\Data\Long Experiment\msq1D.mat");
             return ((MLDouble)reader.GetMLArray("msq1D")).GetArray();
         }
 
