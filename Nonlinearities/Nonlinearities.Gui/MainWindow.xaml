@@ -59,10 +59,18 @@
             <TabItem Header="Principal Components Analysis">
                 <Grid Background="#FFE5E5E5">
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    
-                    <d3:ChartPlotter Name="EigenvaluePlotter"/>
+
+                    <StackPanel Orientation="Vertical" Margin="10,0,10,0">
+                        <CheckBox x:Name="PCACell1CheckBox" Content="Cell 1" Margin="0,15,30,5" Click="OnPCACellCheckBoxClicked" IsChecked="True" />
+                        <CheckBox x:Name="PCACell2CheckBox" Content="Cell 2" Margin="0,0,30,5" Click="OnPCACellCheckBoxClicked"/>
+                        <CheckBox x:Name="PCACell3CheckBox" Content="Cell 3" Margin="0,0,30,5" Click="OnPCACellCheckBoxClicked"/>
+                        <CheckBox x:Name="PCACell4CheckBox" Content="Cell 4" Margin="0,0,30,5" Click="OnPCACellCheckBoxClicked"/>
+                    </StackPanel>
+
+                    <d3:ChartPlotter Name="EigenvaluePlotter" Grid.Column="1"/>
                 </Grid>
             </TabItem>
         </TabControl>

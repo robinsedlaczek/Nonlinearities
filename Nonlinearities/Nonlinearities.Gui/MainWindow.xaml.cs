@@ -30,6 +30,7 @@ namespace Nonlinearities.Gui
         private double[][][] _spikes;
         private Timer _animationTimer;
         private double[][] _imageData;
+        private List<LineAndMarker<ElementMarkerPointsGraph>> _eigenvaluesGraphs;
 
         public MainWindow()
         {
@@ -48,38 +49,77 @@ namespace Nonlinearities.Gui
 
         private void InitializeEigenvaluesPlot()
         {
-            int cell = 0;
+            if (_eigenvaluesGraphs == null)
+                _eigenvaluesGraphs = new List<LineAndMarker<ElementMarkerPointsGraph>>();
+
+            var graph = PlotEigenvalues(1, Brushes.Blue);
+            _eigenvaluesGraphs.Add(graph);
+
+            graph = PlotEigenvalues(2, Brushes.Red);
+            _eigenvaluesGraphs.Add(graph);
+
+            graph = PlotEigenvalues(3, Brushes.Green);
+            _eigenvaluesGraphs.Add(graph);
+
+            graph = PlotEigenvalues(4, Brushes.HotPink);
+            _eigenvaluesGraphs.Add(graph);
+
+            UpdateEigenvalueGraphVisibility();
+        }
+
+        private void UpdateEigenvalueGraphVisibility()
+        {
+            _eigenvaluesGraphs[0].LineGraph.Visibility = BoolToVisibility(PCACell1CheckBox.IsChecked);
+            _eigenvaluesGraphs[0].MarkerGraph.Visibility = BoolToVisibility(PCACell1CheckBox.IsChecked);
+            _eigenvaluesGraphs[1].LineGraph.Visibility = BoolToVisibility(PCACell2CheckBox.IsChecked);
+            _eigenvaluesGraphs[1].MarkerGraph.Visibility = BoolToVisibility(PCACell2CheckBox.IsChecked);
+            _eigenvaluesGraphs[2].LineGraph.Visibility = BoolToVisibility(PCACell3CheckBox.IsChecked);
+            _eigenvaluesGraphs[2].MarkerGraph.Visibility = BoolToVisibility(PCACell3CheckBox.IsChecked);
+            _eigenvaluesGraphs[3].LineGraph.Visibility = BoolToVisibility(PCACell4CheckBox.IsChecked);
+            _eigenvaluesGraphs[3].MarkerGraph.Visibility = BoolToVisibility(PCACell4CheckBox.IsChecked);
+        }
+
+        private Visibility BoolToVisibility(bool? visible)
+        {
+            if (visible != null && visible.Value)
+                return System.Windows.Visibility.Visible;
+            else
+                return System.Windows.Visibility.Hidden;
+        }
+
+        private LineAndMarker<ElementMarkerPointsGraph> PlotEigenvalues(int cell, Brush brush)
+        {
             double[] eigenValues;
             double[][] eigenVectors;
 
-            var stc = SpikeTriggeredAnalysis.CalculateSTC(_stimuli, new double[][][] { _spikes[cell] }, RoundStrategy.Round);
+            var stc = SpikeTriggeredAnalysis.CalculateSTC(_stimuli, new double[][][] { _spikes[cell - 1] }, RoundStrategy.Round);
             SpikeTriggeredAnalysis.CalculateEigenValues(stc, out eigenValues, out eigenVectors);
 
             // Prepare data in arrays
-            int N = eigenValues.Length;
-            double[] x = new double[N];
-            double[] y = new double[N];
+            var N = eigenValues.Length;
+            var x = new double[N];
+            var y = new double[N];
 
-            for (int i = 0; i < N; i++)
+            for (var index = 0; index < N; index++)
             {
-                x[i] = i;
-                y[i] = eigenValues[i];
+                x[index] = index;
+                y[index] = eigenValues[index];
             }
 
             // Add data sources:
             var yDataSource = new EnumerableDataSource<double>(y);
             yDataSource.SetYMapping(Y => Y);
-            yDataSource.AddMapping(ShapeElementPointMarker.ToolTipTextProperty, Y => string.Format("Eigenvalue is {0}", Y));
+            yDataSource.AddMapping(ShapeElementPointMarker.ToolTipTextProperty, Y => string.Format("Cell {0} - Eigenvalue \n\n{1}", cell, Y));
 
             var xDataSource = new EnumerableDataSource<double>(x);
             xDataSource.SetXMapping(X => X);
 
             var compositeDataSource = new CompositeDataSource(xDataSource, yDataSource);
 
-            EigenvaluePlotter.Viewport.Restrictions.Add(new PhysicalProportionsRestriction { ProportionRatio = 20 });
+            EigenvaluePlotter.Viewport.Restrictions.Add(new PhysicalProportionsRestriction { ProportionRatio = 30 });
+            var graph = EigenvaluePlotter.AddLineGraph(compositeDataSource, new Pen(brush, 1), new SampleMarker() { Brush = brush }, new PenDescription(string.Format("Eigenvalues of Cell {0}", cell)));
 
-            // adding graph to plotter
-            EigenvaluePlotter.AddLineGraph(compositeDataSource, new Pen(Brushes.Goldenrod, 3), new SampleMarker(), new PenDescription("Eigenvalues"));
+            return graph;
         }
 
         private void InitializeReceptiveFieldPlotView()
@@ -284,6 +324,11 @@ namespace Nonlinearities.Gui
 
             var imageData = GetReceptiveFieldPlotData();
             PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+        }
+
+        private void OnPCACellCheckBoxClicked(object sender, RoutedEventArgs e)
+        {
+            UpdateEigenvalueGraphVisibility();
         }
     } 
 }

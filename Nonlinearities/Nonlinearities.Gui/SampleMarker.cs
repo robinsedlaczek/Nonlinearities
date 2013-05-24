@@ -18,6 +18,7 @@ namespace Nonlinearities.Gui
                 Width = 10,
                 Height = Size
             };
+
             result.Width = Size;
             result.Height = Size;
             result.Background = Brush;
