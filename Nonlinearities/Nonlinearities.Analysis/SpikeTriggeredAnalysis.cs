@@ -105,37 +105,21 @@ namespace Nonlinearities.Analysis
             return stc;
         }
 
+        /// <summary>
+        /// This service calculates the Eigen-value decomposition and returns the Eigen-values and -vectors of a given matrix.
+        /// </summary>
+        /// <param name="matrix">The matrix for which the Eigen-values should be calculated.</param>
+        /// <param name="eigenValues">The calculated Eigen-values.</param>
+        /// <param name="eigenVectors">The calculated Eigen-vectors.</param>
         public static void CalculateEigenValues(double[][] matrix, out double[] eigenValues, out double[][] eigenVectors)
         {
-            var rows = matrix.Length;
-            var columns = matrix[0].Length;
-            var matrix2 = new double[rows, columns];
-
-            for (var row = 0; row < rows; row++)
-            {
-                for (var column = 0; column < columns; column++)
-                    matrix2[row, column] = matrix[row][column];
-            }
-
-            var denseMatrix = DenseMatrix.OfArray(matrix2);
+            var denseMatrix = (new DenseMatrix(1)).OfArray(matrix);
             var evd = denseMatrix.Evd();
-            evd.
+
             eigenValues = (from value in evd.EigenValues()
                            select value.Real).ToArray<double>();
-
-            var tempEigenVectors = evd.EigenValues().ToArray();
-            //evd.EigenValues()
-
-            eigenVectors = new double[tempEigenVectors.GetUpperBound(0)][];
-
-            for (var vector = 0; vector < tempEigenVectors.GetUpperBound(0); vector++)
-            {
-                for (var value = 0; value < tempEigenVectors.GetUpperBound(1); value++)
-                {
-                    eigenVectors[vector] = new double[tempEigenVectors.GetUpperBound(1)];
-                    eigenVectors[vector][value] = tempEigenVectors[vector, value];
-                }
-            }
+            
+            eigenVectors = evd.EigenVectorsAsArrayOfArray();
         }
 
         #endregion

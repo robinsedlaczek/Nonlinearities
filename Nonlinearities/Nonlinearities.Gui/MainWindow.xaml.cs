@@ -14,6 +14,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Research.DynamicDataDisplay.DataSources;
+using Microsoft.Research.DynamicDataDisplay.ViewportRestrictions;
+using Microsoft.Research.DynamicDataDisplay;
+using Microsoft.Research.DynamicDataDisplay.PointMarkers;
 
 namespace Nonlinearities.Gui
 {
@@ -39,15 +43,52 @@ namespace Nonlinearities.Gui
 
             InitializeStimuliView();
             InitializeReceptiveFieldPlotView();
+            InitializeEigenvaluesPlot();
+        }
+
+        private void InitializeEigenvaluesPlot()
+        {
+            int cell = 0;
+            double[] eigenValues;
+            double[][] eigenVectors;
+
+            var stc = SpikeTriggeredAnalysis.CalculateSTC(_stimuli, new double[][][] { _spikes[cell] }, RoundStrategy.Round);
+            SpikeTriggeredAnalysis.CalculateEigenValues(stc, out eigenValues, out eigenVectors);
+
+            // Prepare data in arrays
+            int N = eigenValues.Length;
+            double[] x = new double[N];
+            double[] y = new double[N];
+
+            for (int i = 0; i < N; i++)
+            {
+                x[i] = i;
+                y[i] = eigenValues[i];
+            }
+
+            // Add data sources:
+            var yDataSource = new EnumerableDataSource<double>(y);
+            yDataSource.SetYMapping(Y => Y);
+            yDataSource.AddMapping(ShapeElementPointMarker.ToolTipTextProperty, Y => string.Format("Eigenvalue is {0}", Y));
+
+            var xDataSource = new EnumerableDataSource<double>(x);
+            xDataSource.SetXMapping(X => X);
+
+            var compositeDataSource = new CompositeDataSource(xDataSource, yDataSource);
+
+            EigenvaluePlotter.Viewport.Restrictions.Add(new PhysicalProportionsRestriction { ProportionRatio = 20 });
+
+            // adding graph to plotter
+            EigenvaluePlotter.AddLineGraph(compositeDataSource, new Pen(Brushes.Goldenrod, 3), new SampleMarker(), new PenDescription("Eigenvalues"));
         }
 
         private void InitializeReceptiveFieldPlotView()
         {
-            var imageData = GetPlotData();
+            var imageData = GetReceptiveFieldPlotData();
             PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
         }
 
-        private double[][] GetPlotData(bool recalcData = true)
+        private double[][] GetReceptiveFieldPlotData(bool recalcData = true)
         {
             if (_spikes == null)
                 return null;
@@ -191,7 +232,7 @@ namespace Nonlinearities.Gui
         {
             ReceptiveFieldPlotCanvas.Children.Clear();
 
-            var imageData = GetPlotData(false);
+            var imageData = GetReceptiveFieldPlotData(false);
             PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
         }
 
@@ -199,7 +240,7 @@ namespace Nonlinearities.Gui
         {
             ReceptiveFieldPlotCanvas.Children.Clear();
 
-            var imageData = GetPlotData();
+            var imageData = GetReceptiveFieldPlotData();
             PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
         }
 
@@ -207,7 +248,7 @@ namespace Nonlinearities.Gui
         {
             ReceptiveFieldPlotCanvas.Children.Clear();
 
-            var imageData = GetPlotData();
+            var imageData = GetReceptiveFieldPlotData();
             PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
         }
 
@@ -215,7 +256,7 @@ namespace Nonlinearities.Gui
         {
             ReceptiveFieldPlotCanvas.Children.Clear();
 
-            var imageData = GetPlotData();
+            var imageData = GetReceptiveFieldPlotData();
             PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
         }
 
@@ -223,7 +264,7 @@ namespace Nonlinearities.Gui
         {
             ReceptiveFieldPlotCanvas.Children.Clear();
 
-            var imageData = GetPlotData();
+            var imageData = GetReceptiveFieldPlotData();
             PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
         }
 
@@ -232,7 +273,7 @@ namespace Nonlinearities.Gui
             if (ReceptiveFieldPlotCanvas != null) 
                 ReceptiveFieldPlotCanvas.Children.Clear();
 
-            var imageData = GetPlotData();
+            var imageData = GetReceptiveFieldPlotData();
             PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
         }
 
@@ -241,7 +282,7 @@ namespace Nonlinearities.Gui
             if (ReceptiveFieldPlotCanvas != null) 
                 ReceptiveFieldPlotCanvas.Children.Clear();
 
-            var imageData = GetPlotData();
+            var imageData = GetReceptiveFieldPlotData();
             PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
         }
     } 

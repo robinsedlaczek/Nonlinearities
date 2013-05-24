@@ -119,12 +119,19 @@ namespace Nonlinearities.Tests
 
             double[] eigenValues;
             double[][] eigenVectors;
-            var stopwatch = Stopwatch.StartNew();
-            var stc = SpikeTriggeredAnalysis.CalculateSTC(stimuli, new double[][][] { spikes[0] }, RoundStrategy.Round);
-            
-            SpikeTriggeredAnalysis.CalculateEigenValues(stc, out eigenValues, out eigenVectors);
-            
-            stopwatch.Stop();
+
+            for (var cell = 0; cell < 4; cell++)
+            {
+                var stopwatch = Stopwatch.StartNew();
+
+                var stc = SpikeTriggeredAnalysis.CalculateSTC(stimuli, new double[][][] { spikes[cell] }, RoundStrategy.Round);
+                SpikeTriggeredAnalysis.CalculateEigenValues(stc, out eigenValues, out eigenVectors);
+
+                stopwatch.Stop();
+
+                var values = string.Join(", ", Array.ConvertAll(eigenValues, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
+                Console.WriteLine("Eigen-values (cell " + cell.ToString() + ", duration: " + stopwatch.ElapsedMilliseconds + " ms) = [ " + values + " ]");
+            }
         }
 
         [TestMethod]
