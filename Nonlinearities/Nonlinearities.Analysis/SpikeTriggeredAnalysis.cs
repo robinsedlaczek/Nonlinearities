@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics.LinearAlgebra.Double;
-using MathNet.Numerics.LinearAlgebra.Double.Factorization;
-using MathNet.Numerics.LinearAlgebra.Generic.Factorization;
 
 namespace Nonlinearities.Analysis
 {
@@ -122,11 +119,12 @@ namespace Nonlinearities.Analysis
 
             var denseMatrix = DenseMatrix.OfArray(matrix2);
             var evd = denseMatrix.Evd();
-
+            evd.
             eigenValues = (from value in evd.EigenValues()
                            select value.Real).ToArray<double>();
 
-            var tempEigenVectors = evd.EigenVectors().ToArray();
+            var tempEigenVectors = evd.EigenValues().ToArray();
+            //evd.EigenValues()
 
             eigenVectors = new double[tempEigenVectors.GetUpperBound(0)][];
 
