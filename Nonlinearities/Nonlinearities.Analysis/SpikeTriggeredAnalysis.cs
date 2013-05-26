@@ -55,6 +55,19 @@ namespace Nonlinearities.Analysis
             return sta;
         }
 
+        public static double[][] CalculateRF(double[][] stimuli, double[][][] spikes, int offset, int maxTime)
+        {
+            var result = new double[maxTime][];
+
+            for (var time = 0; time < maxTime; time++)
+            {
+                var sta = SpikeTriggeredAnalysis.CalculateSTA(stimuli, spikes, offset - time, RoundStrategy.Round);
+                result[time] = sta;
+            }
+
+            return result;
+        }
+
         /// <summary>
         /// This service calculates the spike-triggered covariance for given stimuli data and response spikes data.
         /// </summary>

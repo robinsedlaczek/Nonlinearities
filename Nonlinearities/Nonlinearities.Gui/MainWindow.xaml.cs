@@ -18,23 +18,41 @@ using Microsoft.Research.DynamicDataDisplay.DataSources;
 using Microsoft.Research.DynamicDataDisplay.ViewportRestrictions;
 using Microsoft.Research.DynamicDataDisplay;
 using Microsoft.Research.DynamicDataDisplay.PointMarkers;
+using System.ComponentModel;
+using System.Data;
 
 namespace Nonlinearities.Gui
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private double[][] _stimuli;
         private double[][][] _spikes;
+        private double[][] _receptiveField;
         private Timer _animationTimer;
-        private double[][] _imageData;
         private List<LineAndMarker<ElementMarkerPointsGraph>> _eigenvaluesGraphs;
+
+        #region Interface IPropertyChanged
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion
 
         public MainWindow()
         {
+            DataContext = this;
+
             InitializeComponent();
+
+            NumericViewWindow.DataContext = this;
+        }
+
+        public DataTable NumericData
+        {
+            get;
+            private set;
         }
 
         private void OnLoadStimuliDataButtonClick(object sender, RoutedEventArgs e)
@@ -94,7 +112,7 @@ namespace Nonlinearities.Gui
 
             var stc = SpikeTriggeredAnalysis.CalculateSTC(_stimuli, new double[][][] { _spikes[cell - 1] }, RoundStrategy.Round);
             SpikeTriggeredAnalysis.CalculateEigenValues(stc, out eigenValues, out eigenVectors);
-
+            
             // Prepare data in arrays
             var N = eigenValues.Length;
             var x = new double[N];
@@ -134,7 +152,7 @@ namespace Nonlinearities.Gui
                 return null;
 
             if (!recalcData)
-                return _imageData;
+                return _receptiveField;
 
             var spikes = new List<double[][]>();
 
@@ -161,15 +179,9 @@ namespace Nonlinearities.Gui
             if (!int.TryParse(TimeTextbox.Text, out maxTime))
                 maxTime = 16;
 
-            _imageData = new double[maxTime][];
+            _receptiveField = SpikeTriggeredAnalysis.CalculateRF(_stimuli, spikes.ToArray(), offset, maxTime);
 
-            for (var time = 0; time < maxTime; time++)
-            {
-                var sta = SpikeTriggeredAnalysis.CalculateSTA(_stimuli, spikes.ToArray(), offset - time, RoundStrategy.Round);
-                _imageData[time] = sta;
-            }
-
-            return _imageData;
+            return _receptiveField;
         }
 
         private void PlotReceptiveField(double[][] imageData, Canvas plotCanvas)
@@ -329,6 +341,36 @@ namespace Nonlinearities.Gui
         private void OnPCACellCheckBoxClicked(object sender, RoutedEventArgs e)
         {
             UpdateEigenvalueGraphVisibility();
+        }
+
+        private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            NumericViewWindow.Left = ActualWidth - NumericViewWindow.MinWidth - 30;
+            NumericViewWindow.Top = ActualHeight - NumericViewWindow.MinHeight - 50;
+        }
+
+        private void OnStimuliTabItemGotFocus(object sender, RoutedEventArgs e)
+        {
+            if (_stimuli == null)
+                return;
+
+            var dataTable = new DataTable("Stimuli");
+            dataTable.Columns.AddRange((from stimulus in _stimuli[0] select new DataColumn()).ToArray());
+
+            foreach (var stimulus in _stimuli)
+                dataTable.Rows.Add(stimulus);
+
+            NumericData = dataTable;
+        }
+
+        private void OnReceptiveFieldTabItemGotFocus(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void OnPrincipalComponentsAnalysisTabItemGotFocus(object sender, RoutedEventArgs e)
+        {
+             
         }
     } 
 }
