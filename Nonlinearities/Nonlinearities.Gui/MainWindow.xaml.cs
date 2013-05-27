@@ -28,11 +28,18 @@ namespace Nonlinearities.Gui
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        #region Private Fields
+
         private double[][] _stimuli;
         private double[][][] _spikes;
         private double[][] _receptiveField;
+        private int _selectedNumericRowIndex;
+        private DataTable _numericData;
         private Timer _animationTimer;
         private List<LineAndMarker<ElementMarkerPointsGraph>> _eigenvaluesGraphs;
+        private NumericViewWindow _numericViewWindow;
+
+        #endregion
 
         #region Interface IPropertyChanged
 
@@ -40,20 +47,56 @@ namespace Nonlinearities.Gui
 
         #endregion
 
+        #region Construction
+
         public MainWindow()
         {
             DataContext = this;
 
             InitializeComponent();
-
-            NumericViewWindow.DataContext = this;
         }
+
+        #endregion
+
+        #region Public Members
 
         public DataTable NumericData
         {
-            get;
-            private set;
+            get
+            {
+                return _numericData;
+            }
+
+            private set
+            {
+                if (_numericData != value)
+                    _numericData = value;
+
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("NumericData"));
+            }
         }
+
+        public int SelectedNumericRowIndex
+        {
+            get
+            {
+                return _selectedNumericRowIndex;
+            }
+
+            private set
+            {
+                if (_selectedNumericRowIndex!= value)
+                    _selectedNumericRowIndex = value;
+
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("SelectedNumericRowIndex"));
+            }
+        }
+
+        #endregion
+
+        #region Event Handler
 
         private void OnLoadStimuliDataButtonClick(object sender, RoutedEventArgs e)
         {
@@ -64,6 +107,161 @@ namespace Nonlinearities.Gui
             InitializeReceptiveFieldPlotView();
             InitializeEigenvaluesPlot();
         }
+
+        private void OnStimuliSliderValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            var stimulus = _stimuli[(int)StimuliSlider.Value];
+
+            for (int index = 0; index < stimulus.Length; index++)
+            {
+                const double epsilon = 0.00001;
+                var color = System.Math.Abs(stimulus[index] - -1) < epsilon ? Colors.Black : Colors.White;
+                var border = StimuliDisplayGrid.Children[index] as Border;
+
+                if (border != null)
+                    border.Background = new SolidColorBrush(color);
+            }
+        }
+
+        private void OnPlayClick(object sender, RoutedEventArgs e)
+        {
+            if (_animationTimer == null)
+                _animationTimer = new Timer(OnAnimationTimerTick, null, 17, 17);
+            else
+                _animationTimer.Change(17, 17);
+        }
+
+        private void OnAnimationTimerTick(object state)
+        {
+            StimuliSlider.Dispatcher.Invoke(DispatcherPriority.Normal, new System.Action(() =>
+            {
+                if (StimuliSlider.Value <= StimuliSlider.Maximum)
+                {
+                    StimuliSlider.Value++;
+                    SelectedNumericRowIndex++;
+                }
+                else
+                    _animationTimer.Change(Timeout.Infinite, Timeout.Infinite);
+            }));
+        }
+
+        private void OnStopClick(object sender, RoutedEventArgs e)
+        {
+            if (_animationTimer != null)
+                _animationTimer.Change(Timeout.Infinite, Timeout.Infinite);
+        }
+
+        private void OnReceptiveFieldPlotCanvasSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            ReceptiveFieldPlotCanvas.Children.Clear();
+
+            var imageData = GetReceptiveFieldPlotData(false);
+            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+        }
+
+        private void OnCell1CheckBoxClicked(object sender, RoutedEventArgs e)
+        {
+            ReceptiveFieldPlotCanvas.Children.Clear();
+
+            var imageData = GetReceptiveFieldPlotData();
+            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+        }
+
+        private void OnCell2CheckBoxClicked(object sender, RoutedEventArgs e)
+        {
+            ReceptiveFieldPlotCanvas.Children.Clear();
+
+            var imageData = GetReceptiveFieldPlotData();
+            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+        }
+
+        private void OnCell3CheckBoxClicked(object sender, RoutedEventArgs e)
+        {
+            ReceptiveFieldPlotCanvas.Children.Clear();
+
+            var imageData = GetReceptiveFieldPlotData();
+            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+        }
+
+        private void OnCell4CheckBoxClicked(object sender, RoutedEventArgs e)
+        {
+            ReceptiveFieldPlotCanvas.Children.Clear();
+
+            var imageData = GetReceptiveFieldPlotData();
+            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+        }
+
+        private void OnOffsetTextboxTextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (ReceptiveFieldPlotCanvas != null)
+                ReceptiveFieldPlotCanvas.Children.Clear();
+
+            var imageData = GetReceptiveFieldPlotData();
+            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+        }
+
+        private void OnTimeTextboxTextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (ReceptiveFieldPlotCanvas != null)
+                ReceptiveFieldPlotCanvas.Children.Clear();
+
+            var imageData = GetReceptiveFieldPlotData();
+            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+        }
+
+        private void OnPCACellCheckBoxClicked(object sender, RoutedEventArgs e)
+        {
+            UpdateEigenvalueGraphVisibility();
+        }
+
+        private void OnStimuliTabItemGotFocus(object sender, RoutedEventArgs e)
+        {
+            if (_stimuli == null)
+                return;
+
+            var dataTable = new DataTable("Stimuli");
+            dataTable.Columns.AddRange((from stimulus in _stimuli[0] select new DataColumn(string.Empty, typeof(double))).ToArray());
+
+            foreach (var stimulus in _stimuli)
+            {
+                var objectArray = new object[stimulus.Length];
+                stimulus.CopyTo(objectArray, 0);
+
+                dataTable.Rows.Add(objectArray);
+            }
+
+            NumericData = dataTable;
+        }
+
+        private void OnReceptiveFieldTabItemGotFocus(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void OnPrincipalComponentsAnalysisTabItemGotFocus(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            CreateChildWindows();
+            ArrangeChildWindows();
+        }
+
+        private void OnLocationChanged(object sender, System.EventArgs e)
+        {
+            ArrangeChildWindows();
+        }
+
+        private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            ArrangeChildWindows();
+        }
+
+        #endregion
+
+        #region Private Members
 
         private void InitializeEigenvaluesPlot()
         {
@@ -240,137 +438,27 @@ namespace Nonlinearities.Gui
             StimuliSlider.Maximum = _stimuli.Length - 1;
         }
 
-        private void OnStimuliSliderValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void CreateChildWindows()
         {
-            var stimulus = _stimuli[(int)StimuliSlider.Value];
-
-            for (int index = 0; index < stimulus.Length; index++ )
+            if (_numericViewWindow == null)
             {
-                const double epsilon = 0.00001;
-                var color = System.Math.Abs(stimulus[index] - -1) < epsilon ? Colors.Black : Colors.White;
-                var border = StimuliDisplayGrid.Children[index] as Border;
+                _numericViewWindow = new NumericViewWindow();
+                _numericViewWindow.DataContext = this;
+                _numericViewWindow.Owner = this;
 
-                if (border != null) 
-                    border.Background = new SolidColorBrush(color);
+                _numericViewWindow.Show();
             }
         }
 
-        private void OnPlayClick(object sender, RoutedEventArgs e)
+        private void ArrangeChildWindows()
         {
-            if (_animationTimer == null)
-                _animationTimer = new Timer(OnAnimationTimerTick, null, 17, 17);
-            else
-                _animationTimer.Change(17, 17);
+            if (_numericViewWindow != null)
+            {
+                _numericViewWindow.Left = Left + ActualWidth + 10;
+                _numericViewWindow.Top = Top + (ActualHeight - _numericViewWindow.ActualHeight);
+            }
         }
-
-        private void OnAnimationTimerTick(object state)
-        {
-            StimuliSlider.Dispatcher.Invoke(DispatcherPriority.Normal, new System.Action(() =>
-                {
-                    if (StimuliSlider.Value <= StimuliSlider.Maximum)
-                        StimuliSlider.Value++;
-                    else
-                        _animationTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                }));
-        }
-
-        private void OnStopClick(object sender, RoutedEventArgs e)
-        {
-            if (_animationTimer != null)
-                _animationTimer.Change(Timeout.Infinite, Timeout.Infinite);
-        }
-
-        private void OnReceptiveFieldPlotCanvasSizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            ReceptiveFieldPlotCanvas.Children.Clear();
-
-            var imageData = GetReceptiveFieldPlotData(false);
-            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
-        }
-
-        private void OnCell1CheckBoxClicked(object sender, RoutedEventArgs e)
-        {
-            ReceptiveFieldPlotCanvas.Children.Clear();
-
-            var imageData = GetReceptiveFieldPlotData();
-            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
-        }
-
-        private void OnCell2CheckBoxClicked(object sender, RoutedEventArgs e)
-        {
-            ReceptiveFieldPlotCanvas.Children.Clear();
-
-            var imageData = GetReceptiveFieldPlotData();
-            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
-        }
-
-        private void OnCell3CheckBoxClicked(object sender, RoutedEventArgs e)
-        {
-            ReceptiveFieldPlotCanvas.Children.Clear();
-
-            var imageData = GetReceptiveFieldPlotData();
-            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
-        }
-
-        private void OnCell4CheckBoxClicked(object sender, RoutedEventArgs e)
-        {
-            ReceptiveFieldPlotCanvas.Children.Clear();
-
-            var imageData = GetReceptiveFieldPlotData();
-            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
-        }
-
-        private void OnOffsetTextboxTextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (ReceptiveFieldPlotCanvas != null) 
-                ReceptiveFieldPlotCanvas.Children.Clear();
-
-            var imageData = GetReceptiveFieldPlotData();
-            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
-        }
-
-        private void OnTimeTextboxTextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (ReceptiveFieldPlotCanvas != null) 
-                ReceptiveFieldPlotCanvas.Children.Clear();
-
-            var imageData = GetReceptiveFieldPlotData();
-            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
-        }
-
-        private void OnPCACellCheckBoxClicked(object sender, RoutedEventArgs e)
-        {
-            UpdateEigenvalueGraphVisibility();
-        }
-
-        private void OnSizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            NumericViewWindow.Left = ActualWidth - NumericViewWindow.MinWidth - 30;
-            NumericViewWindow.Top = ActualHeight - NumericViewWindow.MinHeight - 50;
-        }
-
-        private void OnStimuliTabItemGotFocus(object sender, RoutedEventArgs e)
-        {
-            if (_stimuli == null)
-                return;
-
-            var dataTable = new DataTable("Stimuli");
-            dataTable.Columns.AddRange((from stimulus in _stimuli[0] select new DataColumn()).ToArray());
-
-            foreach (var stimulus in _stimuli)
-                dataTable.Rows.Add(stimulus);
-
-            NumericData = dataTable;
-        }
-
-        private void OnReceptiveFieldTabItemGotFocus(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void OnPrincipalComponentsAnalysisTabItemGotFocus(object sender, RoutedEventArgs e)
-        {
-             
-        }
+    
+        #endregion
     } 
 }

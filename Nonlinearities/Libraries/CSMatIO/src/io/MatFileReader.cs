@@ -96,6 +96,9 @@ namespace csmatio.io
 
 				for(;;)
 				{
+                    if (dataIn.Position == dataIn.Length)
+                        break;
+
 					ReadData( dataIn );
 				}
 			}
