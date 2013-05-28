@@ -37,7 +37,6 @@ namespace Nonlinearities.Gui
         private DataTable _numericData;
         private Timer _animationTimer;
         private List<LineAndMarker<ElementMarkerPointsGraph>> _eigenvaluesGraphs;
-        private NumericViewWindow _numericViewWindow;
 
         #endregion
 
@@ -74,23 +73,6 @@ namespace Nonlinearities.Gui
 
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("NumericData"));
-            }
-        }
-
-        public int SelectedNumericRowIndex
-        {
-            get
-            {
-                return _selectedNumericRowIndex;
-            }
-
-            private set
-            {
-                if (_selectedNumericRowIndex!= value)
-                    _selectedNumericRowIndex = value;
-
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("SelectedNumericRowIndex"));
             }
         }
 
@@ -136,10 +118,7 @@ namespace Nonlinearities.Gui
             StimuliSlider.Dispatcher.Invoke(DispatcherPriority.Normal, new System.Action(() =>
             {
                 if (StimuliSlider.Value <= StimuliSlider.Maximum)
-                {
                     StimuliSlider.Value++;
-                    SelectedNumericRowIndex++;
-                }
                 else
                     _animationTimer.Change(Timeout.Infinite, Timeout.Infinite);
             }));
@@ -245,18 +224,17 @@ namespace Nonlinearities.Gui
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            CreateChildWindows();
-            ArrangeChildWindows();
+
         }
 
         private void OnLocationChanged(object sender, System.EventArgs e)
         {
-            ArrangeChildWindows();
+
         }
 
         private void OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            ArrangeChildWindows();
+
         }
 
         #endregion
@@ -436,27 +414,6 @@ namespace Nonlinearities.Gui
 
             StimuliSlider.Minimum = 0;
             StimuliSlider.Maximum = _stimuli.Length - 1;
-        }
-
-        private void CreateChildWindows()
-        {
-            if (_numericViewWindow == null)
-            {
-                _numericViewWindow = new NumericViewWindow();
-                _numericViewWindow.DataContext = this;
-                _numericViewWindow.Owner = this;
-
-                _numericViewWindow.Show();
-            }
-        }
-
-        private void ArrangeChildWindows()
-        {
-            if (_numericViewWindow != null)
-            {
-                _numericViewWindow.Left = Left + ActualWidth + 10;
-                _numericViewWindow.Top = Top + (ActualHeight - _numericViewWindow.ActualHeight);
-            }
         }
     
         #endregion
