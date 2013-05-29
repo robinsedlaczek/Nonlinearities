@@ -55,6 +55,26 @@ namespace Nonlinearities.Analysis
             return sta;
         }
 
+        /// <summary>
+        /// This service calculates the receptive field for given stimuli data and response spikes data.
+        /// </summary>
+        /// <param name="stimuli">
+        /// The stimuli that triggered spikes as 2-dimensional array with:
+        /// [?][ ] - List of stimuli frames.
+        /// [ ][?] - Stimulus data for the frame.</param>
+        /// <param name="spikes">
+        /// The detected spikes for the stimuli as 2-dimensional array with:
+        /// [?][ ][ ] - List of cells.
+        /// [ ][?][ ] - List of spike data for the cell.
+        /// [ ][ ][?] - Time when spike occurred.
+        /// </param>
+        /// <param name="offset">
+        /// The offset of the first frame which is taken for calculations. All other frames will be behind that frame.
+        /// </param>
+        /// <param name="maxTime">
+        /// The maximum for STA iterations. So maxTime defines the number of rows for the resulting receptive field matrix.
+        /// </param>
+        /// <returns>Returns a 2x2-matrix containing the receptive field. </returns>
         public static double[][] CalculateRF(double[][] stimuli, double[][][] spikes, int offset, int maxTime)
         {
             var result = new double[maxTime][];
@@ -128,6 +148,10 @@ namespace Nonlinearities.Analysis
         {
             var denseMatrix = (new DenseMatrix(1)).OfArray(matrix);
             var evd = denseMatrix.Evd();
+
+
+
+
 
             eigenValues = (from value in evd.EigenValues()
                            select value.Real).ToArray<double>();

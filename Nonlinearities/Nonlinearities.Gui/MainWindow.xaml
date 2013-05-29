@@ -9,14 +9,11 @@
 		
 	<Grid Background="DarkGray">
 		<Grid.RowDefinitions>
-			<RowDefinition Height="50"/>
 			<RowDefinition/>
 		</Grid.RowDefinitions>
 
-		<Button x:Name="LoadStimuliDataButton" Content="Load Stimuli Data" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" Grid.Row="0" Padding="10,5" Click="OnLoadStimuliDataButtonClick"/>
-
 		<TabControl Grid.Row="1">
-			<TabItem x:Name="StimuliTabItem" Header="Stimuli" GotFocus="OnStimuliTabItemGotFocus">
+			<TabItem x:Name="StimuliTabItem" Header="Stimuli" GotFocus="OnStimuliTabItemGotFocus" Padding="20,5">
 				<Grid Background="#FFE5E5E5">
 					<Grid.RowDefinitions>
 						<RowDefinition/>
@@ -37,7 +34,7 @@
 					</Grid>
 				</Grid>
 			</TabItem>
-			<TabItem x:Name="ReceptiveFieldTabItem" Header="Receptive Field" GotFocus="OnReceptiveFieldTabItemGotFocus">
+			<TabItem x:Name="ReceptiveFieldTabItem" Header="Receptive Field" GotFocus="OnReceptiveFieldTabItemGotFocus" Padding="20,5">
 				<Grid Background="#FFE5E5E5">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto"/>
@@ -58,7 +55,7 @@
 					<Canvas x:Name="ReceptiveFieldPlotCanvas" Grid.Column="1" Background="#FF555555" SizeChanged="OnReceptiveFieldPlotCanvasSizeChanged"/>
 				</Grid>
 			</TabItem>
-			<TabItem x:Name="PrincipalComponentsAnalysisTabItem" Header="Principal Components Analysis" GotFocus="OnPrincipalComponentsAnalysisTabItemGotFocus">
+			<TabItem x:Name="PrincipalComponentsAnalysisTabItem" Header="Principal Components Analysis" GotFocus="OnPrincipalComponentsAnalysisTabItemGotFocus" Padding="20,5">
 				<Grid Background="#FFE5E5E5">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto"/>
