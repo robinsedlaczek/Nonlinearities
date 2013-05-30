@@ -266,6 +266,12 @@ namespace Nonlinearities.Analysis
             return result;
         }
 
+        /// <summary>
+        /// This method subtracts a scalar from each value in an abritary 3-by-3 matrix.
+        /// </summary>
+        /// <param name="matrix">The 3-by-3 matrix where to reduce the values.</param>
+        /// <param name="scalar">The scalar which will be subtracted from each value in the matrix.</param>
+        /// <returns>Returns the resulting matrix where all values are reduced by the scalar.</returns>
         public static double[][][] Subtract(double[][][] matrix, double scalar)
         {
             var result = Copy(matrix);
@@ -335,5 +341,131 @@ namespace Nonlinearities.Analysis
                 }
             }
         }
+
+
+
+        public static double[][] Convolution(double[][] sourceMatrix, int sourceRows, int sourceColumns, double[][] kernel, int kernelRows, int kernelColumns)
+        {
+
+
+
+        }
+
+
+        // Process 8 bpp grayscale images
+        private void Process8bppImage(double[][] source, int sourceRows, int sourceColumns, 
+                                              double[,] kernelMatrix,
+                                              int srcStride, int dstStride, int srcOffset, int dstOffset,
+                                              int stopX, int stopY)
+        {
+            var kernelRows = kernelMatrix.GetLength(0);
+            var kernelColumns = kernelMatrix.GetLength(1);
+
+            // check kernel size
+            if ((kernelRows != kernelColumns) || (kernelRows < 3) || (kernelRows > 99) || (kernelRows % 2 == 0))
+                throw new ArgumentException("Invalid kernel size.");
+
+            // kernel size
+            var kernelSize = kernelRows ^ 2;
+
+            // calculate divisor
+            var divisor = 0d;
+            for (int row = 0, n = kernelRows; row < n; row++)
+            {
+                for (int column = 0, kernelColumn = kernelColumns; column < kernelColumns; column++)
+                    divisor += kernelMatrix[row, column];
+            }
+
+            if (System.Math.Abs(divisor - 0d) < double.Epsilon)
+                divisor = 1;
+
+            // loop and array indexes
+            int i, j, t, ir, jr;
+            double k;
+
+            // kernel's radius
+            var radius = kernelRows >> 1;
+
+            // color sums
+            double g;
+            double div;
+
+            // number of kernel elements taken into account
+            int processedKernelSize;
+
+            // for each line
+            for (int y = 0; y < sourceRows; y++)
+            {
+                // for each pixel
+                for (int x = 0; x < sourceColumns; x++, src++, dst++)
+                {
+                    g = div = processedKernelSize = 0;
+                    
+                    // for each kernel row
+                    for (i = 0; i < kernelRows; i++)
+                    {
+                        ir = i - radius;
+                        t = y + ir;
+
+                        // skip row
+                        if (t < 0)
+                            continue;
+
+                        // break
+                        if (t >= sourceRows)
+                            break;
+
+                        // for each kernel column
+                        for (j = 0; j < kernelColumns; j++)
+                        {
+                            jr = j - radius;
+                            t = x + jr;
+
+                            // skip column
+                            if (t < 0)
+                                continue;
+
+                            if (t < sourceColumns)
+                            {
+                                k = kernelMatrix[i, j];
+
+                                div += k;
+                                g += k * source[ir][jr];
+                                processedKernelSize++;
+                            }
+                        }
+                    }
+
+                    // check if all kernel elements were processed
+                    if (processedKernelSize == kernelSize)
+                    {
+                        // all kernel elements are processed - we are not on the edge
+                        div = divisor;
+                    }
+                    else
+                    {
+                        // we are on edge. do we need to use dynamic divisor or not?
+                        if (!dynamicDivisorForEdges)
+                        {
+                            // do
+                            div = divisor;
+                        }
+                    }
+
+                    // check divider
+                    if (div != 0)
+                    {
+                        g /= div;
+                    }
+                    g += threshold;
+                    *dst = (byte)((g > 255) ? 255 : ((g < 0) ? 0 : g));
+                }
+                src += srcOffset;
+                dst += dstOffset;
+            }
+        }
+
+
+
     }
 }

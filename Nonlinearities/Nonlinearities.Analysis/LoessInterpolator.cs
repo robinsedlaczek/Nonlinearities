@@ -63,7 +63,7 @@ namespace Nonlinearities.Analysis
          * <li> All arguments and values are finite real numbers</li>
          * </ul>
          */
-        public double[] Smooth(double[] xval, double[] yval)
+        public double[] LoessSmooth(double[] xval, double[] yval)
         {
             if (xval.Length != yval.Length)
                 throw new ApplicationException(string.Format("Loess expects the abscissa and ordinate arrays to be of the same size, but got {0} abscisssae and {1} ordinatae", xval.Length, yval.Length));
@@ -77,14 +77,10 @@ namespace Nonlinearities.Analysis
             CheckStrictlyIncreasing(xval);
 
             if (n == 1)
-            {
                 return new double[] { yval[0] };
-            }
 
             if (n == 2)
-            {
                 return new double[] { yval[0], yval[1] };
-            }
 
             int bandwidthInPoints = (int)(bandwidth * n);
 

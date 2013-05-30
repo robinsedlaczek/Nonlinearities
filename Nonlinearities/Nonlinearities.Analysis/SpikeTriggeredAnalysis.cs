@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics.LinearAlgebra.Double;
 
@@ -74,8 +75,12 @@ namespace Nonlinearities.Analysis
         /// <param name="maxTime">
         /// The maximum for STA iterations. So maxTime defines the number of rows for the resulting receptive field matrix.
         /// </param>
+        /// <param name="smoothKernel">
+        /// A square matrix representing the smoothing kernel mask used to smooth the result. If this parameter is null,
+        /// no smoothing will be done.
+        /// </param>
         /// <returns>Returns a 2x2-matrix containing the receptive field. </returns>
-        public static double[][] CalculateRF(double[][] stimuli, double[][][] spikes, int offset, int maxTime)
+        public static double[][] CalculateRF(double[][] stimuli, double[][][] spikes, int offset, int maxTime, int[,] smoothKernel)
         {
             var result = new double[maxTime][];
 
@@ -84,6 +89,13 @@ namespace Nonlinearities.Analysis
                 var sta = SpikeTriggeredAnalysis.CalculateSTA(stimuli, spikes, offset - time, RoundStrategy.Round);
                 result[time] = sta;
             }
+
+            if (smoothKernel == null)
+                return result;
+
+
+
+
 
             return result;
         }
@@ -148,10 +160,6 @@ namespace Nonlinearities.Analysis
         {
             var denseMatrix = (new DenseMatrix(1)).OfArray(matrix);
             var evd = denseMatrix.Evd();
-
-
-
-
 
             eigenValues = (from value in evd.EigenValues()
                            select value.Real).ToArray<double>();
