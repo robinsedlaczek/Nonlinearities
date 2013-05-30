@@ -145,7 +145,7 @@ namespace Nonlinearities.Tests
             stopwatch.Stop();
 
             var loess = new LoessInterpolator();
-            var result = loess.Smooth()
+            // var result = loess.Smooth()
 
             var values = string.Join("\n", Array.ConvertAll(receptiveField, row => string.Join("\t", Array.ConvertAll(row, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)))));
             Console.WriteLine("\nReceptive Field (cell 1, duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[\n" + values + "\n]");
