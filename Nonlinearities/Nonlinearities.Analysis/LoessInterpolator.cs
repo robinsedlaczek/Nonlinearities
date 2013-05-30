@@ -66,14 +66,11 @@ namespace Nonlinearities.Analysis
         public double[] Smooth(double[] xval, double[] yval)
         {
             if (xval.Length != yval.Length)
-            {
                 throw new ApplicationException(string.Format("Loess expects the abscissa and ordinate arrays to be of the same size, but got {0} abscisssae and {1} ordinatae", xval.Length, yval.Length));
-            }
-            int n = xval.Length;
+
+            var n = xval.Length;
             if (n == 0)
-            {
                 throw new ApplicationException("Loess expects at least 1 point");
-            }
 
             CheckAllFiniteReal(xval, true);
             CheckAllFiniteReal(yval, false);
