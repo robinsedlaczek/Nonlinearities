@@ -347,16 +347,17 @@ namespace Nonlinearities.Analysis
         public static double[][] Convolution(double[][] sourceMatrix, int sourceRows, int sourceColumns, double[][] kernel, int kernelRows, int kernelColumns)
         {
 
-
+            return null;
 
         }
 
 
         // Process 8 bpp grayscale images
-        private void Process8bppImage(double[][] source, int sourceRows, int sourceColumns, 
-                                              double[,] kernelMatrix,
-                                              int srcStride, int dstStride, int srcOffset, int dstOffset,
-                                              int stopX, int stopY)
+        private static void Process8bppImage(
+            double[][] source, int sourceRows, int sourceColumns, 
+            double[,] kernelMatrix,
+            bool useDynamicDivisorForEdges = true,
+            int threshold = 0)
         {
             var kernelRows = kernelMatrix.GetLength(0);
             var kernelColumns = kernelMatrix.GetLength(1);
@@ -445,7 +446,7 @@ namespace Nonlinearities.Analysis
                     else
                     {
                         // we are on edge. do we need to use dynamic divisor or not?
-                        if (!dynamicDivisorForEdges)
+                        if (!useDynamicDivisorForEdges)
                         {
                             // do
                             div = divisor;
@@ -457,6 +458,7 @@ namespace Nonlinearities.Analysis
                     {
                         g /= div;
                     }
+                    
                     g += threshold;
                     *dst = (byte)((g > 255) ? 255 : ((g < 0) ? 0 : g));
                 }
@@ -464,8 +466,6 @@ namespace Nonlinearities.Analysis
                 dst += dstOffset;
             }
         }
-
-
 
     }
 }
