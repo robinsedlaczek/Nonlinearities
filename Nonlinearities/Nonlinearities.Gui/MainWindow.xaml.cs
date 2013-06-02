@@ -342,7 +342,18 @@ namespace Nonlinearities.Gui
             if (!int.TryParse(TimeTextbox.Text, out maxTime))
                 maxTime = 16;
 
-            _receptiveField = SpikeTriggeredAnalysis.CalculateRF(_stimuli, spikes.ToArray(), offset, maxTime);
+            // var kernel = (new Gaussian()).Kernel2D(3);
+            var smoothKernel = new double[3, 3]
+                {
+                    { 1, 1, 1 },
+                    { 1, 1, 1 },
+                    { 1, 1, 1 }
+                };
+
+            double smoothThreshold = 0;
+            bool useDynamicDivisorForEdges = false;
+
+            _receptiveField = SpikeTriggeredAnalysis.CalculateRF(_stimuli, spikes.ToArray(), offset, maxTime, smoothKernel, smoothThreshold, useDynamicDivisorForEdges);
 
             return _receptiveField;
         }

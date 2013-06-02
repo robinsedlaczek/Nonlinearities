@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AForge.Math;
 using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace Nonlinearities.Analysis
@@ -80,22 +81,20 @@ namespace Nonlinearities.Analysis
         /// no smoothing will be done.
         /// </param>
         /// <returns>Returns a 2x2-matrix containing the receptive field. </returns>
-        public static double[][] CalculateRF(double[][] stimuli, double[][][] spikes, int offset, int maxTime, int[,] smoothKernel)
+        public static double[][] CalculateRF(double[][] stimuli, double[][][] spikes, int offset, int maxTime, double[,] smoothKernel, double smoothThreshold = 0, bool useDynamicDivisorForEdges = false)
         {
-            var result = new double[maxTime][];
+            var receptiveField = new double[maxTime][];
 
             for (var time = 0; time < maxTime; time++)
             {
                 var sta = SpikeTriggeredAnalysis.CalculateSTA(stimuli, spikes, offset - time, RoundStrategy.Round);
-                result[time] = sta;
+                receptiveField[time] = sta;
             }
 
             if (smoothKernel == null)
-                return result;
+                return receptiveField;
 
-
-
-
+            var result = Math.Convolution(receptiveField, receptiveField.Length, receptiveField[0].Length, smoothKernel, useDynamicDivisorForEdges, smoothThreshold);
 
             return result;
         }
