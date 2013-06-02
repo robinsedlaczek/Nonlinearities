@@ -1,11 +1,34 @@
 ﻿<Window
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:Custom="http://infragistics.com/DataPresenter" x:Class="Nonlinearities.Gui.MainWindow"
-	xmlns:d3="http://research.microsoft.com/DynamicDataDisplay/1.0"
 	xmlns:wpfx="http://schemas.xceed.com/wpf/xaml/toolkit"
 	xmlns:wpfxdg="http://schemas.xceed.com/wpf/xaml/datagrid"
-	Title="MainWindow" Height="526" Width="831" WindowStartupLocation="CenterScreen" Icon="Resources/Icon.png" SizeChanged="OnSizeChanged" Loaded="OnLoaded" LocationChanged="OnLocationChanged">
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:gui="clr-namespace:Nonlinearities.Gui"
+	xmlns:d3="clr-namespace:Microsoft.Research.DynamicDataDisplay;assembly=DynamicDataDisplay" mc:Ignorable="d" x:Class="Nonlinearities.Gui.MainWindow"
+	Title="MainWindow" Height="600" Width="1000" WindowStartupLocation="CenterScreen" Icon="Resources/Icon.png" SizeChanged="OnSizeChanged" Loaded="OnLoaded" LocationChanged="OnLocationChanged">
+	<Window.Resources>
+		<DataTemplate x:Key="KernelListItemDataTemplate" DataType="gui:Kernel">
+			<Grid MinHeight="75" MaxHeight="75" MinWidth="300" MaxWidth="300">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition/>
+				</Grid.ColumnDefinitions>
+
+                <Image Grid.Column="0" Margin="5" MaxWidth="75" MaxHeight="75" VerticalAlignment="Center">
+                    <Image.Source>
+                        <BitmapImage UriSource="{Binding Path=Image}" />
+                    </Image.Source>
+                </Image>
+                
+                <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+					<TextBlock Text="{Binding Path=Name}" FontWeight="Bold" Margin="5,5,5,0" MaxWidth="300" FontSize="10" />
+					<TextBlock Text="{Binding Path=Description}" Margin="5,0,5,5" TextWrapping="Wrap" MaxWidth="300" FontSize="10" />
+				</StackPanel>
+
+			</Grid>
+		</DataTemplate>
+	</Window.Resources>
 		
 	<Grid Background="DarkGray">
 		<Grid.RowDefinitions>
@@ -42,14 +65,18 @@
 					</Grid.ColumnDefinitions>
 
 					<StackPanel Orientation="Vertical" Margin="10,0,10,0">
-						<CheckBox x:Name="Cell1CheckBox" Content="Cell 1" Margin="0,15,30,5" Click="OnCell1CheckBoxClicked" IsChecked="True" />
-						<CheckBox x:Name="Cell2CheckBox" Content="Cell 2" Margin="0,0,30,5" Click="OnCell2CheckBoxClicked"/>
-						<CheckBox x:Name="Cell3CheckBox" Content="Cell 3" Margin="0,0,30,5" Click="OnCell3CheckBoxClicked"/>
-						<CheckBox x:Name="Cell4CheckBox" Content="Cell 4" Margin="0,0,30,5" Click="OnCell4CheckBoxClicked"/>
+						<CheckBox x:Name="Cell1CheckBox" Content="Cell 1" Margin="0,15,30,0" Click="OnCell1CheckBoxClicked" IsChecked="True" />
+						<CheckBox x:Name="Cell2CheckBox" Content="Cell 2" Margin="0,0,30,0" Click="OnCell2CheckBoxClicked"/>
+						<CheckBox x:Name="Cell3CheckBox" Content="Cell 3" Margin="0,0,30,0" Click="OnCell3CheckBoxClicked"/>
+						<CheckBox x:Name="Cell4CheckBox" Content="Cell 4" Margin="0,0,30,0" Click="OnCell4CheckBoxClicked"/>
 						<Label Content="Offset:" Padding="0,10,0,0"/>
 						<TextBox x:Name="OffsetTextbox" Text="16" TextChanged="OnOffsetTextboxTextChanged"/>
 						<Label Content="Time:" Padding="0"/>
 						<TextBox x:Name="TimeTextbox" Text="16" TextChanged="OnTimeTextboxTextChanged"/>
+						<CheckBox x:Name="SmoothCheckBox" Content="Smooth" Margin="0,15,0,0" Click="OnSmoothCheckBoxClick"/>
+						<CheckBox x:Name="DynamicDevisorCheckBox" Content="Dynamic Devisor" IsEnabled="{Binding IsChecked, ElementName=SmoothCheckBox}" Click="OnDynamicDevisorCheckBoxClick" />
+						<Label Content="Kernel:" Padding="0,10,0,0" IsEnabled="{Binding IsChecked, ElementName=SmoothCheckBox}" />
+                        <ComboBox x:Name="SmoothKernelComboBox" ItemsSource="{Binding Path=Kernels}" IsEnabled="{Binding IsChecked, ElementName=SmoothCheckBox}" IsReadOnly="True" SelectionChanged="OnSmoothKernelComboBoxSelectionChanged" ItemTemplate="{DynamicResource KernelListItemDataTemplate}" d:DataContext="{d:DesignInstance gui:Kernel, IsDesignTimeCreatable=True}" SelectedIndex="0" />
 					</StackPanel>
 
 					<Canvas x:Name="ReceptiveFieldPlotCanvas" Grid.Column="1" Background="#FF555555" SizeChanged="OnReceptiveFieldPlotCanvasSizeChanged"/>
@@ -69,7 +96,7 @@
 						<CheckBox x:Name="PCACell4CheckBox" Content="Cell 4" Margin="0,0,30,5" Click="OnPCACellCheckBoxClicked"/>
 					</StackPanel>
 
-					<d3:ChartPlotter Name="EigenvaluePlotter" Grid.Column="1"/>
+					<d3:ChartPlotter x:Name="EigenvaluePlotter" Grid.Column="1"/>
 				</Grid>
 			</TabItem>
 		</TabControl>

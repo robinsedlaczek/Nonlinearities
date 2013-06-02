@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using AForge.Math;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Nonlinearities.Analysis;
 using System.Globalization;
@@ -141,14 +142,23 @@ namespace Nonlinearities.Tests
             var spikes = DataLoader.GetSpikes();
 
             var stopwatch = Stopwatch.StartNew();
-
-            double[,] smoothKernel = null;
-            var receptiveField = SpikeTriggeredAnalysis.CalculateRF(stimuli, spikes, 16, 16, smoothKernel);
-            
+            var receptiveField = SpikeTriggeredAnalysis.CalculateRF(stimuli, spikes, 16, 16, null);
             stopwatch.Stop();
 
-            var loess = new LoessInterpolator();
-            // var result = loess.Smooth()
+            var values = string.Join("\n", Array.ConvertAll(receptiveField, row => string.Join("\t", Array.ConvertAll(row, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)))));
+            Console.WriteLine("\nReceptive Field (cell 1, duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[\n" + values + "\n]");
+        }
+
+        [TestMethod]
+        public void TestCalculateRFSmoothed()
+        {
+            var stimuli = DataLoader.GetStimuli();
+            var spikes = DataLoader.GetSpikes();
+
+            var stopwatch = Stopwatch.StartNew();
+            var kernel = (new Gaussian()).Kernel2D(3);
+            var receptiveField = SpikeTriggeredAnalysis.CalculateRF(stimuli, spikes, 16, 16, kernel);
+            stopwatch.Stop();
 
             var values = string.Join("\n", Array.ConvertAll(receptiveField, row => string.Join("\t", Array.ConvertAll(row, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)))));
             Console.WriteLine("\nReceptive Field (cell 1, duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[\n" + values + "\n]");

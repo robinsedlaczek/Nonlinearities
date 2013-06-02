@@ -343,7 +343,7 @@ namespace Nonlinearities.Analysis
             }
         }
 
-        public static double[][] Convolution(double[][] source, int sourceRows, int sourceColumns, double[,] kernelMatrix, bool useDynamicDivisorForEdges = true, double threshold = 0)
+        public static double[][] Convolution(double[][] source, int sourceRows, int sourceColumns, double[,] kernelMatrix, bool useDynamicDivisorForEdges = true)
         {
             var result = new double[sourceRows][];
 
@@ -441,7 +441,7 @@ namespace Nonlinearities.Analysis
                     if (System.Math.Abs(div - 0) > double.Epsilon)
                         g /= div;
 
-                    result[y][x] = g + threshold;
+                    result[y][x] = g;
                 }
             }
 

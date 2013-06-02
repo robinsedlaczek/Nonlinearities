@@ -397,7 +397,7 @@ namespace Nonlinearities.Tests
             const int threshold = 0;
 
             var stopwatch = Stopwatch.StartNew();
-            var convolution = Analysis.Math.Convolution(source, source.Length, source[0].Length, kernel, useDynamicDivisorForEdges, threshold);
+            var convolution = Analysis.Math.Convolution(source, source.Length, source[0].Length, kernel, useDynamicDivisorForEdges);
             stopwatch.Stop();
 
             var sourceValues = string.Join("\n", Array.ConvertAll(source, row => string.Join(string.Empty, Array.ConvertAll(row, value => string.Format(CultureInfo.InvariantCulture, "   {0:0}", value)))));
@@ -438,7 +438,7 @@ namespace Nonlinearities.Tests
             const int threshold = 0;
 
             var stopwatch = Stopwatch.StartNew();
-            var convolution = Analysis.Math.Convolution(source, source.Length, source[0].Length, kernel, useDynamicDivisorForEdges, threshold);
+            var convolution = Analysis.Math.Convolution(source, source.Length, source[0].Length, kernel, useDynamicDivisorForEdges);
             stopwatch.Stop();
 
             var sourceValues = string.Join("\n", Array.ConvertAll(source, row => string.Join(string.Empty, Array.ConvertAll(row, value => string.Format(CultureInfo.InvariantCulture, "   {0:0}", value)))));
@@ -471,10 +471,9 @@ namespace Nonlinearities.Tests
             var kernel = gaussian.Kernel2D(3);
 
             const bool useDynamicDivisorForEdges = false;
-            const int threshold = 0;
 
             var stopwatch = Stopwatch.StartNew();
-            var convolution = Analysis.Math.Convolution(source, source.Length, source[0].Length, kernel, useDynamicDivisorForEdges, threshold);
+            var convolution = Analysis.Math.Convolution(source, source.Length, source[0].Length, kernel, useDynamicDivisorForEdges);
             stopwatch.Stop();
 
             var sourceValues = string.Join("\n", Array.ConvertAll(source, row => string.Join(string.Empty, Array.ConvertAll(row, value => string.Format(CultureInfo.InvariantCulture, "   {0:0}", value)))));

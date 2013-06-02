@@ -1,4 +1,6 @@
-﻿using System.Windows.Threading;
+﻿using System.Windows.Media.Imaging;
+using System.Windows.Threading;
+using AForge.Math;
 using Nonlinearities.Analysis;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +15,7 @@ using Microsoft.Research.DynamicDataDisplay;
 using Microsoft.Research.DynamicDataDisplay.PointMarkers;
 using System.ComponentModel;
 using System.Data;
+using Nonlinearities.Gui.Properties;
 
 namespace Nonlinearities.Gui
 {
@@ -29,6 +32,7 @@ namespace Nonlinearities.Gui
         private DataTable _numericData;
         private Timer _animationTimer;
         private List<LineAndMarker<ElementMarkerPointsGraph>> _eigenvaluesGraphs;
+        private List<Kernel> _kernels;
 
         #endregion
 
@@ -42,6 +46,8 @@ namespace Nonlinearities.Gui
 
         public MainWindow()
         {
+            LoadKernels();
+
             DataContext = this;
 
             InitializeComponent();
@@ -65,6 +71,14 @@ namespace Nonlinearities.Gui
 
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("NumericData"));
+            }
+        }
+
+        public List<Kernel> Kernels
+        {
+            get
+            {
+                return _kernels;
             }
         }
 
@@ -224,9 +238,63 @@ namespace Nonlinearities.Gui
 
         }
 
+        private void OnSmoothCheckBoxClick(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (ReceptiveFieldPlotCanvas != null)
+                ReceptiveFieldPlotCanvas.Children.Clear();
+
+            var imageData = GetReceptiveFieldPlotData();
+            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+        }
+
+        private void OnDynamicDevisorCheckBoxClick(object sender, RoutedEventArgs e)
+        {
+            if (ReceptiveFieldPlotCanvas != null)
+                ReceptiveFieldPlotCanvas.Children.Clear();
+
+            var imageData = GetReceptiveFieldPlotData();
+            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+        }
+
+        private void OnSmoothKernelComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ReceptiveFieldPlotCanvas != null)
+                ReceptiveFieldPlotCanvas.Children.Clear();
+
+            var imageData = GetReceptiveFieldPlotData();
+            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+        }
+
         #endregion
 
         #region Private Members
+
+        private void LoadKernels()
+        {
+            _kernels = new List<Kernel>()
+                {
+                    new Kernel()
+                        {
+                            Name = "All Neighbors",
+                            Description = "A normal blur filter is a type of image-blurring that uses all neighbors for calculating the transformation to apply to each pixel in the image.",
+                            Image = "Resources/AllNeighbors.png",
+                            Matrix = new double[3,3]
+                                {
+                                    { 1, 1, 1 },
+                                    { 1, 1, 1 },
+                                    { 1, 1, 1 }
+                                }
+                        },
+
+                    new Kernel()
+                        {
+                            Name = "Gaussian",
+                            Description = "The Gaussian blur is a type of image-blurring filter that uses a Gaussian function for calculating the transformation to apply to each pixel in the image.",
+                            Image = "Resources/Gauss 02.png",
+                            Matrix = (new Gaussian()).Kernel2D(3)
+                        }
+                };
+        }
 
         private void InitializeEigenvaluesPlot()
         {
@@ -342,18 +410,29 @@ namespace Nonlinearities.Gui
             if (!int.TryParse(TimeTextbox.Text, out maxTime))
                 maxTime = 16;
 
-            // var kernel = (new Gaussian()).Kernel2D(3);
-            var smoothKernel = new double[3, 3]
-                {
-                    { 1, 1, 1 },
-                    { 1, 1, 1 },
-                    { 1, 1, 1 }
-                };
-
-            double smoothThreshold = 0;
+            double[,] smoothKernel = null;
             bool useDynamicDivisorForEdges = false;
 
-            _receptiveField = SpikeTriggeredAnalysis.CalculateRF(_stimuli, spikes.ToArray(), offset, maxTime, smoothKernel, smoothThreshold, useDynamicDivisorForEdges);
+            if (SmoothCheckBox.IsChecked.HasValue && SmoothCheckBox.IsChecked.Value)
+            {
+                useDynamicDivisorForEdges = DynamicDevisorCheckBox.IsChecked != null && DynamicDevisorCheckBox.IsChecked.Value;
+
+                if (SmoothKernelComboBox.SelectedIndex == 0)
+                {
+                    smoothKernel = new double[3, 3]
+                        {
+                            { 1, 1, 1 },
+                            { 1, 1, 1 },
+                            { 1, 1, 1 }
+                        };
+                }
+                else if (SmoothKernelComboBox.SelectedIndex==1)
+                {
+                    smoothKernel = (new Gaussian()).Kernel2D(3);
+                }
+            }
+
+            _receptiveField = SpikeTriggeredAnalysis.CalculateRF(_stimuli, spikes.ToArray(), offset, maxTime, smoothKernel, useDynamicDivisorForEdges);
 
             return _receptiveField;
         }
@@ -413,7 +492,7 @@ namespace Nonlinearities.Gui
             StimuliSlider.Minimum = 0;
             StimuliSlider.Maximum = _stimuli.Length - 1;
         }
-    
+
         #endregion
     } 
 }

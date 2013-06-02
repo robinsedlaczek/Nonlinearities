@@ -81,7 +81,7 @@ namespace Nonlinearities.Analysis
         /// no smoothing will be done.
         /// </param>
         /// <returns>Returns a 2x2-matrix containing the receptive field. </returns>
-        public static double[][] CalculateRF(double[][] stimuli, double[][][] spikes, int offset, int maxTime, double[,] smoothKernel, double smoothThreshold = 0, bool useDynamicDivisorForEdges = false)
+        public static double[][] CalculateRF(double[][] stimuli, double[][][] spikes, int offset, int maxTime, double[,] smoothKernel, bool useDynamicDivisorForEdges = false)
         {
             var receptiveField = new double[maxTime][];
 
@@ -94,7 +94,7 @@ namespace Nonlinearities.Analysis
             if (smoothKernel == null)
                 return receptiveField;
 
-            var result = Math.Convolution(receptiveField, receptiveField.Length, receptiveField[0].Length, smoothKernel, useDynamicDivisorForEdges, smoothThreshold);
+            var result = Math.Convolution(receptiveField, receptiveField.Length, receptiveField[0].Length, smoothKernel, useDynamicDivisorForEdges);
 
             return result;
         }
