@@ -343,6 +343,18 @@ namespace Nonlinearities.Analysis
             }
         }
 
+        /// <summary>
+        /// This service calculates the convolution of a matrix and a kernel.
+        /// </summary>
+        /// <param name="source">The source matrix on which the kernel is applied via convolution operation.</param>
+        /// <param name="sourceRows">The number of rows of the source matrix.</param>
+        /// <param name="sourceColumns">The number of columns of the source matrix.</param>
+        /// <param name="kernelMatrix">The kernel matrix which will be applied to the source matrix via convolution operation.</param>
+        /// <param name="useDynamicDivisorForEdges">
+        /// Indicates whether to devide the resulting matrix value by the real number of neighbors processed in one iteration (e.g. there are
+        /// less neighbors at the edge of the matrix) or by the number of all possible neighbors.
+        /// </param>
+        /// <returns>Returns the matrix resulting from the convolution operation.</returns>
         public static double[][] Convolution(double[][] source, int sourceRows, int sourceColumns, double[,] kernelMatrix, bool useDynamicDivisorForEdges = true)
         {
             var result = new double[sourceRows][];
