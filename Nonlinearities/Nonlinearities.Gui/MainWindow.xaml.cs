@@ -32,7 +32,7 @@ namespace Nonlinearities.Gui
         private DataTable _numericData;
         private Timer _animationTimer;
         private List<LineAndMarker<ElementMarkerPointsGraph>> _eigenvaluesGraphs;
-        private List<Kernel> _kernels;
+        private List<KernelGuiElement> _kernels;
 
         #endregion
 
@@ -74,7 +74,7 @@ namespace Nonlinearities.Gui
             }
         }
 
-        public List<Kernel> Kernels
+        public List<KernelGuiElement> Kernels
         {
             get
             {
@@ -271,9 +271,9 @@ namespace Nonlinearities.Gui
 
         private void LoadKernels()
         {
-            _kernels = new List<Kernel>()
+            _kernels = new List<KernelGuiElement>()
                 {
-                    new Kernel()
+                    new KernelGuiElement()
                         {
                             Name = "All Neighbors",
                             Description = "A normal blur filter is a type of image-blurring that uses all neighbors for calculating the transformation to apply to each pixel in the image.",
@@ -286,7 +286,7 @@ namespace Nonlinearities.Gui
                                 }
                         },
 
-                    new Kernel()
+                    new KernelGuiElement()
                         {
                             Name = "Gaussian",
                             Description = "The Gaussian blur is a type of image-blurring filter that uses a Gaussian function for calculating the transformation to apply to each pixel in the image.",
