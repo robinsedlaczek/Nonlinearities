@@ -9,19 +9,19 @@
 	Title="MainWindow" Height="600" Width="1000" WindowStartupLocation="CenterScreen" Icon="Resources/Icon.png" SizeChanged="OnSizeChanged" Loaded="OnLoaded" LocationChanged="OnLocationChanged">
 	<Window.Resources>
 		<DataTemplate x:Key="KernelListItemDataTemplate" DataType="gui:Kernel">
-			<Grid MinHeight="75" MaxHeight="75" MinWidth="300" MaxWidth="300">
+			<Grid MinHeight="75" MaxHeight="100" MinWidth="250" MaxWidth="250">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition/>
 				</Grid.ColumnDefinitions>
 
-                <Image Grid.Column="0" Margin="5" MaxWidth="75" MaxHeight="75" VerticalAlignment="Center">
-                    <Image.Source>
-                        <BitmapImage UriSource="{Binding Path=Image}" />
-                    </Image.Source>
-                </Image>
-                
-                <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+				<Image Grid.Column="0" Margin="5" MaxWidth="75" MaxHeight="75" VerticalAlignment="Center">
+					<Image.Source>
+						<BitmapImage UriSource="{Binding Path=Image}" />
+					</Image.Source>
+				</Image>
+				
+				<StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
 					<TextBlock Text="{Binding Path=Name}" FontWeight="Bold" Margin="5,5,5,0" MaxWidth="300" FontSize="10" />
 					<TextBlock Text="{Binding Path=Description}" Margin="5,0,5,5" TextWrapping="Wrap" MaxWidth="300" FontSize="10" />
 				</StackPanel>
@@ -58,28 +58,58 @@
 				</Grid>
 			</TabItem>
 			<TabItem x:Name="ReceptiveFieldTabItem" Header="Receptive Field" GotFocus="OnReceptiveFieldTabItemGotFocus" Padding="20,5">
-				<Grid Background="#FFE5E5E5">
+                <Grid x:Name="ReceptiveFieldTabItemGrid" Background="#FFE5E5E5">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto"/>
 						<ColumnDefinition/>
 					</Grid.ColumnDefinitions>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition/>
+					</Grid.RowDefinitions>
 
-					<StackPanel Orientation="Vertical" Margin="10,0,10,0">
-						<CheckBox x:Name="Cell1CheckBox" Content="Cell 1" Margin="0,15,30,0" Click="OnCell1CheckBoxClicked" IsChecked="True" />
-						<CheckBox x:Name="Cell2CheckBox" Content="Cell 2" Margin="0,0,30,0" Click="OnCell2CheckBoxClicked"/>
-						<CheckBox x:Name="Cell3CheckBox" Content="Cell 3" Margin="0,0,30,0" Click="OnCell3CheckBoxClicked"/>
-						<CheckBox x:Name="Cell4CheckBox" Content="Cell 4" Margin="0,0,30,0" Click="OnCell4CheckBoxClicked"/>
-						<Label Content="Offset:" Padding="0,10,0,0"/>
-						<TextBox x:Name="OffsetTextbox" Text="16" TextChanged="OnOffsetTextboxTextChanged"/>
-						<Label Content="Time:" Padding="0"/>
-						<TextBox x:Name="TimeTextbox" Text="16" TextChanged="OnTimeTextboxTextChanged"/>
-						<CheckBox x:Name="SmoothCheckBox" Content="Smooth" Margin="0,15,0,0" Click="OnSmoothCheckBoxClick"/>
-						<CheckBox x:Name="DynamicDevisorCheckBox" Content="Dynamic Devisor" IsEnabled="{Binding IsChecked, ElementName=SmoothCheckBox}" Click="OnDynamicDevisorCheckBoxClick" />
-						<Label Content="Kernel:" Padding="0,10,0,0" IsEnabled="{Binding IsChecked, ElementName=SmoothCheckBox}" />
-                        <ComboBox x:Name="SmoothKernelComboBox" ItemsSource="{Binding Path=Kernels}" IsEnabled="{Binding IsChecked, ElementName=SmoothCheckBox}" IsReadOnly="True" SelectionChanged="OnSmoothKernelComboBoxSelectionChanged" ItemTemplate="{DynamicResource KernelListItemDataTemplate}" d:DataContext="{d:DesignInstance gui:Kernel, IsDesignTimeCreatable=True}" SelectedIndex="0" />
-					</StackPanel>
+					<StackPanel x:Name="StaOptionsPanel" Orientation="Horizontal" Grid.Column="0" Grid.Row="0">
+                        <Border BorderThickness="1" BorderBrush="DarkGray"  Margin="5,5,5,5">
+                            <StackPanel Orientation="Vertical" Background="#FFFBFBFB">
+							    <CheckBox x:Name="Cell1CheckBox" Content="Cell 1" Margin="10,10,60,0" Click="OnCell1CheckBoxClicked" IsChecked="True" />
+							    <CheckBox x:Name="Cell2CheckBox" Content="Cell 2" Margin="10,5,60,0" Click="OnCell2CheckBoxClicked"/>
+							    <CheckBox x:Name="Cell3CheckBox" Content="Cell 3" Margin="10,5,60,0" Click="OnCell3CheckBoxClicked"/>
+							    <CheckBox x:Name="Cell4CheckBox" Content="Cell 4" Margin="10,5,60,15" Click="OnCell4CheckBoxClicked"/>
+						    </StackPanel>
+                        </Border>
+                        <Border BorderThickness="1" BorderBrush="DarkGray" Margin="0,5,5,5">
+                            <StackPanel Orientation="Vertical" Width="75" Background="#FFFBFBFB" >
+							    <Label Content="Offset:" Padding="10,10,0,0" Margin="0,0,0,0"/>
+                                <TextBox x:Name="OffsetTextbox" Margin="10,0,10,0" Text="16" TextChanged="OnOffsetTextboxTextChanged"/>
+                                <Label Content="Time:" Padding="10,0,0,0" Margin="0,0,0,0"/>
+							    <TextBox x:Name="TimeTextbox" Text="16" Margin="10,0,10,0" TextChanged="OnTimeTextboxTextChanged"/>
+						    </StackPanel>
+                        </Border>
+                        <Border BorderThickness="1" BorderBrush="DarkGray" Margin="0,5,5,5">
+                            <StackPanel Orientation="Vertical" Background="#FFFBFBFB">
+                                <StackPanel Orientation="Horizontal" Margin="10,0,10,0">
+                                    <CheckBox x:Name="SmoothCheckBox" Content="Smooth" Margin="0,10,0,0" Click="OnSmoothCheckBoxClick"/>
+                                    <CheckBox x:Name="DynamicDevisorCheckBox" Content="Dynamic Devisor" Margin="20,10,0,0" IsEnabled="{Binding IsChecked, ElementName=SmoothCheckBox}" Click="OnDynamicDevisorCheckBoxClick" />
+                                </StackPanel>
+                                <ComboBox x:Name="SmoothKernelComboBox" ItemsSource="{Binding Path=Kernels}" IsEnabled="{Binding IsChecked, ElementName=SmoothCheckBox}" IsReadOnly="True" SelectionChanged="OnSmoothKernelComboBoxSelectionChanged" ItemTemplate="{DynamicResource KernelListItemDataTemplate}" d:DataContext="{d:DesignInstance gui:KernelGuiElement, IsDesignTimeCreatable=True}" SelectedIndex="0" Margin="10,5,10,10"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
 
-					<Canvas x:Name="ReceptiveFieldPlotCanvas" Grid.Column="1" Background="#FF555555" SizeChanged="OnReceptiveFieldPlotCanvasSizeChanged"/>
+                    <Canvas x:Name="ReceptiveFieldPlotCanvas" Margin="5,5,5,5" Grid.Column="0" Grid.Row="1" Background="#FF555555" SizeChanged="OnReceptiveFieldPlotCanvasSizeChanged"/>
+
+                    <StackPanel Orientation="Horizontal" Grid.Column="2" Grid.Row="0">
+                        <Border BorderThickness="1" BorderBrush="DarkGray" Margin="10,5,5,5">
+                            <StackPanel Orientation="Vertical" Background="#FFFBFBFB" Margin="0,0,0,0" >
+                                <Label Content="Stimuli-offset for Match:" Padding="10,10,20,0" Margin="0,0,0,0"/>
+                                <wpfx:LongUpDown x:Name="StimuliOffsetForMatchUpDown" Margin="10,0,10,0" ValueChanged="OnStimuliOffsetForMatchUpDownValueChanged" DefaultValue="0"></wpfx:LongUpDown>
+                                <RadioButton GroupName="MatchOperation" IsChecked="True" x:Name="MatchWithStaLeftHandRadioButton" Content="match with STA left-hand" Margin="10,10,10,0" Checked="OnMatchWithStaLeftHandRadioButtonChecked"/>
+                                <RadioButton GroupName="MatchOperation" x:Name="MatchWithStimuliLeftHandRadioButton" Content="match with Stimuli left-hand" Margin="10,0,10,0" Checked="OnMatchWithStimuliLeftHandRadioButtonChecked"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <Canvas x:Name="MatchPlotCanvas" Margin="10,5,5,5" Grid.Column="1" Grid.Row="1" Background="#FF555555" SizeChanged="OnMatchPlotCanvasSizeChanged"/>
 				</Grid>
 			</TabItem>
 			<TabItem x:Name="PrincipalComponentsAnalysisTabItem" Header="Principal Components Analysis" GotFocus="OnPrincipalComponentsAnalysisTabItemGotFocus" Padding="20,5">

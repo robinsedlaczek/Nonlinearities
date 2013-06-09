@@ -29,6 +29,7 @@ namespace Nonlinearities.Gui
         private double[][] _stimuli;
         private double[][][] _spikes;
         private double[][] _receptiveField;
+        private double[][][] _matches;
         private DataTable _numericData;
         private Timer _animationTimer;
         private List<LineAndMarker<ElementMarkerPointsGraph>> _eigenvaluesGraphs;
@@ -126,62 +127,50 @@ namespace Nonlinearities.Gui
                 _animationTimer.Change(Timeout.Infinite, Timeout.Infinite);
         }
 
+        private void OnMatchPlotCanvasSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            DrawMatch(false);
+        }
+
         private void OnReceptiveFieldPlotCanvasSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            ReceptiveFieldPlotCanvas.Children.Clear();
-
-            var imageData = GetReceptiveFieldPlotData(false);
-            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+            DrawReceptiveField(false);
         }
 
         private void OnCell1CheckBoxClicked(object sender, RoutedEventArgs e)
         {
-            ReceptiveFieldPlotCanvas.Children.Clear();
-
-            var imageData = GetReceptiveFieldPlotData();
-            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+            DrawReceptiveField(true);
+            DrawMatch(true);
         }
 
         private void OnCell2CheckBoxClicked(object sender, RoutedEventArgs e)
         {
-            ReceptiveFieldPlotCanvas.Children.Clear();
-
-            var imageData = GetReceptiveFieldPlotData();
-            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+            DrawReceptiveField(true);
+            DrawMatch(true);
         }
 
         private void OnCell3CheckBoxClicked(object sender, RoutedEventArgs e)
         {
-            ReceptiveFieldPlotCanvas.Children.Clear();
-
-            var imageData = GetReceptiveFieldPlotData();
-            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+            DrawReceptiveField(true);
+            DrawMatch(true);
         }
 
         private void OnCell4CheckBoxClicked(object sender, RoutedEventArgs e)
         {
-            ReceptiveFieldPlotCanvas.Children.Clear();
-
-            var imageData = GetReceptiveFieldPlotData();
-            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+            DrawReceptiveField(true);
+            DrawMatch(true);
         }
 
         private void OnOffsetTextboxTextChanged(object sender, TextChangedEventArgs e)
         {
-            if (ReceptiveFieldPlotCanvas != null)
-                ReceptiveFieldPlotCanvas.Children.Clear();
-
-            var imageData = GetReceptiveFieldPlotData();
-            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+            DrawReceptiveField(true);
+            DrawMatch(true);
         }
 
         private void OnTimeTextboxTextChanged(object sender, TextChangedEventArgs e)
         {
-            if (ReceptiveFieldPlotCanvas != null)
-                ReceptiveFieldPlotCanvas.Children.Clear();
-
-            var imageData = GetReceptiveFieldPlotData();
-            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+            DrawReceptiveField(true);
+            DrawMatch(true);
         }
 
         private void OnPCACellCheckBoxClicked(object sender, RoutedEventArgs e)
@@ -225,7 +214,8 @@ namespace Nonlinearities.Gui
 
             InitializeStimuliView();
             InitializeReceptiveFieldPlotView();
-            InitializeEigenvaluesPlot();
+            InitializeMatchPlotView();
+            InitializeEigenvaluesPlotView();
         }
 
         private void OnLocationChanged(object sender, System.EventArgs e)
@@ -240,29 +230,35 @@ namespace Nonlinearities.Gui
 
         private void OnSmoothCheckBoxClick(object sender, System.Windows.RoutedEventArgs e)
         {
-            if (ReceptiveFieldPlotCanvas != null)
-                ReceptiveFieldPlotCanvas.Children.Clear();
-
-            var imageData = GetReceptiveFieldPlotData();
-            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+            DrawReceptiveField(true);
+            DrawMatch(true);
         }
 
         private void OnDynamicDevisorCheckBoxClick(object sender, RoutedEventArgs e)
         {
-            if (ReceptiveFieldPlotCanvas != null)
-                ReceptiveFieldPlotCanvas.Children.Clear();
-
-            var imageData = GetReceptiveFieldPlotData();
-            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+            DrawReceptiveField(true);
+            DrawMatch(true);
         }
 
         private void OnSmoothKernelComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (ReceptiveFieldPlotCanvas != null)
-                ReceptiveFieldPlotCanvas.Children.Clear();
+            DrawReceptiveField(true);
+            DrawMatch(true);
+        }
 
-            var imageData = GetReceptiveFieldPlotData();
-            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+        private void OnStimuliOffsetForMatchUpDownValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            DrawMatch(false);
+        }
+
+        private void OnMatchWithStaLeftHandRadioButtonChecked(object sender, RoutedEventArgs e)
+        {
+            DrawMatch(true);
+        }
+
+        private void OnMatchWithStimuliLeftHandRadioButtonChecked(object sender, RoutedEventArgs e)
+        {
+            DrawMatch(true);
         }
 
         #endregion
@@ -296,7 +292,7 @@ namespace Nonlinearities.Gui
                 };
         }
 
-        private void InitializeEigenvaluesPlot()
+        private void InitializeEigenvaluesPlotView()
         {
             if (_eigenvaluesGraphs == null)
                 _eigenvaluesGraphs = new List<LineAndMarker<ElementMarkerPointsGraph>>();
@@ -473,6 +469,108 @@ namespace Nonlinearities.Gui
             }
         }
 
+        private void InitializeMatchPlotView()
+        {
+            var imageData = GetMatchPlotData();
+            PlotMatche(imageData, MatchPlotCanvas);
+        }
+
+        private double[][] GetMatchPlotData(bool recalcData = true)
+        {
+            if (_spikes == null)
+                return null;
+
+            if (!recalcData)
+                return _matches[(int)StimuliOffsetForMatchUpDown.Value];
+
+            var spikes = new List<double[][]>();
+
+            if (Cell1CheckBox.IsChecked != null && Cell1CheckBox.IsChecked.Value)
+                spikes.Add(_spikes[0]);
+
+            if (Cell2CheckBox.IsChecked != null && Cell2CheckBox.IsChecked.Value)
+                spikes.Add(_spikes[1]);
+
+            if (Cell3CheckBox.IsChecked != null && Cell3CheckBox.IsChecked.Value)
+                spikes.Add(_spikes[2]);
+
+            if (Cell4CheckBox.IsChecked != null && Cell4CheckBox.IsChecked.Value)
+                spikes.Add(_spikes[3]);
+
+            if (spikes.Count == 0)
+                return null;
+
+            int offset;
+            if (!int.TryParse(OffsetTextbox.Text, out offset))
+                offset = 16;
+
+            int maxTime;
+            if (!int.TryParse(TimeTextbox.Text, out maxTime))
+                maxTime = 16;
+
+            double[,] smoothKernel = null;
+            bool useDynamicDivisorForEdges = false;
+
+            if (SmoothCheckBox.IsChecked.HasValue && SmoothCheckBox.IsChecked.Value)
+            {
+                useDynamicDivisorForEdges = DynamicDevisorCheckBox.IsChecked != null && DynamicDevisorCheckBox.IsChecked.Value;
+
+                if (SmoothKernelComboBox.SelectedIndex == 0)
+                    smoothKernel = new double[3, 3]
+                        {
+                            { 1, 1, 1 },
+                            { 1, 1, 1 },
+                            { 1, 1, 1 }
+                        };
+                else if (SmoothKernelComboBox.SelectedIndex == 1)
+                    smoothKernel = (new Gaussian()).Kernel2D(3);
+            }
+
+            var receptiveField = SpikeTriggeredAnalysis.CalculateRF(_stimuli, spikes.ToArray(), offset, maxTime, smoothKernel, useDynamicDivisorForEdges);
+            _matches = SpikeTriggeredAnalysis.CalculateMatches(_stimuli, receptiveField, MatchWithStaLeftHandRadioButton.IsChecked.Value ? MatchOperation.StaLeftHandWithStimuliRightHand : MatchOperation.StimuliLeftHandWithStaRightHand);
+
+            StimuliOffsetForMatchUpDown.Minimum = 0;
+            StimuliOffsetForMatchUpDown.Maximum = _stimuli.Length - receptiveField.GetLength(0) - 1;
+
+            return _matches[(int)StimuliOffsetForMatchUpDown.Value];
+        }
+
+        private void PlotMatche(double[][] imageData, Canvas plotCanvas)
+        {
+            if (imageData == null)
+                return;
+
+            double minimum;
+            double maximum;
+            Math.MinMax(imageData, out minimum, out maximum);
+
+            var dataHeight = imageData.Length;
+            var dataWidth = imageData[0].Length;
+
+            var rasterHeight = plotCanvas.ActualHeight / dataHeight;
+            var rasterWidth = plotCanvas.ActualWidth / dataWidth;
+
+            for (var y = 0; y < dataHeight; y++)
+            {
+                for (var x = 0; x < dataWidth; x++)
+                {
+                    var alpha = (byte)(((imageData[y][x] - minimum) * 255) / (maximum - minimum));
+
+                    var rect = new Rectangle
+                    {
+                        Fill = new SolidColorBrush(Color.FromArgb(255, alpha, alpha, alpha)),
+                        Width = rasterWidth,
+                        Height = rasterHeight
+                    };
+
+                    Canvas.SetTop(rect, y * rasterHeight);
+                    Canvas.SetLeft(rect, x * rasterWidth);
+
+                    plotCanvas.Children.Add(rect);
+                }
+            }
+        }
+
         private void InitializeStimuliView()
         {
             var columns = _stimuli[0].Length;
@@ -493,6 +591,25 @@ namespace Nonlinearities.Gui
             StimuliSlider.Maximum = _stimuli.Length - 1;
         }
 
+        private void DrawMatch(bool recalcData)
+        {
+            if (MatchPlotCanvas != null)
+                MatchPlotCanvas.Children.Clear();
+
+            var imageData = GetMatchPlotData(recalcData);
+            PlotMatche(imageData, MatchPlotCanvas);
+        }
+
+        private void DrawReceptiveField(bool recalcData)
+        {
+            if (ReceptiveFieldPlotCanvas != null)
+                ReceptiveFieldPlotCanvas.Children.Clear();
+
+            var imageData = GetReceptiveFieldPlotData(recalcData);
+            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+        }
+
         #endregion
+
     } 
 }

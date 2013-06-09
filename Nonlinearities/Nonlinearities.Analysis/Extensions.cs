@@ -11,28 +11,27 @@ namespace Nonlinearities.Analysis
     public static class Extensions
     {
         /// <summary>
-        /// This method returns the Eigenvectors of a matrix as an array of arrays rather than a multi-dimensional array (C#-stuff).
+        /// This method returns the values of a matrix as an array of arrays rather than a multi-dimensional array.
+        /// The values will be copied element by element. So the result is a real copy of the original matrix. 
         /// </summary>
-        /// <param name="evd">The Eigen value decomposition of the matrix.</param>
+        /// <param name="matrix">The matrix to copy into an array.</param>
         /// <returns>
-        /// Returns an array of arrays where the first dimension contains the vectors and the second dimension contains the values of each vector.
+        /// Returns an array of arrays where the first dimension contains the rows and the second dimension contains 
+        /// the column values of the original matrix.
         /// </returns>
-        public static double[][] EigenVectorsAsArrayOfArray(this Evd<double> evd)
+        public static double[][] AsArray(this Matrix<double> matrix)
         {
-            Matrix<double> evdEigenVectors = evd.EigenVectors();
+            var result = new double[matrix.RowCount][];
 
-            var eigenVectors = new double[evdEigenVectors.RowCount][];
-
-            for (var vector = 0; vector < evdEigenVectors.RowCount; vector++)
+            for (var row = 0; row < matrix.RowCount; row++)
             {
-                for (var value = 0; value < evdEigenVectors.ColumnCount; value++)
-                {
-                    eigenVectors[vector] = new double[evdEigenVectors.ColumnCount];
-                    eigenVectors[vector][value] = evdEigenVectors[vector, value];
-                }
+                result[row] = new double[matrix.ColumnCount];
+
+                for (var column = 0; column < matrix.ColumnCount; column++)
+                    result[row][column] = matrix[row, column];
             }
 
-            return eigenVectors;
+            return result;
         }
 
         /// <summary>

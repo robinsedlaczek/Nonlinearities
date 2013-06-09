@@ -175,5 +175,21 @@ namespace Nonlinearities.Tests
             var values = String.Join(", ", Array.ConvertAll(mean, value => string.Format(CultureInfo.InvariantCulture, "{0:0.00000000}", value)));
             Console.WriteLine("Mean(raw stimuli, duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[" + values + "]\n");
         }
+
+        [TestMethod] 
+        public void TestCalculateMatch()
+        {
+            var stimuli = DataLoader.GetStimuli();
+            var spikes = DataLoader.GetSpikes();
+
+            var stopwatch = Stopwatch.StartNew();
+            var receptiveField = SpikeTriggeredAnalysis.CalculateRF(stimuli, spikes, 16, 16, null);
+            var match = SpikeTriggeredAnalysis.CalculateMatches(stimuli, receptiveField, MatchOperation.StaLeftHandWithStimuliRightHand);
+
+            stopwatch.Stop();
+
+            var values = string.Join("\n", Array.ConvertAll(receptiveField, row => string.Join("\t", Array.ConvertAll(row, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)))));
+            Console.WriteLine("\nMatch (STA * Stimuli) (duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[\n" + values + "\n]");
+        }
     }
 }
