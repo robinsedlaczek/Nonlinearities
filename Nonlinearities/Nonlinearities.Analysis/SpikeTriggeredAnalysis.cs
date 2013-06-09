@@ -167,6 +167,8 @@ namespace Nonlinearities.Analysis
         }
 
         #endregion
+        
+
 
         #region Private Members
 
