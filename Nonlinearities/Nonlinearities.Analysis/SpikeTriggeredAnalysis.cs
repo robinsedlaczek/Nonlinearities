@@ -99,6 +99,31 @@ namespace Nonlinearities.Analysis
             return result;
         }
 
+        public static double[][][] CalculateMatches(double[][] stimuli, double[][] receptiveField, MatchOperation matchOperation)
+        {
+            var dimension = receptiveField.Length;
+            var result = new double[stimuli.Length - dimension][][];
+            var receptiveFieldMatrix = (new DenseMatrix(1)).OfArray(receptiveField);
+
+            for (var matchIndex = 0; matchIndex < stimuli.Length - dimension; matchIndex++)
+            {
+                result[matchIndex] = new double[dimension][];
+
+                var stimuliData = new double[dimension][];
+                for (var index = 0; index < dimension; index++)
+                    stimuliData[index] = stimuli[dimension - index - 1 + matchIndex];
+
+                var stimuliMatrix = (new DenseMatrix(1)).OfArray(stimuliData);
+
+                if (matchOperation == MatchOperation.StaLeftHandWithStimuliRightHand)
+                    result[matchIndex] = receptiveFieldMatrix.Multiply(stimuliMatrix).AsArray();
+                else if (matchOperation == MatchOperation.StimuliLeftHandWithStaRightHand)
+                    result[matchIndex] = stimuliMatrix.Multiply(receptiveFieldMatrix).AsArray();
+            }
+
+            return result;
+        }
+
         /// <summary>
         /// This service calculates the spike-triggered covariance for given stimuli data and response spikes data.
         /// </summary>
@@ -162,8 +187,8 @@ namespace Nonlinearities.Analysis
 
             eigenValues = (from value in evd.EigenValues()
                            select value.Real).ToArray<double>();
-            
-            eigenVectors = evd.EigenVectorsAsArrayOfArray();
+
+            eigenVectors = evd.EigenVectors().AsArray();
         }
 
         #endregion
