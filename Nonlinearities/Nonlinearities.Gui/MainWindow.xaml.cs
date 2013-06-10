@@ -29,7 +29,8 @@ namespace Nonlinearities.Gui
         private double[][] _stimuli;
         private double[][][] _spikes;
         private double[][] _receptiveField;
-        private double[][][] _matches;
+        private double[][][] _matchesForRawStimuli;
+        private double[][][] _matchesForSpikeTriggeredStimuli;
         private DataTable _numericData;
         private Timer _animationTimer;
         private List<LineAndMarker<ElementMarkerPointsGraph>> _eigenvaluesGraphs;
@@ -261,6 +262,11 @@ namespace Nonlinearities.Gui
             DrawMatch(true);
         }
 
+        private void OnMatchViewComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            DrawMatch(true);
+        }
+
         #endregion
 
         #region Private Members
@@ -481,7 +487,7 @@ namespace Nonlinearities.Gui
                 return null;
 
             if (!recalcData)
-                return _matches[(int)StimuliOffsetForMatchUpDown.Value];
+                return _matchesForRawStimuli[(int)StimuliOffsetForMatchUpDown.Value];
 
             var spikes = new List<double[][]>();
 
@@ -527,12 +533,22 @@ namespace Nonlinearities.Gui
             }
 
             var receptiveField = SpikeTriggeredAnalysis.CalculateRF(_stimuli, spikes.ToArray(), offset, maxTime, smoothKernel, useDynamicDivisorForEdges);
-            _matches = SpikeTriggeredAnalysis.CalculateMatches(_stimuli, receptiveField, MatchWithStaLeftHandRadioButton.IsChecked.Value ? MatchOperation.StaLeftHandWithStimuliRightHand : MatchOperation.StimuliLeftHandWithStaRightHand);
+
+            const double frameInterval = 1 / 59.721395; // = 0.016744 ms
+
+            var spikeTriggeredStimuli = SpikeTriggeredAnalysis.GetSpikeTriggeredStimulusEnsemble(_stimuli, _spikes, frameInterval, 0, RoundStrategy.Round);
+            
+            _matchesForRawStimuli = SpikeTriggeredAnalysis.CalculateMatches(_stimuli, receptiveField, MatchWithStaLeftHandRadioButton.IsChecked.Value ? MatchOperation.StaLeftHandWithStimuliRightHand : MatchOperation.StimuliLeftHandWithStaRightHand);
+            _matchesForSpikeTriggeredStimuli = SpikeTriggeredAnalysis.CalculateMatches(spikeTriggeredStimuli, receptiveField, MatchWithStaLeftHandRadioButton.IsChecked.Value ? MatchOperation.StaLeftHandWithStimuliRightHand : MatchOperation.StimuliLeftHandWithStaRightHand);
 
             StimuliOffsetForMatchUpDown.Minimum = 0;
             StimuliOffsetForMatchUpDown.Maximum = _stimuli.Length - receptiveField.GetLength(0) - 1;
 
-            return _matches[(int)StimuliOffsetForMatchUpDown.Value];
+            
+            //var histogram = new Histogram();
+
+
+            return _matchesForRawStimuli[(int)StimuliOffsetForMatchUpDown.Value];
         }
 
         private void PlotMatche(double[][] imageData, Canvas plotCanvas)
