@@ -216,10 +216,6 @@ namespace Nonlinearities.Analysis
             eigenVectors = evd.EigenVectors().AsArray();
         }
 
-        #endregion
-
-        #region Private Members
-
         /// <summary>
         /// This method creates a list with all stimuli data that elicited spikes.
         /// </summary>
@@ -243,7 +239,7 @@ namespace Nonlinearities.Analysis
         /// The strategy for rounding the frame numbers.
         /// </param>
         /// <returns>Returns an array of the stimuli which triggered spikes. </returns>
-        private static double[][] GetSpikeTriggeredStimulusEnsemble(double[][] stimuli, double[][][] spikes, double frameInterval, double frameOffset, RoundStrategy roundStrategy)
+        public static double[][] GetSpikeTriggeredStimulusEnsemble(double[][] stimuli, double[][][] spikes, double frameInterval, double frameOffset, RoundStrategy roundStrategy)
         {
             var spikeTriggeredStimulusEnsemble = new List<double[]>();
             var spikesAndFrames = new double[0][][];
