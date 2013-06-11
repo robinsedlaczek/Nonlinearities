@@ -129,7 +129,7 @@ namespace Nonlinearities.Gui
 
         private void OnMatchPlotCanvasSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            DrawMatch(false);
+            DrawMatchValues(false);
         }
 
         private void OnReceptiveFieldPlotCanvasSizeChanged(object sender, SizeChangedEventArgs e)
@@ -140,37 +140,37 @@ namespace Nonlinearities.Gui
         private void OnCell1CheckBoxClicked(object sender, RoutedEventArgs e)
         {
             DrawReceptiveField(true);
-            DrawMatch(true);
+            DrawMatchValues(true);
         }
 
         private void OnCell2CheckBoxClicked(object sender, RoutedEventArgs e)
         {
             DrawReceptiveField(true);
-            DrawMatch(true);
+            DrawMatchValues(true);
         }
 
         private void OnCell3CheckBoxClicked(object sender, RoutedEventArgs e)
         {
             DrawReceptiveField(true);
-            DrawMatch(true);
+            DrawMatchValues(true);
         }
 
         private void OnCell4CheckBoxClicked(object sender, RoutedEventArgs e)
         {
             DrawReceptiveField(true);
-            DrawMatch(true);
+            DrawMatchValues(true);
         }
 
         private void OnOffsetTextboxTextChanged(object sender, TextChangedEventArgs e)
         {
             DrawReceptiveField(true);
-            DrawMatch(true);
+            DrawMatchValues(true);
         }
 
         private void OnTimeTextboxTextChanged(object sender, TextChangedEventArgs e)
         {
             DrawReceptiveField(true);
-            DrawMatch(true);
+            DrawMatchValues(true);
         }
 
         private void OnPCACellCheckBoxClicked(object sender, RoutedEventArgs e)
@@ -231,34 +231,39 @@ namespace Nonlinearities.Gui
         private void OnSmoothCheckBoxClick(object sender, System.Windows.RoutedEventArgs e)
         {
             DrawReceptiveField(true);
-            DrawMatch(true);
+            DrawMatchValues(true);
         }
 
         private void OnDynamicDevisorCheckBoxClick(object sender, RoutedEventArgs e)
         {
             DrawReceptiveField(true);
-            DrawMatch(true);
+            DrawMatchValues(true);
         }
 
         private void OnSmoothKernelComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             DrawReceptiveField(true);
-            DrawMatch(true);
+            DrawMatchValues(true);
         }
 
         private void OnStimuliOffsetForMatchUpDownValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            DrawMatch(false);
+            DrawMatchValues(false);
         }
 
         private void OnMatchWithStaLeftHandRadioButtonChecked(object sender, RoutedEventArgs e)
         {
-            DrawMatch(true);
+            DrawMatchValues(true);
         }
 
         private void OnMatchWithStimuliLeftHandRadioButtonChecked(object sender, RoutedEventArgs e)
         {
-            DrawMatch(true);
+            DrawMatchValues(true);
+        }
+
+        private void OnMatchViewComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            DrawMatchValues(true);
         }
 
         #endregion
@@ -582,8 +587,11 @@ namespace Nonlinearities.Gui
             StimuliSlider.Maximum = _stimuli.Length - 1;
         }
 
-        private void DrawMatch(bool recalcData)
+        private void DrawMatchValues(bool recalcData)
         {
+            if (MatchValuePlotter != null)
+                MatchValuePlotter.Children.Clear();
+
             var matchValues = GetMatchValuesPlotData();
             PlotMatchValues(matchValues, Colors.DarkGray);
         }
