@@ -188,8 +188,8 @@ namespace Nonlinearities.Tests
 
             stopwatch.Stop();
 
-            var values = string.Join("\n", Array.ConvertAll(receptiveField, row => string.Join("\t", Array.ConvertAll(row, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)))));
-            Console.WriteLine("\nMatch (STA * Stimuli) (duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[\n" + values + "\n]");
+            var values = string.Join(", ", Array.ConvertAll(match, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
+            Console.WriteLine("\nMatch Values (STA * Stimuli) (duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[\n" + values + "\n]");
         }
     }
 }

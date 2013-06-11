@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MathNet.Numerics.Statistics;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -458,6 +459,11 @@ namespace Nonlinearities.Analysis
             }
 
             return result;
+        }
+
+        public static Histogram CalculateHistogram(double[] values, int buckets)
+        {
+            return new Histogram(values, buckets);
         }
     }
 }

@@ -29,7 +29,7 @@ namespace Nonlinearities.Gui
         private double[][] _stimuli;
         private double[][][] _spikes;
         private double[][] _receptiveField;
-        private double[][][] _matches;
+        private double[] _matches;
         private DataTable _numericData;
         private Timer _animationTimer;
         private List<LineAndMarker<ElementMarkerPointsGraph>> _eigenvaluesGraphs;
@@ -214,7 +214,7 @@ namespace Nonlinearities.Gui
 
             InitializeStimuliView();
             InitializeReceptiveFieldPlotView();
-            InitializeMatchPlotView();
+            InitializeMatchValuesPlotView();
             InitializeEigenvaluesPlotView();
         }
 
@@ -406,8 +406,19 @@ namespace Nonlinearities.Gui
             if (!int.TryParse(TimeTextbox.Text, out maxTime))
                 maxTime = 16;
 
-            double[,] smoothKernel = null;
-            bool useDynamicDivisorForEdges = false;
+            double[,] smoothKernel;
+            bool useDynamicDivisorForEdges;
+            GetSmoothKernel(out smoothKernel, out useDynamicDivisorForEdges);
+
+            _receptiveField = SpikeTriggeredAnalysis.CalculateRF(_stimuli, spikes.ToArray(), offset, maxTime, smoothKernel, useDynamicDivisorForEdges);
+
+            return _receptiveField;
+        }
+
+        private void GetSmoothKernel(out double[,] smoothKernel, out bool useDynamicDivisorForEdges)
+        {
+            smoothKernel = null;
+            useDynamicDivisorForEdges = false;
 
             if (SmoothCheckBox.IsChecked.HasValue && SmoothCheckBox.IsChecked.Value)
             {
@@ -422,15 +433,11 @@ namespace Nonlinearities.Gui
                             { 1, 1, 1 }
                         };
                 }
-                else if (SmoothKernelComboBox.SelectedIndex==1)
+                else if (SmoothKernelComboBox.SelectedIndex == 1)
                 {
                     smoothKernel = (new Gaussian()).Kernel2D(3);
                 }
             }
-
-            _receptiveField = SpikeTriggeredAnalysis.CalculateRF(_stimuli, spikes.ToArray(), offset, maxTime, smoothKernel, useDynamicDivisorForEdges);
-
-            return _receptiveField;
         }
 
         private void PlotReceptiveField(double[][] imageData, Canvas plotCanvas)
@@ -469,19 +476,19 @@ namespace Nonlinearities.Gui
             }
         }
 
-        private void InitializeMatchPlotView()
+        private void InitializeMatchValuesPlotView()
         {
-            var imageData = GetMatchPlotData();
-            PlotMatche(imageData, MatchPlotCanvas);
+            var matchValues = GetMatchValuesPlotData();
+            PlotMatchValues(matchValues, Colors.DarkGray);
         }
 
-        private double[][] GetMatchPlotData(bool recalcData = true)
+        private double[] GetMatchValuesPlotData(bool recalcData = true)
         {
             if (_spikes == null)
                 return null;
 
             if (!recalcData)
-                return _matches[(int)StimuliOffsetForMatchUpDown.Value];
+                return _matches;
 
             var spikes = new List<double[][]>();
 
@@ -511,64 +518,48 @@ namespace Nonlinearities.Gui
             double[,] smoothKernel = null;
             bool useDynamicDivisorForEdges = false;
 
-            if (SmoothCheckBox.IsChecked.HasValue && SmoothCheckBox.IsChecked.Value)
-            {
-                useDynamicDivisorForEdges = DynamicDevisorCheckBox.IsChecked != null && DynamicDevisorCheckBox.IsChecked.Value;
-
-                if (SmoothKernelComboBox.SelectedIndex == 0)
-                    smoothKernel = new double[3, 3]
-                        {
-                            { 1, 1, 1 },
-                            { 1, 1, 1 },
-                            { 1, 1, 1 }
-                        };
-                else if (SmoothKernelComboBox.SelectedIndex == 1)
-                    smoothKernel = (new Gaussian()).Kernel2D(3);
-            }
+            GetSmoothKernel(out smoothKernel, out useDynamicDivisorForEdges);
 
             var receptiveField = SpikeTriggeredAnalysis.CalculateRF(_stimuli, spikes.ToArray(), offset, maxTime, smoothKernel, useDynamicDivisorForEdges);
             _matches = SpikeTriggeredAnalysis.CalculateMatches(_stimuli, receptiveField, MatchWithStaLeftHandRadioButton.IsChecked.Value ? MatchOperation.StaLeftHandWithStimuliRightHand : MatchOperation.StimuliLeftHandWithStaRightHand);
 
-            StimuliOffsetForMatchUpDown.Minimum = 0;
-            StimuliOffsetForMatchUpDown.Maximum = _stimuli.Length - receptiveField.GetLength(0) - 1;
-
-            return _matches[(int)StimuliOffsetForMatchUpDown.Value];
+            return _matches;
         }
 
-        private void PlotMatche(double[][] imageData, Canvas plotCanvas)
+        private LineGraph PlotMatchValues(double[] matchValues, Color color)
         {
-            if (imageData == null)
-                return;
+            if (matchValues == null)
+                return null;
 
-            double minimum;
-            double maximum;
-            Math.MinMax(imageData, out minimum, out maximum);
+            var buckets = 10;
 
-            var dataHeight = imageData.Length;
-            var dataWidth = imageData[0].Length;
+            var histogram = Math.CalculateHistogram(matchValues, buckets);
 
-            var rasterHeight = plotCanvas.ActualHeight / dataHeight;
-            var rasterWidth = plotCanvas.ActualWidth / dataWidth;
+            // Prepare data in arrays
+            // var N = 1000; // matchValues.Length;
+            var x = new double[buckets];
+            var y = new double[buckets];
 
-            for (var y = 0; y < dataHeight; y++)
+            for (var index = 0; index < buckets; index++)
             {
-                for (var x = 0; x < dataWidth; x++)
-                {
-                    var alpha = (byte)(((imageData[y][x] - minimum) * 255) / (maximum - minimum));
-
-                    var rect = new Rectangle
-                    {
-                        Fill = new SolidColorBrush(Color.FromArgb(255, alpha, alpha, alpha)),
-                        Width = rasterWidth,
-                        Height = rasterHeight
-                    };
-
-                    Canvas.SetTop(rect, y * rasterHeight);
-                    Canvas.SetLeft(rect, x * rasterWidth);
-
-                    plotCanvas.Children.Add(rect);
-                }
+                x[index] = histogram[index].LowerBound;
+                y[index] = histogram[index].Count;
             }
+
+            // Add data sources:
+            var yDataSource = new EnumerableDataSource<double>(y);
+            yDataSource.SetYMapping(Y => Y);
+            yDataSource.AddMapping(ShapeElementPointMarker.ToolTipTextProperty, Y => string.Format("Match Value \n\n{0}", Y));
+
+            var xDataSource = new EnumerableDataSource<double>(x);
+            xDataSource.SetXMapping(X => X);
+
+            var compositeDataSource = new CompositeDataSource(xDataSource, yDataSource);
+
+            MatchValuePlotter.Viewport.Restrictions.Add(new PhysicalProportionsRestriction { ProportionRatio = 500000 });
+            var graph = MatchValuePlotter.AddLineGraph(compositeDataSource, color, 0.5, "Match Values");
+
+            return graph;
         }
 
         private void InitializeStimuliView()
@@ -593,11 +584,8 @@ namespace Nonlinearities.Gui
 
         private void DrawMatch(bool recalcData)
         {
-            if (MatchPlotCanvas != null)
-                MatchPlotCanvas.Children.Clear();
-
-            var imageData = GetMatchPlotData(recalcData);
-            PlotMatche(imageData, MatchPlotCanvas);
+            var matchValues = GetMatchValuesPlotData();
+            PlotMatchValues(matchValues, Colors.DarkGray);
         }
 
         private void DrawReceptiveField(bool recalcData)

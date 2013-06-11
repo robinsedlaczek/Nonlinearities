@@ -99,16 +99,41 @@ namespace Nonlinearities.Analysis
             return result;
         }
 
-        public static double[][][] CalculateMatches(double[][] stimuli, double[][] receptiveField, MatchOperation matchOperation)
+        /// <summary>
+        /// This service calculates the match values of stimuli and a receptive field.
+        /// </summary>
+        /// <param name="stimuli">
+        /// The stimuli that triggered spikes as 2-dimensional array with:
+        /// [?][ ] - List of stimuli frames.
+        /// [ ][?] - Stimulus data for the frame.</param>
+        /// <param name="receptiveField">
+        /// The receptive field as 2-dimensional array with:
+        /// [?][ ] - Rows of the receptive field.
+        /// [ ][?] - Column values of the receptive field.
+        /// </param>
+        /// <param name="matchOperation">
+        /// The order of operands in multiplication operation.
+        /// </param>
+        /// <returns>
+        /// Returns a vector containing the match values of the receptive field and the stimuli.
+        /// </returns>
+        /// <remarks>
+        /// Calculation of match values:
+        /// 
+        /// M =  Mean(RF * S)
+        /// 
+        /// RF = receptive field
+        /// S  = stimuli
+        /// M  = resulting match value vector
+        /// </remarks>
+        public static double[] CalculateMatches(double[][] stimuli, double[][] receptiveField, MatchOperation matchOperation)
         {
             var dimension = receptiveField.Length;
-            var result = new double[stimuli.Length - dimension][][];
+            var result = new double[stimuli.Length - dimension];
             var receptiveFieldMatrix = (new DenseMatrix(1)).OfArray(receptiveField);
 
             for (var matchIndex = 0; matchIndex < stimuli.Length - dimension; matchIndex++)
             {
-                result[matchIndex] = new double[dimension][];
-
                 var stimuliData = new double[dimension][];
                 for (var index = 0; index < dimension; index++)
                     stimuliData[index] = stimuli[dimension - index - 1 + matchIndex];
@@ -116,9 +141,9 @@ namespace Nonlinearities.Analysis
                 var stimuliMatrix = (new DenseMatrix(1)).OfArray(stimuliData);
 
                 if (matchOperation == MatchOperation.StaLeftHandWithStimuliRightHand)
-                    result[matchIndex] = receptiveFieldMatrix.Multiply(stimuliMatrix).AsArray();
+                    result[matchIndex] = receptiveFieldMatrix.PointwiseMultiply(stimuliMatrix).ToRowWiseArray().Average();
                 else if (matchOperation == MatchOperation.StimuliLeftHandWithStaRightHand)
-                    result[matchIndex] = stimuliMatrix.Multiply(receptiveFieldMatrix).AsArray();
+                    result[matchIndex] = stimuliMatrix.PointwiseMultiply(receptiveFieldMatrix).ToRowWiseArray().Average();
             }
 
             return result;
