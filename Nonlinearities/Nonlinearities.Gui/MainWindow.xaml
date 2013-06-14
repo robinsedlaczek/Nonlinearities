@@ -103,16 +103,18 @@
                             <StackPanel Orientation="Vertical" Background="#FFFBFBFB" Margin="0,0,0,0" >
                                 <RadioButton GroupName="MatchOperation" IsChecked="True" x:Name="MatchWithStaLeftHandRadioButton" Content="match with STA left-hand" Margin="10,10,10,0" Checked="OnMatchWithStaLeftHandRadioButtonChecked"/>
                                 <RadioButton GroupName="MatchOperation" x:Name="MatchWithStimuliLeftHandRadioButton" Content="match with Stimuli left-hand" Margin="10,0,10,0" Checked="OnMatchWithStimuliLeftHandRadioButtonChecked"/>
-                            </StackPanel>
-                        </Border>
-                        
-                        <Border BorderThickness="1" BorderBrush="DarkGray" Margin="0,5,5,5">
-                            <StackPanel Orientation="Vertical" Background="#FFFBFBFB" Margin="0,0,0,0" >
                                 <Label Content="View:" Padding="10,10,20,0" Margin="0,0,0,0"/>
                                 <ComboBox x:Name="MatchViewComboBox" Margin="10,0,10,0" IsTextSearchEnabled="False" SelectedIndex="0" SelectionChanged="OnMatchViewComboBoxSelectionChanged">
                                     <ListBoxItem Content="Matches of raw stimuli"/>
                                     <ListBoxItem Content="Matches of spike-triggered stimuli"/>
                                 </ComboBox>
+                            </StackPanel>
+                        </Border>
+                        
+                        <Border BorderThickness="1" BorderBrush="DarkGray" Margin="0,5,5,5">
+                            <StackPanel Orientation="Vertical" Background="#FFFBFBFB" Margin="0,0,0,0" >
+                                <Label Content="Buckets:" Padding="10,10,20,0" Margin="0,0,0,0"/>
+                                <wpfx:IntegerUpDown x:Name="BucketsUpDown" Margin="10,0,10,0" Minimum="1" Maximum="1000" DefaultValue="10" Text="10" ValueChanged="OnBucketsUpDownValueChanged"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>

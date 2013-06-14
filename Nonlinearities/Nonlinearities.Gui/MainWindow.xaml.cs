@@ -33,6 +33,7 @@ namespace Nonlinearities.Gui
         private DataTable _numericData;
         private Timer _animationTimer;
         private List<LineAndMarker<ElementMarkerPointsGraph>> _eigenvaluesGraphs;
+        private List<LineGraph> _histogramGraphs;
         private List<KernelGuiElement> _kernels;
 
         #endregion
@@ -266,6 +267,11 @@ namespace Nonlinearities.Gui
             DrawMatchValues(true);
         }
 
+        private void OnBucketsUpDownValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            DrawMatchValues(true);
+        }
+
         #endregion
 
         #region Private Members
@@ -483,8 +489,13 @@ namespace Nonlinearities.Gui
 
         private void InitializeMatchValuesPlotView()
         {
+            if (_histogramGraphs == null)
+                _histogramGraphs = new List<LineGraph>();
+
             var matchValues = GetMatchValuesPlotData();
-            PlotMatchValues(matchValues, Colors.DarkGray);
+            var graph = PlotMatchValues(matchValues, Constants.COLOR_Histogram);
+
+            _histogramGraphs.Add(graph);
         }
 
         private double[] GetMatchValuesPlotData(bool recalcData = true)
@@ -536,8 +547,7 @@ namespace Nonlinearities.Gui
             if (matchValues == null)
                 return null;
 
-            var buckets = 10;
-
+            var buckets = BucketsUpDown.Value != null ? BucketsUpDown.Value.Value : 10;
             var histogram = Math.CalculateHistogram(matchValues, buckets);
 
             // Prepare data in arrays
@@ -561,7 +571,7 @@ namespace Nonlinearities.Gui
 
             var compositeDataSource = new CompositeDataSource(xDataSource, yDataSource);
 
-            MatchValuePlotter.Viewport.Restrictions.Add(new PhysicalProportionsRestriction { ProportionRatio = 500000 });
+            // MatchValuePlotter.Viewport.Restrictions.Add(new PhysicalProportionsRestriction { ProportionRatio = 500000 });
             var graph = MatchValuePlotter.AddLineGraph(compositeDataSource, color, 0.5, "Match Values");
 
             return graph;
@@ -590,10 +600,16 @@ namespace Nonlinearities.Gui
         private void DrawMatchValues(bool recalcData)
         {
             if (MatchValuePlotter != null)
-                MatchValuePlotter.Children.Clear();
+            {
+                _histogramGraphs.ForEach(graph => MatchValuePlotter.Children.Remove(graph));
+                _histogramGraphs.Clear();                    
+            }
 
             var matchValues = GetMatchValuesPlotData();
-            PlotMatchValues(matchValues, Colors.DarkGray);
+            var newGraph = PlotMatchValues(matchValues, Constants.COLOR_Histogram);
+
+            if (newGraph != null)
+                _histogramGraphs.Add(newGraph);
         }
 
         private void DrawReceptiveField(bool recalcData)
