@@ -182,9 +182,12 @@ namespace Nonlinearities.Tests
             var stimuli = DataLoader.GetStimuli();
             var spikes = DataLoader.GetSpikes();
 
+            var useDynamicDivisorForEdges = true;
             var stopwatch = Stopwatch.StartNew();
             var receptiveField = SpikeTriggeredAnalysis.CalculateRF(stimuli, spikes, 16, 16, null);
-            var match = SpikeTriggeredAnalysis.CalculateMatches(stimuli, receptiveField, MatchOperation.StaLeftHandWithStimuliRightHand);
+            var smoothKernel = (new Gaussian()).Kernel2D(3);
+            var forSpikeTriggeredStimuliOnly = true;
+            var match = SpikeTriggeredAnalysis.CalculateMatchValues(stimuli, spikes, forSpikeTriggeredStimuliOnly, 16, 16, smoothKernel, useDynamicDivisorForEdges, MatchOperation.StaLeftHandWithStimuliRightHand);
 
             stopwatch.Stop();
 

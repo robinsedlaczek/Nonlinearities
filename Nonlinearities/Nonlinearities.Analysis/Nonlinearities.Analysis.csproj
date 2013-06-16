@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants.cs" />
     <Compile Include="DataLoader.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="LoessInterpolator.cs" />

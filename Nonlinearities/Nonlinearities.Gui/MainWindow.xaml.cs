@@ -536,8 +536,10 @@ namespace Nonlinearities.Gui
 
             GetSmoothKernel(out smoothKernel, out useDynamicDivisorForEdges);
 
-            var receptiveField = SpikeTriggeredAnalysis.CalculateRF(_stimuli, spikes.ToArray(), offset, maxTime, smoothKernel, useDynamicDivisorForEdges);
-            _matches = SpikeTriggeredAnalysis.CalculateMatches(_stimuli, receptiveField, MatchWithStaLeftHandRadioButton.IsChecked.Value ? MatchOperation.StaLeftHandWithStimuliRightHand : MatchOperation.StimuliLeftHandWithStaRightHand);
+            if (MatchViewComboBox.SelectedIndex == 0) // raw stimuli
+                _matches = SpikeTriggeredAnalysis.CalculateMatchValues(_stimuli, _spikes, false, offset, maxTime, smoothKernel, useDynamicDivisorForEdges, MatchWithStaLeftHandRadioButton.IsChecked.Value ? MatchOperation.StaLeftHandWithStimuliRightHand : MatchOperation.StimuliLeftHandWithStaRightHand);
+            else
+                _matches = SpikeTriggeredAnalysis.CalculateMatchValues(_stimuli, _spikes, true, offset, maxTime, smoothKernel, useDynamicDivisorForEdges, MatchWithStaLeftHandRadioButton.IsChecked.Value ? MatchOperation.StaLeftHandWithStimuliRightHand : MatchOperation.StimuliLeftHandWithStaRightHand);
 
             return _matches;
         }
@@ -546,6 +548,8 @@ namespace Nonlinearities.Gui
         {
             if (matchValues == null)
                 return null;
+
+            TotalMatchValuesLabel.Content = matchValues.Length.ToString();
 
             var buckets = BucketsUpDown.Value != null ? BucketsUpDown.Value.Value : 10;
             var histogram = Math.CalculateHistogram(matchValues, buckets);

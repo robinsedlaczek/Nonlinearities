@@ -49,8 +49,7 @@ namespace Nonlinearities.Analysis
         /// </remarks>
         public static double[] CalculateSTA(double[][] stimuli, double[][][] spikes, int frameOffset, RoundStrategy roundStrategy)
         {
-            const double frameInterval = 1 / 59.721395; // = 0.016744 ms
-            var spikeTriggeredStimulusEnsemble = GetSpikeTriggeredStimulusEnsemble(stimuli, spikes, frameInterval, frameOffset, roundStrategy);
+            var spikeTriggeredStimulusEnsemble = GetSpikeTriggeredStimulusEnsemble(stimuli, spikes, frameOffset, roundStrategy);
 
             var sta = Math.Subtract(Math.Mean(spikeTriggeredStimulusEnsemble), Math.Mean(stimuli));
 
@@ -80,6 +79,10 @@ namespace Nonlinearities.Analysis
         /// A square matrix representing the smoothing kernel mask used to smooth the result. If this parameter is null,
         /// no smoothing will be done.
         /// </param>
+        /// <param name="useDynamicDivisorForEdges">
+        /// If this parameter is true, division in the convolution operation will be done by the exact number of
+        /// used pixel (considering calculation at edges), otherwise by the maximum number of used pixel.
+        /// </param>
         /// <returns>Returns a 2x2-matrix containing the receptive field. </returns>
         public static double[][] CalculateRF(double[][] stimuli, double[][][] spikes, int offset, int maxTime, double[,] smoothKernel, bool useDynamicDivisorForEdges = false)
         {
@@ -106,10 +109,30 @@ namespace Nonlinearities.Analysis
         /// The stimuli that triggered spikes as 2-dimensional array with:
         /// [?][ ] - List of stimuli frames.
         /// [ ][?] - Stimulus data for the frame.</param>
-        /// <param name="receptiveField">
-        /// The receptive field as 2-dimensional array with:
-        /// [?][ ] - Rows of the receptive field.
-        /// [ ][?] - Column values of the receptive field.
+        /// <param name="spikes">
+        /// The detected spikes for the stimuli as 2-dimensional array with:
+        /// [?][ ][ ] - List of cells.
+        /// [ ][?][ ] - List of spike data for the cell.
+        /// [ ][ ][?] - Time when spike occurred.
+        /// </param>
+        /// <param name="forSpikeTriggeredStimuliOnly">
+        /// 
+        /// 
+        /// 
+        /// </param>
+        /// <param name="frameOffset">
+        /// The offset of the first frame which is taken for calculations. All other frames will be behind that frame.
+        /// </param>
+        /// <param name="maxTime">
+        /// The maximum for STA iterations. So maxTime defines the number of rows for the resulting receptive field matrix.
+        /// </param>
+        /// <param name="smoothKernel">
+        /// A square matrix representing the smoothing kernel mask used to smooth the result. If this parameter is null,
+        /// no smoothing will be done.
+        /// </param>
+        /// <param name="useDynamicDivisorForEdges">
+        /// If this parameter is true, division in the convolution operation will be done by the exact number of
+        /// used pixel (considering calculation at edges), otherwise by the maximum number of used pixel.
         /// </param>
         /// <param name="matchOperation">
         /// The order of operands in multiplication operation.
@@ -126,8 +149,13 @@ namespace Nonlinearities.Analysis
         /// S  = stimuli
         /// M  = resulting match value vector
         /// </remarks>
-        public static double[] CalculateMatches(double[][] stimuli, double[][] receptiveField, MatchOperation matchOperation)
+        public static double[] CalculateMatchValues(double[][] stimuli, double[][][] spikes, bool forSpikeTriggeredStimuliOnly, int frameOffset, int maxTime, double[,] smoothKernel, bool useDynamicDivisorForEdges, MatchOperation matchOperation)
         {
+            // TODO: Can be optimized! CalculateRF also calls GetSpikeTriggeredStimulusEnsemble.
+            if (forSpikeTriggeredStimuliOnly)
+                stimuli = GetSpikeTriggeredStimulusEnsemble(stimuli, spikes, frameOffset, RoundStrategy.Round);
+
+            var receptiveField = CalculateRF(stimuli, spikes, frameOffset, maxTime, smoothKernel, useDynamicDivisorForEdges);
             var dimension = receptiveField.Length;
             var result = new double[stimuli.Length - dimension];
             var receptiveFieldMatrix = (new DenseMatrix(1)).OfArray(receptiveField);
@@ -183,9 +211,7 @@ namespace Nonlinearities.Analysis
         /// </remarks>
         public static double[][] CalculateSTC(double[][] stimuli, double[][][] spikes, RoundStrategy roundStrategy)
         {
-
-            const double frameInterval = 1 / 59.721395; // = 0.016744 ms
-            var spikeTriggeredStimulusEnsemble = GetSpikeTriggeredStimulusEnsemble(stimuli, spikes, frameInterval, 0, roundStrategy);
+            var spikeTriggeredStimulusEnsemble = GetSpikeTriggeredStimulusEnsemble(stimuli, spikes, 0, roundStrategy);
             var sta = CalculateSTA(stimuli, spikes, 0, roundStrategy);
             var n = spikeTriggeredStimulusEnsemble.Length;
 
@@ -229,9 +255,6 @@ namespace Nonlinearities.Analysis
         /// [ ][?][ ] - List of spike data for the cell.
         /// [ ][ ][?] - No. of frame which triggered the spike.
         /// </param>
-        /// <param name="frameInterval">
-        /// The presentation duration of one stimulus frame.
-        /// </param>
         /// <param name="frameOffset">
         /// The offset of the first frame which is taken for calculations. All other frames will be behind that frame.
         /// </param>
@@ -239,17 +262,17 @@ namespace Nonlinearities.Analysis
         /// The strategy for rounding the frame numbers.
         /// </param>
         /// <returns>Returns an array of the stimuli which triggered spikes. </returns>
-        public static double[][] GetSpikeTriggeredStimulusEnsemble(double[][] stimuli, double[][][] spikes, double frameInterval, double frameOffset, RoundStrategy roundStrategy)
+        public static double[][] GetSpikeTriggeredStimulusEnsemble(double[][] stimuli, double[][][] spikes, int frameOffset, RoundStrategy roundStrategy)
         {
             var spikeTriggeredStimulusEnsemble = new List<double[]>();
             var spikesAndFrames = new double[0][][];
 
             if (roundStrategy == RoundStrategy.Ceiling)
-                spikesAndFrames = Math.Ceiling(Math.Divide(spikes, frameInterval));
+                spikesAndFrames = Math.Ceiling(Math.Divide(spikes, Constants.STIMULI_FrameInterval));
             else if (roundStrategy == RoundStrategy.Floor)
-                spikesAndFrames = Math.Floor(Math.Divide(spikes, frameInterval));
+                spikesAndFrames = Math.Floor(Math.Divide(spikes, Constants.STIMULI_FrameInterval));
             else if (roundStrategy == RoundStrategy.Round)
-                spikesAndFrames = Math.Round(Math.Divide(spikes, frameInterval));
+                spikesAndFrames = Math.Round(Math.Divide(spikes, Constants.STIMULI_FrameInterval));
 
             foreach (double[][] cell in spikesAndFrames)
             {
