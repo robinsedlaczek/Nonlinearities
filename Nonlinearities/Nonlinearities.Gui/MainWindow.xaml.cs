@@ -35,6 +35,7 @@ namespace Nonlinearities.Gui
         private List<LineAndMarker<ElementMarkerPointsGraph>> _eigenvaluesGraphs;
         private List<LineGraph> _histogramGraphs;
         private List<KernelGuiElement> _kernels;
+        private Histogram _nonlinearity;
 
         #endregion
 
@@ -541,15 +542,17 @@ namespace Nonlinearities.Gui
         {
             Histogram matchValuesForRawStimuli;
             Histogram matchValuesForSpikeTriggeredStimuli;
+            Histogram nonlinearity;
 
             var bucketsRawStimuli = MatchValuesForRawStimuliBucketsUpDown != null && MatchValuesForRawStimuliBucketsUpDown.Value != null ? MatchValuesForRawStimuliBucketsUpDown.Value.Value : 200;
             var bucketsSpikeTriggeredStimuli = MatchValuesForSpikeTriggeredStimuliBucketsUpDown != null && MatchValuesForSpikeTriggeredStimuliBucketsUpDown.Value != null ? MatchValuesForSpikeTriggeredStimuliBucketsUpDown.Value.Value : 200;
 
             ClearSTAResponseHistogramGraphs();
-            GetSTAResponseHistogramPlotData(out matchValuesForRawStimuli, out matchValuesForSpikeTriggeredStimuli, recalcData);
-            
+            GetSTAResponseHistogramPlotData(out matchValuesForRawStimuli, out matchValuesForSpikeTriggeredStimuli, out nonlinearity, recalcData);
+
             CreateSTAResponseHistogramGraph(matchValuesForRawStimuli, "Match Values raw Stimuli", bucketsRawStimuli, Constants.COLOR_MatchValuesForRawStimuliHistogram);
             CreateSTAResponseHistogramGraph(matchValuesForSpikeTriggeredStimuli, "Match Values for Spike-triggered Stimuli", bucketsSpikeTriggeredStimuli, Constants.COLOR_MatchValuesForSpikeTriggeredStimuliHistogram);
+            CreateSTAResponseHistogramGraph(nonlinearity, "Nonlinearity (Bayes rule)", nonlinearity != null ? nonlinearity.BucketCount : 0, Constants.COLOR_NonlinearityHistogram);
         }
 
         private void ClearSTAResponseHistogramGraphs()
@@ -563,18 +566,22 @@ namespace Nonlinearities.Gui
             }
         }
 
-        private void GetSTAResponseHistogramPlotData(out Histogram matchValuesForRawStimuli, out Histogram matchValuesForSpikeTriggeredStimuli, bool recalcData = true)
+        private void GetSTAResponseHistogramPlotData(out Histogram matchValuesForRawStimuli, out Histogram matchValuesForSpikeTriggeredStimuli, out Histogram nonlinearity, bool recalcData = true)
         {
             matchValuesForRawStimuli = null;
             matchValuesForSpikeTriggeredStimuli = null;
+            nonlinearity = null;
 
             if (_spikes == null)
                 return;
 
+            // caching
             if (!recalcData)
             {
                 matchValuesForRawStimuli = _matchValuesForRawStimuli;
                 matchValuesForSpikeTriggeredStimuli = _matchValuesForSpikeTriggeredStimuli;
+                nonlinearity = _nonlinearity;
+
                 return;
             }
 
@@ -610,19 +617,17 @@ namespace Nonlinearities.Gui
 
             GetSmoothKernel(out smoothKernel, out useDynamicDivisorForEdges);
 
-            // return value
             matchValuesForRawStimuli =
                 // caching
-                _matchValuesForRawStimuli =
-                // value
-                SpikeTriggeredAnalysis.CalculateSTAResponseHistogram(_stimuli, spikes.ToArray(), false, offset, maxTime, smoothKernel, useDynamicDivisorForEdges, rawStimuliHistogramBuckets);
+                _matchValuesForRawStimuli = SpikeTriggeredAnalysis.CalculateSTAResponseHistogram(_stimuli, spikes.ToArray(), false, offset, maxTime, smoothKernel, useDynamicDivisorForEdges, rawStimuliHistogramBuckets);
 
-            // return value
             matchValuesForSpikeTriggeredStimuli =
                 // caching
-                _matchValuesForSpikeTriggeredStimuli =
-                // value
-                SpikeTriggeredAnalysis.CalculateSTAResponseHistogram(_stimuli, spikes.ToArray(), true, offset, maxTime, smoothKernel, useDynamicDivisorForEdges, spikeTriggeredStimuliHistogramBuckets);
+                _matchValuesForSpikeTriggeredStimuli = SpikeTriggeredAnalysis.CalculateSTAResponseHistogram(_stimuli, spikes.ToArray(), true, offset, maxTime, smoothKernel, useDynamicDivisorForEdges, spikeTriggeredStimuliHistogramBuckets);
+
+            nonlinearity =
+                // caching
+                _nonlinearity = SpikeTriggeredAnalysis.CalculateNonlinearity(matchValuesForRawStimuli, matchValuesForSpikeTriggeredStimuli);
         }
 
         private void CreateSTAResponseHistogramGraph(Histogram histogram, string name, int buckets, Color color)

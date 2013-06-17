@@ -2,6 +2,7 @@
 using MathNet.Numerics.LinearAlgebra.Double.Factorization;
 using MathNet.Numerics.LinearAlgebra.Generic;
 using MathNet.Numerics.LinearAlgebra.Generic.Factorization;
+using MathNet.Numerics.Statistics;
 
 namespace Nonlinearities.Analysis
 {
@@ -10,6 +11,21 @@ namespace Nonlinearities.Analysis
     /// </summary>
     public static class Extensions
     {
+        public static double Mean(this Histogram histogram)
+        {
+            var result = 0d;
+
+            for (var index = 0; index < histogram.BucketCount; index++)
+            {
+                var bucket = histogram[index];
+                result += index * bucket.Count;
+            }
+
+            result /= histogram.DataCount;
+
+            return result;
+        }
+
         /// <summary>
         /// This method returns the values of a matrix as an array of arrays rather than a multi-dimensional array.
         /// The values will be copied element by element. So the result is a real copy of the original matrix. 

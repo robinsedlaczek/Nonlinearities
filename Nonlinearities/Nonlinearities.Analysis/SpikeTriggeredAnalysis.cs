@@ -102,7 +102,7 @@ namespace Nonlinearities.Analysis
         }
 
         /// <summary>
-        /// This service calculates a histogram that shows the probability of spike-triggered average responses. 
+        /// This service calculates a histogram that shows the probability of responses for a single filter applied to a given stimuli
         /// </summary>
         /// <param name="stimuli">
         /// The stimuli that triggered spikes as 2-dimensional array with:
@@ -115,7 +115,7 @@ namespace Nonlinearities.Analysis
         /// [ ][ ][?] - Time when spike occurred.
         /// </param>
         /// <param name="forSpikeTriggeredStimuliOnly">
-        /// 
+        // TODO: Documentation.
         /// 
         /// 
         /// </param>
@@ -168,10 +168,27 @@ namespace Nonlinearities.Analysis
                     stimuliData[index] = stimuli[dimension - index - 1 + matchIndex];
 
                 var stimuliMatrix = (new DenseMatrix(1)).OfArray(stimuliData);
+
+                // TODO: Convolution operation. It is more complicated implemented in Math.cs.
                 result[matchIndex] = receptiveFieldMatrix.PointwiseMultiply(stimuliMatrix).ToRowWiseArray().Average();
             }
 
             return Math.CalculateHistogram(result, buckets);
+        }
+
+        // TODO: Documentation.
+        public static Histogram CalculateNonlinearity(Histogram rawStimuliResponseHistogram, Histogram spikeTriggeredStimuliResponseHistogram)
+        {
+            return null;
+
+            var buckets = System.Math.Min(rawStimuliResponseHistogram.BucketCount, spikeTriggeredStimuliResponseHistogram.BucketCount);
+            var dataCount = System.Math.Min(rawStimuliResponseHistogram.DataCount, spikeTriggeredStimuliResponseHistogram.DataCount);
+            var nonlinearity = new double[(int)dataCount];
+
+            for (var index = 0; index < dataCount; index++)
+                nonlinearity[index] = spikeTriggeredStimuliResponseHistogram[index].Count / rawStimuliResponseHistogram[index].Count;
+
+            return new Histogram(nonlinearity, buckets);
         }
 
         /// <summary>

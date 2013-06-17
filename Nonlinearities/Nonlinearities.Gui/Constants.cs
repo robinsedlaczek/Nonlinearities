@@ -11,5 +11,6 @@ namespace Nonlinearities.Gui
     {
         internal static Color COLOR_MatchValuesForRawStimuliHistogram = Colors.DarkBlue;
         internal static Color COLOR_MatchValuesForSpikeTriggeredStimuliHistogram = Colors.DarkRed;
+        internal static Color COLOR_NonlinearityHistogram = Colors.Black;
     }
 }
