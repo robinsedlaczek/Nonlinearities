@@ -1,5 +1,4 @@
-﻿using System.Windows.Media.Imaging;
-using System.Windows.Threading;
+﻿using System.Windows.Threading;
 using AForge.Math;
 using Nonlinearities.Analysis;
 using System.Collections.Generic;
@@ -15,7 +14,7 @@ using Microsoft.Research.DynamicDataDisplay;
 using Microsoft.Research.DynamicDataDisplay.PointMarkers;
 using System.ComponentModel;
 using System.Data;
-using Nonlinearities.Gui.Properties;
+using Histogram = MathNet.Numerics.Statistics.Histogram;
 
 namespace Nonlinearities.Gui
 {
@@ -29,7 +28,8 @@ namespace Nonlinearities.Gui
         private double[][] _stimuli;
         private double[][][] _spikes;
         private double[][] _receptiveField;
-        private double[] _matches;
+        private Histogram _matchValuesForRawStimuli;
+        private Histogram _matchValuesForSpikeTriggeredStimuli;
         private DataTable _numericData;
         private Timer _animationTimer;
         private List<LineAndMarker<ElementMarkerPointsGraph>> _eigenvaluesGraphs;
@@ -88,6 +88,16 @@ namespace Nonlinearities.Gui
 
         #region Event Handler
 
+        private void OnMatchesForRawStimuliCheckBoxClick(object sender, RoutedEventArgs e)
+        {
+            UpdateSTAResponseHistogramGraphsVisibility();
+        }
+
+        private void OnMatchesForSpikeTriggeredStimuliCheckBoxClick(object sender, RoutedEventArgs e)
+        {
+            UpdateSTAResponseHistogramGraphsVisibility();
+        }
+
         private void OnStimuliSliderValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             var stimulus = _stimuli[(int)StimuliSlider.Value];
@@ -130,7 +140,7 @@ namespace Nonlinearities.Gui
 
         private void OnMatchPlotCanvasSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            DrawMatchValues(false);
+            DrawSTAResponseHistograms(false);
         }
 
         private void OnReceptiveFieldPlotCanvasSizeChanged(object sender, SizeChangedEventArgs e)
@@ -141,37 +151,37 @@ namespace Nonlinearities.Gui
         private void OnCell1CheckBoxClicked(object sender, RoutedEventArgs e)
         {
             DrawReceptiveField(true);
-            DrawMatchValues(true);
+            DrawSTAResponseHistograms(true);
         }
 
         private void OnCell2CheckBoxClicked(object sender, RoutedEventArgs e)
         {
             DrawReceptiveField(true);
-            DrawMatchValues(true);
+            DrawSTAResponseHistograms(true);
         }
 
         private void OnCell3CheckBoxClicked(object sender, RoutedEventArgs e)
         {
             DrawReceptiveField(true);
-            DrawMatchValues(true);
+            DrawSTAResponseHistograms(true);
         }
 
         private void OnCell4CheckBoxClicked(object sender, RoutedEventArgs e)
         {
             DrawReceptiveField(true);
-            DrawMatchValues(true);
+            DrawSTAResponseHistograms(true);
         }
 
         private void OnOffsetTextboxTextChanged(object sender, TextChangedEventArgs e)
         {
             DrawReceptiveField(true);
-            DrawMatchValues(true);
+            DrawSTAResponseHistograms(true);
         }
 
         private void OnTimeTextboxTextChanged(object sender, TextChangedEventArgs e)
         {
             DrawReceptiveField(true);
-            DrawMatchValues(true);
+            DrawSTAResponseHistograms(true);
         }
 
         private void OnPCACellCheckBoxClicked(object sender, RoutedEventArgs e)
@@ -215,8 +225,9 @@ namespace Nonlinearities.Gui
 
             InitializeStimuliView();
             InitializeReceptiveFieldPlotView();
-            InitializeMatchValuesPlotView();
             InitializeEigenvaluesPlotView();
+
+            DrawSTAResponseHistograms(true);
         }
 
         private void OnLocationChanged(object sender, System.EventArgs e)
@@ -232,44 +243,44 @@ namespace Nonlinearities.Gui
         private void OnSmoothCheckBoxClick(object sender, System.Windows.RoutedEventArgs e)
         {
             DrawReceptiveField(true);
-            DrawMatchValues(true);
+            DrawSTAResponseHistograms(true);
         }
 
         private void OnDynamicDevisorCheckBoxClick(object sender, RoutedEventArgs e)
         {
             DrawReceptiveField(true);
-            DrawMatchValues(true);
+            DrawSTAResponseHistograms(true);
         }
 
         private void OnSmoothKernelComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             DrawReceptiveField(true);
-            DrawMatchValues(true);
+            DrawSTAResponseHistograms(true);
         }
 
         private void OnStimuliOffsetForMatchUpDownValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            DrawMatchValues(false);
+            DrawSTAResponseHistograms(false);
         }
 
         private void OnMatchWithStaLeftHandRadioButtonChecked(object sender, RoutedEventArgs e)
         {
-            DrawMatchValues(true);
+            DrawSTAResponseHistograms(true);
         }
 
         private void OnMatchWithStimuliLeftHandRadioButtonChecked(object sender, RoutedEventArgs e)
         {
-            DrawMatchValues(true);
+            DrawSTAResponseHistograms(true);
         }
 
         private void OnMatchViewComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            DrawMatchValues(true);
+            DrawSTAResponseHistograms(true);
         }
 
         private void OnBucketsUpDownValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            DrawMatchValues(true);
+            DrawSTAResponseHistograms(true);
         }
 
         #endregion
@@ -335,12 +346,21 @@ namespace Nonlinearities.Gui
             _eigenvaluesGraphs[3].MarkerGraph.Visibility = BoolToVisibility(PCACell4CheckBox.IsChecked);
         }
 
+        private void UpdateSTAResponseHistogramGraphsVisibility()
+        {
+            if (_histogramGraphs != null && _histogramGraphs.Count > 0)
+            {
+                _histogramGraphs[0].Visibility = BoolToVisibility(MatchesForRawStimuliCheckBox.IsChecked);
+                _histogramGraphs[1].Visibility = BoolToVisibility(MatchesForSpikeTriggeredStimuliCheckBox.IsChecked);
+            }
+        }
+
         private Visibility BoolToVisibility(bool? visible)
         {
             if (visible != null && visible.Value)
-                return System.Windows.Visibility.Visible;
-            else
-                return System.Windows.Visibility.Hidden;
+                return Visibility.Visible;
+            
+            return Visibility.Hidden;
         }
 
         private LineAndMarker<ElementMarkerPointsGraph> PlotEigenvalues(int cell, Brush brush)
@@ -426,6 +446,7 @@ namespace Nonlinearities.Gui
             return _receptiveField;
         }
 
+        // TODO: Move somewhere else e.g. into the Nonlinearities.Analysis project.
         private void GetSmoothKernel(out double[,] smoothKernel, out bool useDynamicDivisorForEdges)
         {
             smoothKernel = null;
@@ -449,6 +470,15 @@ namespace Nonlinearities.Gui
                     smoothKernel = (new Gaussian()).Kernel2D(3);
                 }
             }
+        }
+
+        private void DrawReceptiveField(bool recalcData)
+        {
+            if (ReceptiveFieldPlotCanvas != null)
+                ReceptiveFieldPlotCanvas.Children.Clear();
+
+            var imageData = GetReceptiveFieldPlotData(recalcData);
+            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
         }
 
         private void PlotReceptiveField(double[][] imageData, Canvas plotCanvas)
@@ -487,100 +517,6 @@ namespace Nonlinearities.Gui
             }
         }
 
-        private void InitializeMatchValuesPlotView()
-        {
-            if (_histogramGraphs == null)
-                _histogramGraphs = new List<LineGraph>();
-
-            var matchValues = GetMatchValuesPlotData();
-            var graph = PlotMatchValues(matchValues, Constants.COLOR_Histogram);
-
-            _histogramGraphs.Add(graph);
-        }
-
-        private double[] GetMatchValuesPlotData(bool recalcData = true)
-        {
-            if (_spikes == null)
-                return null;
-
-            if (!recalcData)
-                return _matches;
-
-            var spikes = new List<double[][]>();
-
-            if (Cell1CheckBox.IsChecked != null && Cell1CheckBox.IsChecked.Value)
-                spikes.Add(_spikes[0]);
-
-            if (Cell2CheckBox.IsChecked != null && Cell2CheckBox.IsChecked.Value)
-                spikes.Add(_spikes[1]);
-
-            if (Cell3CheckBox.IsChecked != null && Cell3CheckBox.IsChecked.Value)
-                spikes.Add(_spikes[2]);
-
-            if (Cell4CheckBox.IsChecked != null && Cell4CheckBox.IsChecked.Value)
-                spikes.Add(_spikes[3]);
-
-            if (spikes.Count == 0)
-                return null;
-
-            int offset;
-            if (!int.TryParse(OffsetTextbox.Text, out offset))
-                offset = 16;
-
-            int maxTime;
-            if (!int.TryParse(TimeTextbox.Text, out maxTime))
-                maxTime = 16;
-
-            double[,] smoothKernel = null;
-            bool useDynamicDivisorForEdges = false;
-
-            GetSmoothKernel(out smoothKernel, out useDynamicDivisorForEdges);
-
-            if (MatchViewComboBox.SelectedIndex == 0) // raw stimuli
-                _matches = SpikeTriggeredAnalysis.CalculateMatchValues(_stimuli, _spikes, false, offset, maxTime, smoothKernel, useDynamicDivisorForEdges, MatchWithStaLeftHandRadioButton.IsChecked.Value ? MatchOperation.StaLeftHandWithStimuliRightHand : MatchOperation.StimuliLeftHandWithStaRightHand);
-            else
-                _matches = SpikeTriggeredAnalysis.CalculateMatchValues(_stimuli, _spikes, true, offset, maxTime, smoothKernel, useDynamicDivisorForEdges, MatchWithStaLeftHandRadioButton.IsChecked.Value ? MatchOperation.StaLeftHandWithStimuliRightHand : MatchOperation.StimuliLeftHandWithStaRightHand);
-
-            return _matches;
-        }
-
-        private LineGraph PlotMatchValues(double[] matchValues, Color color)
-        {
-            if (matchValues == null)
-                return null;
-
-            TotalMatchValuesLabel.Content = matchValues.Length.ToString();
-
-            var buckets = BucketsUpDown.Value != null ? BucketsUpDown.Value.Value : 10;
-            var histogram = Math.CalculateHistogram(matchValues, buckets);
-
-            // Prepare data in arrays
-            // var N = 1000; // matchValues.Length;
-            var x = new double[buckets];
-            var y = new double[buckets];
-
-            for (var index = 0; index < buckets; index++)
-            {
-                x[index] = histogram[index].LowerBound;
-                y[index] = histogram[index].Count;
-            }
-
-            // Add data sources:
-            var yDataSource = new EnumerableDataSource<double>(y);
-            yDataSource.SetYMapping(Y => Y);
-            yDataSource.AddMapping(ShapeElementPointMarker.ToolTipTextProperty, Y => string.Format("Match Value \n\n{0}", Y));
-
-            var xDataSource = new EnumerableDataSource<double>(x);
-            xDataSource.SetXMapping(X => X);
-
-            var compositeDataSource = new CompositeDataSource(xDataSource, yDataSource);
-
-            // MatchValuePlotter.Viewport.Restrictions.Add(new PhysicalProportionsRestriction { ProportionRatio = 500000 });
-            var graph = MatchValuePlotter.AddLineGraph(compositeDataSource, color, 0.5, "Match Values");
-
-            return graph;
-        }
-
         private void InitializeStimuliView()
         {
             var columns = _stimuli[0].Length;
@@ -601,28 +537,135 @@ namespace Nonlinearities.Gui
             StimuliSlider.Maximum = _stimuli.Length - 1;
         }
 
-        private void DrawMatchValues(bool recalcData)
+        private void DrawSTAResponseHistograms(bool recalcData)
         {
-            if (MatchValuePlotter != null)
+            Histogram matchValuesForRawStimuli;
+            Histogram matchValuesForSpikeTriggeredStimuli;
+
+            var bucketsRawStimuli = MatchValuesForRawStimuliBucketsUpDown != null && MatchValuesForRawStimuliBucketsUpDown.Value != null ? MatchValuesForRawStimuliBucketsUpDown.Value.Value : 200;
+            var bucketsSpikeTriggeredStimuli = MatchValuesForSpikeTriggeredStimuliBucketsUpDown != null && MatchValuesForSpikeTriggeredStimuliBucketsUpDown.Value != null ? MatchValuesForSpikeTriggeredStimuliBucketsUpDown.Value.Value : 200;
+
+            ClearSTAResponseHistogramGraphs();
+            GetSTAResponseHistogramPlotData(out matchValuesForRawStimuli, out matchValuesForSpikeTriggeredStimuli, recalcData);
+            
+            CreateSTAResponseHistogramGraph(matchValuesForRawStimuli, "Match Values raw Stimuli", bucketsRawStimuli, Constants.COLOR_MatchValuesForRawStimuliHistogram);
+            CreateSTAResponseHistogramGraph(matchValuesForSpikeTriggeredStimuli, "Match Values for Spike-triggered Stimuli", bucketsSpikeTriggeredStimuli, Constants.COLOR_MatchValuesForSpikeTriggeredStimuliHistogram);
+        }
+
+        private void ClearSTAResponseHistogramGraphs()
+        {
+            if (_histogramGraphs == null)
+                _histogramGraphs = new List<LineGraph>();
+            else
             {
                 _histogramGraphs.ForEach(graph => MatchValuePlotter.Children.Remove(graph));
-                _histogramGraphs.Clear();                    
+                _histogramGraphs.Clear();
+            }
+        }
+
+        private void GetSTAResponseHistogramPlotData(out Histogram matchValuesForRawStimuli, out Histogram matchValuesForSpikeTriggeredStimuli, bool recalcData = true)
+        {
+            matchValuesForRawStimuli = null;
+            matchValuesForSpikeTriggeredStimuli = null;
+
+            if (_spikes == null)
+                return;
+
+            if (!recalcData)
+            {
+                matchValuesForRawStimuli = _matchValuesForRawStimuli;
+                matchValuesForSpikeTriggeredStimuli = _matchValuesForSpikeTriggeredStimuli;
+                return;
             }
 
-            var matchValues = GetMatchValuesPlotData();
-            var newGraph = PlotMatchValues(matchValues, Constants.COLOR_Histogram);
+            var spikes = new List<double[][]>();
+
+            if (Cell1CheckBox.IsChecked != null && Cell1CheckBox.IsChecked.Value)
+                spikes.Add(_spikes[0]);
+
+            if (Cell2CheckBox.IsChecked != null && Cell2CheckBox.IsChecked.Value)
+                spikes.Add(_spikes[1]);
+
+            if (Cell3CheckBox.IsChecked != null && Cell3CheckBox.IsChecked.Value)
+                spikes.Add(_spikes[2]);
+
+            if (Cell4CheckBox.IsChecked != null && Cell4CheckBox.IsChecked.Value)
+                spikes.Add(_spikes[3]);
+
+            if (spikes.Count == 0)
+                return;
+
+            int offset;
+            if (!int.TryParse(OffsetTextbox.Text, out offset))
+                offset = 16;
+
+            int maxTime;
+            if (!int.TryParse(TimeTextbox.Text, out maxTime))
+                maxTime = 16;
+
+            var rawStimuliHistogramBuckets = MatchValuesForRawStimuliBucketsUpDown.Value != null ? MatchValuesForRawStimuliBucketsUpDown.Value.Value : 200;
+            var spikeTriggeredStimuliHistogramBuckets = MatchValuesForSpikeTriggeredStimuliBucketsUpDown.Value != null ? MatchValuesForSpikeTriggeredStimuliBucketsUpDown.Value.Value : 200;
+            double[,] smoothKernel = null;
+            bool useDynamicDivisorForEdges = false;
+
+            GetSmoothKernel(out smoothKernel, out useDynamicDivisorForEdges);
+
+            // return value
+            matchValuesForRawStimuli =
+                // caching
+                _matchValuesForRawStimuli =
+                // value
+                SpikeTriggeredAnalysis.CalculateSTAResponseHistogram(_stimuli, spikes.ToArray(), false, offset, maxTime, smoothKernel, useDynamicDivisorForEdges, rawStimuliHistogramBuckets);
+
+            // return value
+            matchValuesForSpikeTriggeredStimuli =
+                // caching
+                _matchValuesForSpikeTriggeredStimuli =
+                // value
+                SpikeTriggeredAnalysis.CalculateSTAResponseHistogram(_stimuli, spikes.ToArray(), true, offset, maxTime, smoothKernel, useDynamicDivisorForEdges, spikeTriggeredStimuliHistogramBuckets);
+        }
+
+        private void CreateSTAResponseHistogramGraph(Histogram histogram, string name, int buckets, Color color)
+        {
+            if (histogram == null)
+                return;
+
+            var newGraph = PlotMatchValueHistograms(histogram, name, color);
 
             if (newGraph != null)
                 _histogramGraphs.Add(newGraph);
         }
 
-        private void DrawReceptiveField(bool recalcData)
+        private LineGraph PlotMatchValueHistograms(Histogram histogram, string histogramName, Color color)
         {
-            if (ReceptiveFieldPlotCanvas != null)
-                ReceptiveFieldPlotCanvas.Children.Clear();
+            if (histogram == null)
+                return null;
 
-            var imageData = GetReceptiveFieldPlotData(recalcData);
-            PlotReceptiveField(imageData, ReceptiveFieldPlotCanvas);
+            // Prepare data in arrays
+            // var N = 1000; // histogram.Length;
+            var x = new double[histogram.BucketCount];
+            var y = new double[histogram.BucketCount];
+
+            for (var index = 0; index < histogram.BucketCount; index++)
+            {
+                x[index] = histogram[index].LowerBound;
+                y[index] = histogram[index].Count;
+            }
+
+            // Add data sources:
+            var yDataSource = new EnumerableDataSource<double>(y);
+            yDataSource.SetYMapping(Y => Y);
+            yDataSource.AddMapping(ShapeElementPointMarker.ToolTipTextProperty, Y => string.Format("Match Value \n\n{0}", Y));
+
+            var xDataSource = new EnumerableDataSource<double>(x);
+            xDataSource.SetXMapping(X => X);
+
+            var compositeDataSource = new CompositeDataSource(xDataSource, yDataSource);
+
+            // MatchValuePlotter.Viewport.Restrictions.Add(new PhysicalProportionsRestriction { ProportionRatio = 500000 });
+            var graph = MatchValuePlotter.AddLineGraph(compositeDataSource, color, 0.5, histogramName);
+
+            return graph;
         }
 
         #endregion

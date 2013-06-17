@@ -179,20 +179,22 @@ namespace Nonlinearities.Tests
         [TestMethod] 
         public void TestCalculateMatch()
         {
-            var stimuli = DataLoader.GetStimuli();
-            var spikes = DataLoader.GetSpikes();
+            //var stimuli = DataLoader.GetStimuli();
+            //var spikes = DataLoader.GetSpikes();
 
-            var useDynamicDivisorForEdges = true;
-            var stopwatch = Stopwatch.StartNew();
-            var receptiveField = SpikeTriggeredAnalysis.CalculateRF(stimuli, spikes, 16, 16, null);
-            var smoothKernel = (new Gaussian()).Kernel2D(3);
-            var forSpikeTriggeredStimuliOnly = true;
-            var match = SpikeTriggeredAnalysis.CalculateMatchValues(stimuli, spikes, forSpikeTriggeredStimuliOnly, 16, 16, smoothKernel, useDynamicDivisorForEdges, MatchOperation.StaLeftHandWithStimuliRightHand);
+            //var useDynamicDivisorForEdges = true;
+            //var stopwatch = Stopwatch.StartNew();
+            //var receptiveField = SpikeTriggeredAnalysis.CalculateRF(stimuli, spikes, 16, 16, null);
+            //var smoothKernel = (new Gaussian()).Kernel2D(3);
+            //var forSpikeTriggeredStimuliOnly = true;
+            //var match = SpikeTriggeredAnalysis.CalculateSTAResponseHistogram(stimuli, spikes, forSpikeTriggeredStimuliOnly, 16, 16, smoothKernel, useDynamicDivisorForEdges, 10);
 
-            stopwatch.Stop();
+            //stopwatch.Stop();
 
-            var values = string.Join(", ", Array.ConvertAll(match, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
-            Console.WriteLine("\nMatch Values (STA * Stimuli) (duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[\n" + values + "\n]");
+            //var values = string.Join(", ", Array.ConvertAll(match, value => string.Format(CultureInfo.InvariantCulture, "{0:0.0000}", value)));
+            //Console.WriteLine("\nMatch Values (STA * Stimuli) (duration: " + stopwatch.ElapsedMilliseconds + " ms) = \n[\n" + values + "\n]");
+
+            throw new NotImplementedException();
         }
     }
 }

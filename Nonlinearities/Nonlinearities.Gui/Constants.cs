@@ -9,6 +9,7 @@ namespace Nonlinearities.Gui
 {
     internal class Constants
     {
-        internal static Color COLOR_Histogram = Colors.DarkBlue;
+        internal static Color COLOR_MatchValuesForRawStimuliHistogram = Colors.DarkBlue;
+        internal static Color COLOR_MatchValuesForSpikeTriggeredStimuliHistogram = Colors.DarkRed;
     }
 }

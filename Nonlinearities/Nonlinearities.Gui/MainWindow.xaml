@@ -6,7 +6,7 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:gui="clr-namespace:Nonlinearities.Gui"
 	xmlns:d3="clr-namespace:Microsoft.Research.DynamicDataDisplay;assembly=DynamicDataDisplay" mc:Ignorable="d" x:Class="Nonlinearities.Gui.MainWindow"
-	Title="MainWindow" Height="600" Width="1000" WindowStartupLocation="CenterScreen" Icon="Resources/Icon.png" SizeChanged="OnSizeChanged" Loaded="OnLoaded" LocationChanged="OnLocationChanged">
+	Title="MainWindow" Height="600" Width="1200" WindowStartupLocation="CenterScreen" Icon="Resources/Icon.png" SizeChanged="OnSizeChanged" Loaded="OnLoaded" LocationChanged="OnLocationChanged">
 	<Window.Resources>
 		<DataTemplate x:Key="KernelListItemDataTemplate" DataType="gui:Kernel">
 			<Grid MinHeight="75" MaxHeight="100" MinWidth="250" MaxWidth="250">
@@ -101,20 +101,18 @@
                     <StackPanel Orientation="Horizontal" Grid.Column="2" Grid.Row="0">
                         <Border BorderThickness="1" BorderBrush="DarkGray" Margin="10,5,5,5">
                             <StackPanel Orientation="Vertical" Background="#FFFBFBFB" Margin="0,0,0,0" >
-                                <RadioButton GroupName="MatchOperation" IsChecked="True" x:Name="MatchWithStaLeftHandRadioButton" Content="match with STA left-hand" Margin="10,10,10,0" Checked="OnMatchWithStaLeftHandRadioButtonChecked"/>
-                                <RadioButton GroupName="MatchOperation" x:Name="MatchWithStimuliLeftHandRadioButton" Content="match with Stimuli left-hand" Margin="10,0,10,0" Checked="OnMatchWithStimuliLeftHandRadioButtonChecked"/>
-                                <CheckBox x:Name="MatchesForRawStimuliCheckBox" Content="Matche for raw stimuli" Margin="10,10,60,0" IsChecked="True" />
-                                <CheckBox x:Name="MatcheForSpikeTriggeredStimuli" Content="Matche for spike-triggered stimuli" Margin="10,5,60,10" IsChecked="True" />
-                            </StackPanel>
-                        </Border>
-                        
-                        <Border BorderThickness="1" BorderBrush="DarkGray" Margin="0,5,5,5">
-                            <StackPanel Orientation="Vertical" Background="#FFFBFBFB" Margin="0,0,0,0" >
-                                <Label Content="Buckets:" Padding="10,10,20,0" Margin="0,0,0,0"/>
-                                <wpfx:IntegerUpDown x:Name="BucketsUpDown" Margin="10,0,10,0" Minimum="1" Maximum="1000" DefaultValue="10" Text="10" ValueChanged="OnBucketsUpDownValueChanged"/>
-                                <StackPanel Orientation="Horizontal" Margin="0">
-                                    <Label Content="Total Match Values:" Padding="10,10,10,0" Margin="0,0,0,0"/>
-                                    <Label x:Name="TotalMatchValuesLabel" Content="0" Padding="5,10,20,0" Margin="0,0,10,0"/>
+                                <CheckBox x:Name="MatchesForRawStimuliCheckBox" Content="Matche for raw stimuli" Margin="10,10,0,0" IsChecked="True" Foreground="DarkBlue" Click="OnMatchesForRawStimuliCheckBoxClick" />
+                                <Label Content="Buckets (raw stimuli):" Padding="30,5,20,1" Margin="0,0,0,0" IsEnabled="{Binding IsChecked, ElementName=MatchesForRawStimuliCheckBox}"/>
+                                <StackPanel Orientation="Horizontal" Margin="30,0,0,0">
+                                    <wpfx:IntegerUpDown x:Name="MatchValuesForRawStimuliBucketsUpDown" Margin="0,0,10,0" Padding="20,0,0,0" MinWidth="75" MaxWidth="75" Minimum="1" Maximum="1000" DefaultValue="200" Text="200" IsEnabled="{Binding IsChecked, ElementName=MatchesForRawStimuliCheckBox}" ValueChanged="OnBucketsUpDownValueChanged"/>
+                                    <Label x:Name="TotalMatchValuesForRawStimuliLabel" Content="(max. 0)" Padding="0" Margin="0,0,10,0" IsEnabled="{Binding IsChecked, ElementName=MatchesForRawStimuliCheckBox}"/>
+                                </StackPanel>
+
+                                <CheckBox x:Name="MatchesForSpikeTriggeredStimuliCheckBox" Content="Matche for spike-triggered stimuli" Margin="10,20,10,0" IsChecked="True" Foreground="DarkRed" Click="OnMatchesForSpikeTriggeredStimuliCheckBoxClick"/>
+                                <Label Content="Buckets (spike-triggered stimuli):" Padding="30,5,20,1" Margin="0,0,0,0" IsEnabled="{Binding IsChecked, ElementName=MatchesForSpikeTriggeredStimuliCheckBox}"/>
+                                <StackPanel Orientation="Horizontal" Margin="30,0,0,10">
+                                    <wpfx:IntegerUpDown x:Name="MatchValuesForSpikeTriggeredStimuliBucketsUpDown" Margin="0,0,10,0" Padding="20,0,0,0" MinWidth="75" MaxWidth="75" Minimum="1" Maximum="1000" DefaultValue="200" Text="200" IsEnabled="{Binding IsChecked, ElementName=MatchesForSpikeTriggeredStimuliCheckBox}" ValueChanged="OnBucketsUpDownValueChanged"/>
+                                    <Label x:Name="TotalMatchValuesForSpikeTriggeredStimuliLabel" Content="(max. 0)" Padding="0" Margin="0,0,10,0" IsEnabled="{Binding IsChecked, ElementName=MatchesForSpikeTriggeredStimuliCheckBox}"/>
                                 </StackPanel>
                             </StackPanel>
                         </Border>

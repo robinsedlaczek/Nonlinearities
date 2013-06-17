@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using AForge.Math;
 using MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.Statistics;
 
 namespace Nonlinearities.Analysis
 {
@@ -103,7 +102,7 @@ namespace Nonlinearities.Analysis
         }
 
         /// <summary>
-        /// This service calculates the match values of stimuli and a receptive field.
+        /// This service calculates a histogram that shows the probability of spike-triggered average responses. 
         /// </summary>
         /// <param name="stimuli">
         /// The stimuli that triggered spikes as 2-dimensional array with:
@@ -134,11 +133,11 @@ namespace Nonlinearities.Analysis
         /// If this parameter is true, division in the convolution operation will be done by the exact number of
         /// used pixel (considering calculation at edges), otherwise by the maximum number of used pixel.
         /// </param>
-        /// <param name="matchOperation">
-        /// The order of operands in multiplication operation.
+        /// <param name="buckets">
+        /// The number of data bins that the histogram should contain.
         /// </param>
         /// <returns>
-        /// Returns a vector containing the match values of the receptive field and the stimuli.
+        /// Returns the histogram.
         /// </returns>
         /// <remarks>
         /// Calculation of match values:
@@ -148,8 +147,10 @@ namespace Nonlinearities.Analysis
         /// RF = receptive field
         /// S  = stimuli
         /// M  = resulting match value vector
+        /// 
+        /// The histogram will be created for M.
         /// </remarks>
-        public static double[] CalculateMatchValues(double[][] stimuli, double[][][] spikes, bool forSpikeTriggeredStimuliOnly, int frameOffset, int maxTime, double[,] smoothKernel, bool useDynamicDivisorForEdges, MatchOperation matchOperation)
+        public static Histogram CalculateSTAResponseHistogram(double[][] stimuli, double[][][] spikes, bool forSpikeTriggeredStimuliOnly, int frameOffset, int maxTime, double[,] smoothKernel, bool useDynamicDivisorForEdges, int buckets)
         {
             // TODO: Can be optimized! CalculateRF also calls GetSpikeTriggeredStimulusEnsemble.
             if (forSpikeTriggeredStimuliOnly)
@@ -167,14 +168,10 @@ namespace Nonlinearities.Analysis
                     stimuliData[index] = stimuli[dimension - index - 1 + matchIndex];
 
                 var stimuliMatrix = (new DenseMatrix(1)).OfArray(stimuliData);
-
-                if (matchOperation == MatchOperation.StaLeftHandWithStimuliRightHand)
-                    result[matchIndex] = receptiveFieldMatrix.PointwiseMultiply(stimuliMatrix).ToRowWiseArray().Average();
-                else if (matchOperation == MatchOperation.StimuliLeftHandWithStaRightHand)
-                    result[matchIndex] = stimuliMatrix.PointwiseMultiply(receptiveFieldMatrix).ToRowWiseArray().Average();
+                result[matchIndex] = receptiveFieldMatrix.PointwiseMultiply(stimuliMatrix).ToRowWiseArray().Average();
             }
 
-            return result;
+            return Math.CalculateHistogram(result, buckets);
         }
 
         /// <summary>
