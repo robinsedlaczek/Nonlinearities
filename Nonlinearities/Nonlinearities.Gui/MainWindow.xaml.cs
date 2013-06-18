@@ -28,8 +28,8 @@ namespace Nonlinearities.Gui
         private double[][] _stimuli;
         private double[][][] _spikes;
         private double[][] _receptiveField;
-        private Histogram _matchValuesForRawStimuli;
-        private Histogram _matchValuesForSpikeTriggeredStimuli;
+        private Histogram _rawStimuliSTAResponseHistogram;
+        private Histogram _spikeTriggeredStimuliSTAResponseDiagram;
         private DataTable _numericData;
         private Timer _animationTimer;
         private List<LineAndMarker<ElementMarkerPointsGraph>> _eigenvaluesGraphs;
@@ -540,18 +540,18 @@ namespace Nonlinearities.Gui
 
         private void DrawSTAResponseHistograms(bool recalcData)
         {
-            Histogram matchValuesForRawStimuli;
-            Histogram matchValuesForSpikeTriggeredStimuli;
+            Histogram rawStimuliSTAResponseHistogram;
+            Histogram spikeTriggeredStimuliSTAResponseHistogram;
             Histogram nonlinearity;
 
             var bucketsRawStimuli = MatchValuesForRawStimuliBucketsUpDown != null && MatchValuesForRawStimuliBucketsUpDown.Value != null ? MatchValuesForRawStimuliBucketsUpDown.Value.Value : 200;
             var bucketsSpikeTriggeredStimuli = MatchValuesForSpikeTriggeredStimuliBucketsUpDown != null && MatchValuesForSpikeTriggeredStimuliBucketsUpDown.Value != null ? MatchValuesForSpikeTriggeredStimuliBucketsUpDown.Value.Value : 200;
 
             ClearSTAResponseHistogramGraphs();
-            GetSTAResponseHistogramPlotData(out matchValuesForRawStimuli, out matchValuesForSpikeTriggeredStimuli, out nonlinearity, recalcData);
+            GetSTAResponseHistogramPlotData(out rawStimuliSTAResponseHistogram, out spikeTriggeredStimuliSTAResponseHistogram, out nonlinearity, recalcData);
 
-            CreateSTAResponseHistogramGraph(matchValuesForRawStimuli, "Match Values raw Stimuli", bucketsRawStimuli, Constants.COLOR_MatchValuesForRawStimuliHistogram);
-            CreateSTAResponseHistogramGraph(matchValuesForSpikeTriggeredStimuli, "Match Values for Spike-triggered Stimuli", bucketsSpikeTriggeredStimuli, Constants.COLOR_MatchValuesForSpikeTriggeredStimuliHistogram);
+            CreateSTAResponseHistogramGraph(rawStimuliSTAResponseHistogram, "Match Values raw Stimuli", bucketsRawStimuli, Constants.COLOR_MatchValuesForRawStimuliHistogram);
+            CreateSTAResponseHistogramGraph(spikeTriggeredStimuliSTAResponseHistogram, "Match Values for Spike-triggered Stimuli", bucketsSpikeTriggeredStimuli, Constants.COLOR_MatchValuesForSpikeTriggeredStimuliHistogram);
             CreateSTAResponseHistogramGraph(nonlinearity, "Nonlinearity (Bayes rule)", nonlinearity != null ? nonlinearity.BucketCount : 0, Constants.COLOR_NonlinearityHistogram);
         }
 
@@ -566,10 +566,10 @@ namespace Nonlinearities.Gui
             }
         }
 
-        private void GetSTAResponseHistogramPlotData(out Histogram matchValuesForRawStimuli, out Histogram matchValuesForSpikeTriggeredStimuli, out Histogram nonlinearity, bool recalcData = true)
+        private void GetSTAResponseHistogramPlotData(out Histogram rawStimuliSTAResponseHistogram, out Histogram spikeTriggeredStimuliSTAResponseDiagram, out Histogram nonlinearity, bool recalcData = true)
         {
-            matchValuesForRawStimuli = null;
-            matchValuesForSpikeTriggeredStimuli = null;
+            rawStimuliSTAResponseHistogram = null;
+            spikeTriggeredStimuliSTAResponseDiagram = null;
             nonlinearity = null;
 
             if (_spikes == null)
@@ -578,8 +578,8 @@ namespace Nonlinearities.Gui
             // caching
             if (!recalcData)
             {
-                matchValuesForRawStimuli = _matchValuesForRawStimuli;
-                matchValuesForSpikeTriggeredStimuli = _matchValuesForSpikeTriggeredStimuli;
+                rawStimuliSTAResponseHistogram = _rawStimuliSTAResponseHistogram;
+                spikeTriggeredStimuliSTAResponseDiagram = _spikeTriggeredStimuliSTAResponseDiagram;
                 nonlinearity = _nonlinearity;
 
                 return;
@@ -617,17 +617,17 @@ namespace Nonlinearities.Gui
 
             GetSmoothKernel(out smoothKernel, out useDynamicDivisorForEdges);
 
-            matchValuesForRawStimuli =
+            rawStimuliSTAResponseHistogram =
                 // caching
-                _matchValuesForRawStimuli = SpikeTriggeredAnalysis.CalculateSTAResponseHistogram(_stimuli, spikes.ToArray(), false, offset, maxTime, smoothKernel, useDynamicDivisorForEdges, rawStimuliHistogramBuckets);
+                _rawStimuliSTAResponseHistogram = SpikeTriggeredAnalysis.CalculateSTAResponseHistogram(_stimuli, spikes.ToArray(), false, offset, maxTime, smoothKernel, useDynamicDivisorForEdges, rawStimuliHistogramBuckets);
 
-            matchValuesForSpikeTriggeredStimuli =
+            spikeTriggeredStimuliSTAResponseDiagram =
                 // caching
-                _matchValuesForSpikeTriggeredStimuli = SpikeTriggeredAnalysis.CalculateSTAResponseHistogram(_stimuli, spikes.ToArray(), true, offset, maxTime, smoothKernel, useDynamicDivisorForEdges, spikeTriggeredStimuliHistogramBuckets);
+                _spikeTriggeredStimuliSTAResponseDiagram = SpikeTriggeredAnalysis.CalculateSTAResponseHistogram(_stimuli, spikes.ToArray(), true, offset, maxTime, smoothKernel, useDynamicDivisorForEdges, spikeTriggeredStimuliHistogramBuckets);
 
             nonlinearity =
                 // caching
-                _nonlinearity = SpikeTriggeredAnalysis.CalculateNonlinearity(matchValuesForRawStimuli, matchValuesForSpikeTriggeredStimuli);
+                _nonlinearity = SpikeTriggeredAnalysis.CalculateNonlinearity(rawStimuliSTAResponseHistogram, spikeTriggeredStimuliSTAResponseDiagram);
         }
 
         private void CreateSTAResponseHistogramGraph(Histogram histogram, string name, int buckets, Color color)
@@ -635,13 +635,13 @@ namespace Nonlinearities.Gui
             if (histogram == null)
                 return;
 
-            var newGraph = PlotMatchValueHistograms(histogram, name, color);
+            var newGraph = PlotSTAResponseHistograms(histogram, name, color);
 
             if (newGraph != null)
                 _histogramGraphs.Add(newGraph);
         }
 
-        private LineGraph PlotMatchValueHistograms(Histogram histogram, string histogramName, Color color)
+        private LineGraph PlotSTAResponseHistograms(Histogram histogram, string histogramName, Color color)
         {
             if (histogram == null)
                 return null;
