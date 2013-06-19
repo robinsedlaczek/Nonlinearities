@@ -177,18 +177,20 @@ namespace Nonlinearities.Analysis
         }
 
         // TODO: Documentation.
-        public static Histogram CalculateNonlinearity(Histogram rawStimuliResponseHistogram, Histogram spikeTriggeredStimuliResponseHistogram)
+        public static double[] CalculateNonlinearity(Histogram rawStimuliResponseHistogram, Histogram spikeTriggeredStimuliResponseHistogram)
         {
-            return null;
-
             var buckets = System.Math.Min(rawStimuliResponseHistogram.BucketCount, spikeTriggeredStimuliResponseHistogram.BucketCount);
-            var dataCount = System.Math.Min(rawStimuliResponseHistogram.DataCount, spikeTriggeredStimuliResponseHistogram.DataCount);
-            var nonlinearity = new double[(int)dataCount];
+            var nonlinearity = new double[(int)buckets];
 
-            for (var index = 0; index < dataCount; index++)
-                nonlinearity[index] = spikeTriggeredStimuliResponseHistogram[index].Count / rawStimuliResponseHistogram[index].Count;
+            for (var index = 0; index < buckets; index++)
+            {
+                if (System.Math.Abs(rawStimuliResponseHistogram[index].Count - 0) > double.Epsilon)
+                    nonlinearity[index] = spikeTriggeredStimuliResponseHistogram[index].Count / rawStimuliResponseHistogram[index].Count;
+                else
+                    nonlinearity[index] = 0;
+            }
 
-            return new Histogram(nonlinearity, buckets);
+            return nonlinearity;
         }
 
         /// <summary>

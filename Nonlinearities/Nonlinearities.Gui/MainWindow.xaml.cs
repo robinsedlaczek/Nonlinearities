@@ -36,7 +36,7 @@ namespace Nonlinearities.Gui
         private List<LineAndMarker<ElementMarkerPointsGraph>> _eigenvaluesGraphs;
         private List<LineGraph> _histogramGraphs;
         private List<KernelGuiElement> _kernels;
-        private Histogram _nonlinearity;
+        private double[] _nonlinearity;
 
         #endregion
 
@@ -543,20 +543,21 @@ namespace Nonlinearities.Gui
         {
             Histogram rawStimuliSTAResponseHistogram;
             Histogram spikeTriggeredStimuliSTAResponseHistogram;
-            Histogram nonlinearity;
+            double[] nonlinearity;
 
             ClearSTAResponseHistogramGraphs();
             GetSTAResponseHistogramPlotData(out rawStimuliSTAResponseHistogram, out spikeTriggeredStimuliSTAResponseHistogram, out nonlinearity, recalcData);
 
             PlotHistogram(rawStimuliSTAResponseHistogram, "Match Values Histogram for raw Stimuli", Constants.COLOR_MatchValuesForRawStimuliHistogram);
-            // TODO: Plot Gaussian normal curve for raw stimuli STA response histogram here!
+            // TODO: Which cell?
+            if (_stimuli != null)
+                PlotNormalDistribution(_stimuli[0], rawStimuliSTAResponseHistogram, "Normal Curve - Raw Stimuli", Constants.COLOR_MatchValuesForRawStimuliHistogram);
             
             PlotHistogram(spikeTriggeredStimuliSTAResponseHistogram, "Match Values Histogram for Spike-triggered Stimuli", Constants.COLOR_MatchValuesForSpikeTriggeredStimuliHistogram);
             // TODO: Plot Gaussian normal curve for spike-triggered stimuli STA response histogram here!
 
-            PlotHistogram(nonlinearity, "Nonlinearity (Bayes rule)", Constants.COLOR_NonlinearityHistogram);
+            PlotNonlinearity(nonlinearity, "Nonlinearity (Bayes rule)", Constants.COLOR_NonlinearityHistogram);
             // TODO: Plot Gaussian normal curve for nonlinearity here!
-
 
         }
 
@@ -566,12 +567,16 @@ namespace Nonlinearities.Gui
                 _histogramGraphs = new List<LineGraph>();
             else
             {
-                _histogramGraphs.ForEach(graph => MatchValuePlotter.Children.Remove(graph));
+                _histogramGraphs.ForEach(graph =>
+                    {
+                        MatchValuePlotter.Children.Remove(graph);
+                        NonlinearityPlotter.Children.Remove(graph);
+                    });
                 _histogramGraphs.Clear();
             }
         }
 
-        private void GetSTAResponseHistogramPlotData(out Histogram rawStimuliSTAResponseHistogram, out Histogram spikeTriggeredStimuliSTAResponseDiagram, out Histogram nonlinearity, bool recalcData = true)
+        private void GetSTAResponseHistogramPlotData(out Histogram rawStimuliSTAResponseHistogram, out Histogram spikeTriggeredStimuliSTAResponseDiagram, out double[] nonlinearity, bool recalcData = true)
         {
             rawStimuliSTAResponseHistogram = null;
             spikeTriggeredStimuliSTAResponseDiagram = null;
@@ -687,44 +692,27 @@ namespace Nonlinearities.Gui
 
         private void PlotNormalDistribution(double[] data, Histogram histogram, string distributionName, Color color)
         {
-            if (histogram == null)
+            if (data == null || histogram == null)
                 return;
 
-            // Calculate p(X) = p(data)
-            //var px = (1 / StdMath.Sqrt(2 * StdMath.PI * histogram.Variance(data))) *
-            //         StdMath.Pow(StdMath.E, 
-
             // Prepare data in arrays.
-            var pointIndex = 0;
-            var dataPointCount = 4 * histogram.BucketCount;
-            var x = new double[dataPointCount];
-            var y = new double[dataPointCount];
+            var x = new double[data.Length];
+            var y = new double[data.Length];
+            var stepWidth = (histogram.UpperBound - histogram.LowerBound) / data.Length;
 
-            foreach (var bucket in histogram.Buckets())
+            for (var index = 0; index < data.Length; index++)
             {
-                // lower left point of the histogram bar
-                x[pointIndex] = bucket.LowerBound;
-                y[pointIndex] = 0;
+                var px = (1 / StdMath.Sqrt(2 * StdMath.PI * histogram.Variance(data))) *
+                         StdMath.Pow(StdMath.E, (-StdMath.Pow(data[index] - histogram.Mean(), 2)) / 2 * histogram.Variance(data));
 
-                // upper left point of the histogram bar
-                x[pointIndex + 1] = bucket.LowerBound;
-                y[pointIndex + 1] = bucket.Count;
-
-                // upper right point of the histogram bar
-                x[pointIndex + 2] = bucket.UpperBound;
-                y[pointIndex + 2] = bucket.Count;
-
-                // lower right point of the histogram bar
-                x[pointIndex + 3] = bucket.UpperBound;
-                y[pointIndex + 3] = 0;
-
-                pointIndex += 4;
+                x[index] = histogram.LowerBound + index * stepWidth;
+                y[index] = px;
             }
 
             // Add data sources.
             var yDataSource = new EnumerableDataSource<double>(y);
             yDataSource.SetYMapping(Y => Y);
-            yDataSource.AddMapping(ShapeElementPointMarker.ToolTipTextProperty, Y => string.Format("Match Value \n\n{0}", Y));
+            yDataSource.AddMapping(ShapeElementPointMarker.ToolTipTextProperty, Y => string.Format("Normal Value \n\n{0}", Y));
 
             var xDataSource = new EnumerableDataSource<double>(x);
             xDataSource.SetXMapping(X => X);
@@ -733,6 +721,39 @@ namespace Nonlinearities.Gui
 
             // MatchValuePlotter.Viewport.Restrictions.Add(new PhysicalProportionsRestriction { ProportionRatio = 500000 });
             var graph = MatchValuePlotter.AddLineGraph(compositeDataSource, color, 0.5, distributionName);
+
+            // Cache for later usage (e.g. change visibility).
+            if (graph != null)
+                _histogramGraphs.Add(graph);
+        }
+
+        private void PlotNonlinearity(double[] nonlinearity, string distributionName, Color color)
+        {
+            if (nonlinearity == null)
+                return;
+
+            // Prepare data in arrays.
+            var x = new double[nonlinearity.Length];
+            var y = new double[nonlinearity.Length];
+            
+            for (var index = 0; index < nonlinearity.Length; index++)
+            {
+                x[index] = index;
+                y[index] = nonlinearity[index];
+            }
+
+            // Add data sources.
+            var yDataSource = new EnumerableDataSource<double>(y);
+            yDataSource.SetYMapping(Y => Y);
+            yDataSource.AddMapping(ShapeElementPointMarker.ToolTipTextProperty, Y => string.Format("Normal Value \n\n{0}", Y));
+
+            var xDataSource = new EnumerableDataSource<double>(x);
+            xDataSource.SetXMapping(X => X);
+
+            var compositeDataSource = new CompositeDataSource(xDataSource, yDataSource);
+
+            // MatchValuePlotter.Viewport.Restrictions.Add(new PhysicalProportionsRestriction { ProportionRatio = 500000 });
+            var graph = NonlinearityPlotter.AddLineGraph(compositeDataSource, color, 0.5, distributionName);
 
             // Cache for later usage (e.g. change visibility).
             if (graph != null)
