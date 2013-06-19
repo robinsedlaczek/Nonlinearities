@@ -15,6 +15,7 @@ using Microsoft.Research.DynamicDataDisplay.PointMarkers;
 using System.ComponentModel;
 using System.Data;
 using Histogram = MathNet.Numerics.Statistics.Histogram;
+using StdMath = System.Math;
 
 namespace Nonlinearities.Gui
 {
@@ -351,8 +352,8 @@ namespace Nonlinearities.Gui
         {
             if (_histogramGraphs != null && _histogramGraphs.Count > 0)
             {
-                _histogramGraphs[0].Visibility = BoolToVisibility(MatchesForRawStimuliCheckBox.IsChecked);
-                _histogramGraphs[1].Visibility = BoolToVisibility(MatchesForSpikeTriggeredStimuliCheckBox.IsChecked);
+                _histogramGraphs[0].Visibility = BoolToVisibility(HistogramForRawStimuliCheckBox.IsChecked);
+                _histogramGraphs[1].Visibility = BoolToVisibility(HistogramForSpikeTriggeredStimuliCheckBox.IsChecked);
             }
         }
 
@@ -544,15 +545,19 @@ namespace Nonlinearities.Gui
             Histogram spikeTriggeredStimuliSTAResponseHistogram;
             Histogram nonlinearity;
 
-            var bucketsRawStimuli = MatchValuesForRawStimuliBucketsUpDown != null && MatchValuesForRawStimuliBucketsUpDown.Value != null ? MatchValuesForRawStimuliBucketsUpDown.Value.Value : 200;
-            var bucketsSpikeTriggeredStimuli = MatchValuesForSpikeTriggeredStimuliBucketsUpDown != null && MatchValuesForSpikeTriggeredStimuliBucketsUpDown.Value != null ? MatchValuesForSpikeTriggeredStimuliBucketsUpDown.Value.Value : 200;
-
             ClearSTAResponseHistogramGraphs();
             GetSTAResponseHistogramPlotData(out rawStimuliSTAResponseHistogram, out spikeTriggeredStimuliSTAResponseHistogram, out nonlinearity, recalcData);
 
-            CreateSTAResponseHistogramGraph(rawStimuliSTAResponseHistogram, "Match Values raw Stimuli", bucketsRawStimuli, Constants.COLOR_MatchValuesForRawStimuliHistogram);
-            CreateSTAResponseHistogramGraph(spikeTriggeredStimuliSTAResponseHistogram, "Match Values for Spike-triggered Stimuli", bucketsSpikeTriggeredStimuli, Constants.COLOR_MatchValuesForSpikeTriggeredStimuliHistogram);
-            CreateSTAResponseHistogramGraph(nonlinearity, "Nonlinearity (Bayes rule)", nonlinearity != null ? nonlinearity.BucketCount : 0, Constants.COLOR_NonlinearityHistogram);
+            PlotHistogram(rawStimuliSTAResponseHistogram, "Match Values Histogram for raw Stimuli", Constants.COLOR_MatchValuesForRawStimuliHistogram);
+            // TODO: Plot Gaussian normal curve for raw stimuli STA response histogram here!
+            
+            PlotHistogram(spikeTriggeredStimuliSTAResponseHistogram, "Match Values Histogram for Spike-triggered Stimuli", Constants.COLOR_MatchValuesForSpikeTriggeredStimuliHistogram);
+            // TODO: Plot Gaussian normal curve for spike-triggered stimuli STA response histogram here!
+
+            PlotHistogram(nonlinearity, "Nonlinearity (Bayes rule)", Constants.COLOR_NonlinearityHistogram);
+            // TODO: Plot Gaussian normal curve for nonlinearity here!
+
+
         }
 
         private void ClearSTAResponseHistogramGraphs()
@@ -630,34 +635,39 @@ namespace Nonlinearities.Gui
                 _nonlinearity = SpikeTriggeredAnalysis.CalculateNonlinearity(rawStimuliSTAResponseHistogram, spikeTriggeredStimuliSTAResponseDiagram);
         }
 
-        private void CreateSTAResponseHistogramGraph(Histogram histogram, string name, int buckets, Color color)
+        private void PlotHistogram(Histogram histogram, string histogramName, Color color)
         {
             if (histogram == null)
                 return;
 
-            var newGraph = PlotSTAResponseHistograms(histogram, name, color);
+            // Prepare data in arrays.
+            var pointIndex = 0;
+            var dataPointCount = 4 * histogram.BucketCount;
+            var x = new double[dataPointCount];
+            var y = new double[dataPointCount];
 
-            if (newGraph != null)
-                _histogramGraphs.Add(newGraph);
-        }
-
-        private LineGraph PlotSTAResponseHistograms(Histogram histogram, string histogramName, Color color)
-        {
-            if (histogram == null)
-                return null;
-
-            // Prepare data in arrays
-            // var N = 1000; // histogram.Length;
-            var x = new double[histogram.BucketCount];
-            var y = new double[histogram.BucketCount];
-
-            for (var index = 0; index < histogram.BucketCount; index++)
+            foreach (var bucket in histogram.Buckets())
             {
-                x[index] = histogram[index].LowerBound;
-                y[index] = histogram[index].Count;
+                // lower left point of the histogram bar
+                x[pointIndex] = bucket.LowerBound;
+                y[pointIndex] = 0;
+
+                // upper left point of the histogram bar
+                x[pointIndex + 1] = bucket.LowerBound;
+                y[pointIndex + 1] = bucket.Count;
+
+                // upper right point of the histogram bar
+                x[pointIndex + 2] = bucket.UpperBound;
+                y[pointIndex + 2] = bucket.Count;
+
+                // lower right point of the histogram bar
+                x[pointIndex + 3] = bucket.UpperBound;
+                y[pointIndex + 3] = 0;
+
+                pointIndex += 4;
             }
 
-            // Add data sources:
+            // Add data sources.
             var yDataSource = new EnumerableDataSource<double>(y);
             yDataSource.SetYMapping(Y => Y);
             yDataSource.AddMapping(ShapeElementPointMarker.ToolTipTextProperty, Y => string.Format("Match Value \n\n{0}", Y));
@@ -670,7 +680,63 @@ namespace Nonlinearities.Gui
             // MatchValuePlotter.Viewport.Restrictions.Add(new PhysicalProportionsRestriction { ProportionRatio = 500000 });
             var graph = MatchValuePlotter.AddLineGraph(compositeDataSource, color, 0.5, histogramName);
 
-            return graph;
+            // Cache for later usage (e.g. change visibility).
+            if (graph != null)
+                _histogramGraphs.Add(graph);
+        }
+
+        private void PlotNormalDistribution(double[] data, Histogram histogram, string distributionName, Color color)
+        {
+            if (histogram == null)
+                return;
+
+            // Calculate p(X) = p(data)
+            //var px = (1 / StdMath.Sqrt(2 * StdMath.PI * histogram.Variance(data))) *
+            //         StdMath.Pow(StdMath.E, 
+
+            // Prepare data in arrays.
+            var pointIndex = 0;
+            var dataPointCount = 4 * histogram.BucketCount;
+            var x = new double[dataPointCount];
+            var y = new double[dataPointCount];
+
+            foreach (var bucket in histogram.Buckets())
+            {
+                // lower left point of the histogram bar
+                x[pointIndex] = bucket.LowerBound;
+                y[pointIndex] = 0;
+
+                // upper left point of the histogram bar
+                x[pointIndex + 1] = bucket.LowerBound;
+                y[pointIndex + 1] = bucket.Count;
+
+                // upper right point of the histogram bar
+                x[pointIndex + 2] = bucket.UpperBound;
+                y[pointIndex + 2] = bucket.Count;
+
+                // lower right point of the histogram bar
+                x[pointIndex + 3] = bucket.UpperBound;
+                y[pointIndex + 3] = 0;
+
+                pointIndex += 4;
+            }
+
+            // Add data sources.
+            var yDataSource = new EnumerableDataSource<double>(y);
+            yDataSource.SetYMapping(Y => Y);
+            yDataSource.AddMapping(ShapeElementPointMarker.ToolTipTextProperty, Y => string.Format("Match Value \n\n{0}", Y));
+
+            var xDataSource = new EnumerableDataSource<double>(x);
+            xDataSource.SetXMapping(X => X);
+
+            var compositeDataSource = new CompositeDataSource(xDataSource, yDataSource);
+
+            // MatchValuePlotter.Viewport.Restrictions.Add(new PhysicalProportionsRestriction { ProportionRatio = 500000 });
+            var graph = MatchValuePlotter.AddLineGraph(compositeDataSource, color, 0.5, distributionName);
+
+            // Cache for later usage (e.g. change visibility).
+            if (graph != null)
+                _histogramGraphs.Add(graph);
         }
 
         #endregion

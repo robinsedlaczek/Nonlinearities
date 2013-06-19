@@ -15,6 +15,21 @@ namespace Nonlinearities.Analysis
     public static class Extensions
     {
         /// <summary>
+        /// This method returns the buckets of the histogram as an array.
+        /// </summary>
+        /// <param name="histogram">The histogram from which buckets are requested.</param>
+        /// <returns>Returns an array with the bucket objects from the histogram.</returns>
+        public static Bucket[] Buckets(this Histogram histogram)
+        {
+            var result = new Bucket[histogram.BucketCount];
+
+            for (int index = 0; index < histogram.BucketCount; index++)
+                result[index] = histogram[index];
+
+            return result;
+        }
+
+        /// <summary>
         /// This method calculates the mean (center of distribution; expected value of random variable X) of an histogram.
         /// This is a weighted average of the class marks, with the relative frequencies as the weight factors.
         /// </summary>
@@ -22,17 +37,7 @@ namespace Nonlinearities.Analysis
         /// <returns>Returns the mean value of the histogram as a single floating point value.</returns>
         public static double Mean(this Histogram histogram)
         {
-            var result = 0d;
-
-            for (var index = 0; index < histogram.BucketCount; index++)
-            {
-                var bucket = histogram[index];
-                result += index * bucket.Count;
-            }
-
-            result /= histogram.DataCount;
-
-            return result;
+            return Math.Mean(histogram);
         }
 
         /// <summary>
@@ -44,14 +49,7 @@ namespace Nonlinearities.Analysis
         /// <returns>Returns the variance of the data set as a single floating point value.</returns>
         public static double Variance(this Histogram histogram, double[] originalData)
         {
-            var mean = histogram.Mean();
-            var squaredDifferences = new double[originalData.Length];
-
-            for (var index = 0; index < originalData.Length; index++)
-                squaredDifferences[index] = System.Math.Pow(originalData[index] - mean, 2);
-
-            var result = squaredDifferences.Average();
-            return result;
+            return Math.Variance(histogram, originalData);
         }
 
         /// <summary>
@@ -63,10 +61,7 @@ namespace Nonlinearities.Analysis
         /// <returns>Returns the standard deviation of the data set as a single floating point value.</returns>
         public static double StandardDeviation(this Histogram histogram, double[] originalData)
         {
-            var variance = histogram.Variance(originalData);
-            var result = System.Math.Sqrt(variance);
-
-            return result;
+            return Math.StandardDeviation(histogram, originalData);
         }
 
         /// <summary>

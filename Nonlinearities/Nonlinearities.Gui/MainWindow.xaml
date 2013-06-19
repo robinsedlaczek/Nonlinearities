@@ -101,18 +101,18 @@
                     <StackPanel Orientation="Horizontal" Grid.Column="2" Grid.Row="0">
                         <Border BorderThickness="1" BorderBrush="DarkGray" Margin="10,5,5,5">
                             <StackPanel Orientation="Vertical" Background="#FFFBFBFB" Margin="0,0,0,0" >
-                                <CheckBox x:Name="MatchesForRawStimuliCheckBox" Content="Matche for raw stimuli" Margin="10,10,0,0" IsChecked="True" Foreground="DarkBlue" Click="OnMatchesForRawStimuliCheckBoxClick" />
-                                <Label Content="Buckets (raw stimuli):" Padding="30,5,20,1" Margin="0,0,0,0" IsEnabled="{Binding IsChecked, ElementName=MatchesForRawStimuliCheckBox}"/>
+                                <CheckBox x:Name="HistogramForRawStimuliCheckBox" Content="Histogram for raw Stimuli" Margin="10,10,0,0" IsChecked="True" Foreground="DarkBlue" Click="OnMatchesForRawStimuliCheckBoxClick" />
+                                <Label Content="Buckets:" Padding="30,5,20,1" Margin="0,0,0,0" IsEnabled="{Binding IsChecked, ElementName=HistogramForRawStimuliCheckBox}"/>
                                 <StackPanel Orientation="Horizontal" Margin="30,0,0,0">
-                                    <wpfx:IntegerUpDown x:Name="MatchValuesForRawStimuliBucketsUpDown" Margin="0,0,10,0" Padding="20,0,0,0" MinWidth="75" MaxWidth="75" Minimum="1" Maximum="1000" DefaultValue="200" Text="200" IsEnabled="{Binding IsChecked, ElementName=MatchesForRawStimuliCheckBox}" ValueChanged="OnBucketsUpDownValueChanged"/>
-                                    <Label x:Name="TotalMatchValuesForRawStimuliLabel" Content="(max. 0)" Padding="0" Margin="0,0,10,0" IsEnabled="{Binding IsChecked, ElementName=MatchesForRawStimuliCheckBox}"/>
+                                    <wpfx:IntegerUpDown x:Name="MatchValuesForRawStimuliBucketsUpDown" Margin="0,0,10,0" Padding="20,0,0,0" MinWidth="75" MaxWidth="75" Minimum="1" Maximum="1000" DefaultValue="200" Text="200" IsEnabled="{Binding IsChecked, ElementName=HistogramForRawStimuliCheckBox}" ValueChanged="OnBucketsUpDownValueChanged"/>
+                                    <Label x:Name="TotalMatchValuesForRawStimuliLabel" Content="(max. 0)" Padding="0" Margin="0,0,10,0" IsEnabled="{Binding IsChecked, ElementName=HistogramForRawStimuliCheckBox}"/>
                                 </StackPanel>
 
-                                <CheckBox x:Name="MatchesForSpikeTriggeredStimuliCheckBox" Content="Matche for spike-triggered stimuli" Margin="10,20,10,0" IsChecked="True" Foreground="DarkRed" Click="OnMatchesForSpikeTriggeredStimuliCheckBoxClick"/>
-                                <Label Content="Buckets (spike-triggered stimuli):" Padding="30,5,20,1" Margin="0,0,0,0" IsEnabled="{Binding IsChecked, ElementName=MatchesForSpikeTriggeredStimuliCheckBox}"/>
+                                <CheckBox x:Name="HistogramForSpikeTriggeredStimuliCheckBox" Content="Histogram for spike-triggered Stimuli" Margin="10,20,10,0" IsChecked="True" Foreground="DarkRed" Click="OnMatchesForSpikeTriggeredStimuliCheckBoxClick"/>
+                                <Label Content="Buckets:" Padding="30,5,20,1" Margin="0,0,0,0" IsEnabled="{Binding IsChecked, ElementName=HistogramForSpikeTriggeredStimuliCheckBox}"/>
                                 <StackPanel Orientation="Horizontal" Margin="30,0,0,10">
-                                    <wpfx:IntegerUpDown x:Name="MatchValuesForSpikeTriggeredStimuliBucketsUpDown" Margin="0,0,10,0" Padding="20,0,0,0" MinWidth="75" MaxWidth="75" Minimum="1" Maximum="1000" DefaultValue="200" Text="200" IsEnabled="{Binding IsChecked, ElementName=MatchesForSpikeTriggeredStimuliCheckBox}" ValueChanged="OnBucketsUpDownValueChanged"/>
-                                    <Label x:Name="TotalMatchValuesForSpikeTriggeredStimuliLabel" Content="(max. 0)" Padding="0" Margin="0,0,10,0" IsEnabled="{Binding IsChecked, ElementName=MatchesForSpikeTriggeredStimuliCheckBox}"/>
+                                    <wpfx:IntegerUpDown x:Name="MatchValuesForSpikeTriggeredStimuliBucketsUpDown" Margin="0,0,10,0" Padding="20,0,0,0" MinWidth="75" MaxWidth="75" Minimum="1" Maximum="1000" DefaultValue="200" Text="200" IsEnabled="{Binding IsChecked, ElementName=HistogramForSpikeTriggeredStimuliCheckBox}" ValueChanged="OnBucketsUpDownValueChanged"/>
+                                    <Label x:Name="TotalMatchValuesForSpikeTriggeredStimuliLabel" Content="(max. 0)" Padding="0" Margin="0,0,10,0" IsEnabled="{Binding IsChecked, ElementName=HistogramForSpikeTriggeredStimuliCheckBox}"/>
                                 </StackPanel>
                             </StackPanel>
                         </Border>
