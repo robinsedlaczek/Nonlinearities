@@ -136,10 +136,12 @@ namespace Nonlinearities.Analysis
         /// <param name="buckets">
         /// The number of data bins that the histogram should contain.
         /// </param>
-        /// <returns>
-        /// Returns the histogram.
-        /// </returns>
+        /// <param name="matchValues"></param>
+        /// [out] Returns an array of the match values between stimuli and single filter.
         /// <remarks>
+        /// <param name="histogram">
+        /// The histogram of the match values probability distribution.
+        /// </param>
         /// Calculation of match values:
         /// 
         /// M =  Mean(RF * S)
@@ -150,17 +152,18 @@ namespace Nonlinearities.Analysis
         /// 
         /// The histogram will be created for M.
         /// </remarks>
-        public static Histogram CalculateSTAResponseHistogram(double[][] stimuli, double[][][] spikes, bool forSpikeTriggeredStimuliOnly, int frameOffset, int maxTime, double[,] smoothKernel, bool useDynamicDivisorForEdges, int buckets)
+        public static void CalculateSTAResponseHistogram(double[][] stimuli, double[][][] spikes, bool forSpikeTriggeredStimuliOnly, int frameOffset, int maxTime, double[,] smoothKernel, bool useDynamicDivisorForEdges, int buckets, out double[] matchValues, out Histogram histogram)
         {
             // TODO: Can be optimized! CalculateRF also calls GetSpikeTriggeredStimulusEnsemble.
             if (forSpikeTriggeredStimuliOnly)
                 stimuli = GetSpikeTriggeredStimulusEnsemble(stimuli, spikes, frameOffset, RoundStrategy.Round);
 
             var receptiveField = CalculateRF(stimuli, spikes, frameOffset, maxTime, smoothKernel, useDynamicDivisorForEdges);
-            var dimension = receptiveField.Length;
-            var result = new double[stimuli.Length - dimension];
             var receptiveFieldMatrix = (new DenseMatrix(1)).OfArray(receptiveField);
+            var dimension = receptiveField.Length;
 
+            matchValues = new double[stimuli.Length - dimension];
+           
             for (var matchIndex = 0; matchIndex < stimuli.Length - dimension; matchIndex++)
             {
                 var stimuliData = new double[dimension][];
@@ -170,10 +173,10 @@ namespace Nonlinearities.Analysis
                 var stimuliMatrix = (new DenseMatrix(1)).OfArray(stimuliData);
 
                 // TODO: Convolution operation. It is more complicated implemented in Math.cs.
-                result[matchIndex] = receptiveFieldMatrix.PointwiseMultiply(stimuliMatrix).ToRowWiseArray().Average();
+                matchValues[matchIndex] = receptiveFieldMatrix.PointwiseMultiply(stimuliMatrix).ToRowWiseArray().Average();
             }
 
-            return Math.CalculateHistogram(result, buckets);
+            histogram = Math.CalculateHistogram(matchValues, buckets);
         }
 
         // TODO: Documentation.

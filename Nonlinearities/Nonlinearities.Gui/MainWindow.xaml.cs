@@ -37,6 +37,8 @@ namespace Nonlinearities.Gui
         private List<LineGraph> _histogramGraphs;
         private List<KernelGuiElement> _kernels;
         private double[] _nonlinearity;
+        private double[] _rawStimuliSTAMatchValues;
+        private double[] _spikeTriggeredStimuliSTAMatchValues;
 
         #endregion
 
@@ -543,15 +545,15 @@ namespace Nonlinearities.Gui
         {
             Histogram rawStimuliSTAResponseHistogram;
             Histogram spikeTriggeredStimuliSTAResponseHistogram;
+            double[] rawStimuliSTAMatchValues = null;
+            double[] spikeTriggeredStimuliSTAMatchValues = null;
             double[] nonlinearity;
 
             ClearSTAResponseHistogramGraphs();
-            GetSTAResponseHistogramPlotData(out rawStimuliSTAResponseHistogram, out spikeTriggeredStimuliSTAResponseHistogram, out nonlinearity, recalcData);
+            GetSTAResponseHistogramPlotData(out rawStimuliSTAResponseHistogram, out rawStimuliSTAMatchValues, out spikeTriggeredStimuliSTAResponseHistogram, out spikeTriggeredStimuliSTAMatchValues, out nonlinearity, recalcData);
 
             PlotHistogram(rawStimuliSTAResponseHistogram, "Match Values Histogram for raw Stimuli", Constants.COLOR_MatchValuesForRawStimuliHistogram);
-            // TODO: Which cell?
-            if (_stimuli != null)
-                PlotNormalDistribution(_stimuli[0], rawStimuliSTAResponseHistogram, "Normal Curve - Raw Stimuli", Constants.COLOR_MatchValuesForRawStimuliHistogram);
+            PlotNormalDistribution(rawStimuliSTAMatchValues, rawStimuliSTAResponseHistogram, "Normal Curve - Raw Stimuli", Constants.COLOR_MatchValuesForRawStimuliHistogram);
             
             PlotHistogram(spikeTriggeredStimuliSTAResponseHistogram, "Match Values Histogram for Spike-triggered Stimuli", Constants.COLOR_MatchValuesForSpikeTriggeredStimuliHistogram);
             // TODO: Plot Gaussian normal curve for spike-triggered stimuli STA response histogram here!
@@ -576,10 +578,12 @@ namespace Nonlinearities.Gui
             }
         }
 
-        private void GetSTAResponseHistogramPlotData(out Histogram rawStimuliSTAResponseHistogram, out Histogram spikeTriggeredStimuliSTAResponseDiagram, out double[] nonlinearity, bool recalcData = true)
+        private void GetSTAResponseHistogramPlotData(out Histogram rawStimuliSTAResponseHistogram, out double[] rawStimuliSTAMatchValues, out Histogram spikeTriggeredStimuliSTAResponseDiagram, out double[] spikeTriggeredStimuliSTAMatchValues, out double[] nonlinearity, bool recalcData = true)
         {
             rawStimuliSTAResponseHistogram = null;
+            rawStimuliSTAMatchValues = null;
             spikeTriggeredStimuliSTAResponseDiagram = null;
+            spikeTriggeredStimuliSTAMatchValues = null;
             nonlinearity = null;
 
             if (_spikes == null)
@@ -627,13 +631,13 @@ namespace Nonlinearities.Gui
 
             GetSmoothKernel(out smoothKernel, out useDynamicDivisorForEdges);
 
-            rawStimuliSTAResponseHistogram =
-                // caching
-                _rawStimuliSTAResponseHistogram = SpikeTriggeredAnalysis.CalculateSTAResponseHistogram(_stimuli, spikes.ToArray(), false, offset, maxTime, smoothKernel, useDynamicDivisorForEdges, rawStimuliHistogramBuckets);
+            SpikeTriggeredAnalysis.CalculateSTAResponseHistogram(_stimuli, spikes.ToArray(), false, offset, maxTime, smoothKernel, useDynamicDivisorForEdges, rawStimuliHistogramBuckets, out rawStimuliSTAMatchValues, out rawStimuliSTAResponseHistogram);
+            SpikeTriggeredAnalysis.CalculateSTAResponseHistogram(_stimuli, spikes.ToArray(), true, offset, maxTime, smoothKernel, useDynamicDivisorForEdges, spikeTriggeredStimuliHistogramBuckets, out spikeTriggeredStimuliSTAMatchValues, out spikeTriggeredStimuliSTAResponseDiagram);
 
-            spikeTriggeredStimuliSTAResponseDiagram =
-                // caching
-                _spikeTriggeredStimuliSTAResponseDiagram = SpikeTriggeredAnalysis.CalculateSTAResponseHistogram(_stimuli, spikes.ToArray(), true, offset, maxTime, smoothKernel, useDynamicDivisorForEdges, spikeTriggeredStimuliHistogramBuckets);
+            _rawStimuliSTAResponseHistogram = rawStimuliSTAResponseHistogram;
+            _rawStimuliSTAMatchValues = rawStimuliSTAMatchValues;
+            _spikeTriggeredStimuliSTAResponseDiagram = spikeTriggeredStimuliSTAResponseDiagram;
+            _spikeTriggeredStimuliSTAMatchValues = spikeTriggeredStimuliSTAMatchValues;
 
             nonlinearity =
                 // caching
@@ -699,11 +703,14 @@ namespace Nonlinearities.Gui
             var x = new double[data.Length];
             var y = new double[data.Length];
             var stepWidth = (histogram.UpperBound - histogram.LowerBound) / data.Length;
+            var gauss = new MathNet.Numerics.Distributions.Normal(histogram.Mean(), histogram.StandardDeviation(data));
 
             for (var index = 0; index < data.Length; index++)
             {
-                var px = (1 / StdMath.Sqrt(2 * StdMath.PI * histogram.Variance(data))) *
-                         StdMath.Pow(StdMath.E, (-StdMath.Pow(data[index] - histogram.Mean(), 2)) / 2 * histogram.Variance(data));
+                var px = gauss.CumulativeDistribution(histogram.LowerBound + index * stepWidth);
+
+                // var px = (1 / StdMath.Sqrt(2 * StdMath.PI * histogram.Variance(data))) *
+                         // StdMath.Pow(StdMath.E, (-StdMath.Pow(data[index] - histogram.Mean(), 2)) / 2 * histogram.Variance(data));
 
                 x[index] = histogram.LowerBound + index * stepWidth;
                 y[index] = px;
