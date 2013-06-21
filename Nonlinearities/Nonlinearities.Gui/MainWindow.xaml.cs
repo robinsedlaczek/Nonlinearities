@@ -552,10 +552,10 @@ namespace Nonlinearities.Gui
             ClearSTAResponseHistogramGraphs();
             GetSTAResponseHistogramPlotData(out rawStimuliSTAResponseHistogram, out rawStimuliSTAMatchValues, out spikeTriggeredStimuliSTAResponseHistogram, out spikeTriggeredStimuliSTAMatchValues, out nonlinearity, recalcData);
 
-            PlotHistogram(rawStimuliSTAResponseHistogram, "Match Values Histogram for raw Stimuli", Constants.COLOR_MatchValuesForRawStimuliHistogram);
+            //PlotHistogram(rawStimuliSTAResponseHistogram, "Match Values Histogram for raw Stimuli", Constants.COLOR_MatchValuesForRawStimuliHistogram);
             PlotNormalDistribution(rawStimuliSTAMatchValues, rawStimuliSTAResponseHistogram, "Normal Curve - Raw Stimuli", Constants.COLOR_MatchValuesForRawStimuliHistogram);
             
-            PlotHistogram(spikeTriggeredStimuliSTAResponseHistogram, "Match Values Histogram for Spike-triggered Stimuli", Constants.COLOR_MatchValuesForSpikeTriggeredStimuliHistogram);
+            //PlotHistogram(spikeTriggeredStimuliSTAResponseHistogram, "Match Values Histogram for Spike-triggered Stimuli", Constants.COLOR_MatchValuesForSpikeTriggeredStimuliHistogram);
             // TODO: Plot Gaussian normal curve for spike-triggered stimuli STA response histogram here!
 
             PlotNonlinearity(nonlinearity, "Nonlinearity (Bayes rule)", Constants.COLOR_NonlinearityHistogram);
@@ -700,28 +700,30 @@ namespace Nonlinearities.Gui
                 return;
 
             // Prepare data in arrays.
-            var x = new double[data.Length];
-            var y = new double[data.Length];
+            var xValues = new double[data.Length];
+            var yValues = new double[data.Length];
             var stepWidth = (histogram.UpperBound - histogram.LowerBound) / data.Length;
-            var gauss = new MathNet.Numerics.Distributions.Normal(histogram.Mean(), histogram.StandardDeviation(data));
+            var mean = histogram.Mean();
+            var variance = histogram.Variance(data);
+            var PI = StdMath.PI;
+            var E = StdMath.E;
 
             for (var index = 0; index < data.Length; index++)
             {
-                var px = gauss.CumulativeDistribution(histogram.LowerBound + index * stepWidth);
+                var x = histogram.LowerBound + index * stepWidth;
+                var px = (1 / StdMath.Sqrt(2 * PI * variance)) *
+                         StdMath.Pow(E, (-StdMath.Pow(x - mean, 2)) / 2 * variance);
 
-                // var px = (1 / StdMath.Sqrt(2 * StdMath.PI * histogram.Variance(data))) *
-                         // StdMath.Pow(StdMath.E, (-StdMath.Pow(data[index] - histogram.Mean(), 2)) / 2 * histogram.Variance(data));
-
-                x[index] = histogram.LowerBound + index * stepWidth;
-                y[index] = px;
+                xValues[index] = x;
+                yValues[index] = px;
             }
 
             // Add data sources.
-            var yDataSource = new EnumerableDataSource<double>(y);
+            var yDataSource = new EnumerableDataSource<double>(yValues);
             yDataSource.SetYMapping(Y => Y);
             yDataSource.AddMapping(ShapeElementPointMarker.ToolTipTextProperty, Y => string.Format("Normal Value \n\n{0}", Y));
 
-            var xDataSource = new EnumerableDataSource<double>(x);
+            var xDataSource = new EnumerableDataSource<double>(xValues);
             xDataSource.SetXMapping(X => X);
 
             var compositeDataSource = new CompositeDataSource(xDataSource, yDataSource);
