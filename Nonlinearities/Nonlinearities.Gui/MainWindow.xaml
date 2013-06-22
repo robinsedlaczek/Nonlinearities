@@ -6,7 +6,7 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:gui="clr-namespace:Nonlinearities.Gui"
 	xmlns:d3="clr-namespace:Microsoft.Research.DynamicDataDisplay;assembly=DynamicDataDisplay" mc:Ignorable="d" x:Class="Nonlinearities.Gui.MainWindow"
-	Title="MainWindow" Height="600" Width="1200" WindowStartupLocation="CenterScreen" Icon="Resources/Icon.png" SizeChanged="OnSizeChanged" Loaded="OnLoaded" LocationChanged="OnLocationChanged">
+	Title="MainWindow" Height="792" Width="1200" WindowStartupLocation="CenterScreen" Icon="Resources/Icon.png" SizeChanged="OnSizeChanged" Loaded="OnLoaded" LocationChanged="OnLocationChanged">
 	<Window.Resources>
 		<DataTemplate x:Key="KernelListItemDataTemplate" DataType="gui:Kernel">
 			<Grid MinHeight="75" MaxHeight="100" MinWidth="250" MaxWidth="250">

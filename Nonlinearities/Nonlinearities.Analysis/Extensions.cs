@@ -35,33 +35,19 @@ namespace Nonlinearities.Analysis
         /// </summary>
         /// <param name="histogram">The histogram for which the mean will be calculated.</param>
         /// <returns>Returns the mean value of the histogram as a single floating point value.</returns>
-        public static double Mean(this Histogram histogram)
+        public static double Mean(Histogram histogram)
         {
-            return Math.Mean(histogram);
-        }
+            var result = 0d;
 
-        /// <summary>
-        /// This method calculates the variance of a data set (probability distribution). That is the arithmetic average 
-        /// of the squared differences between data values and the mean.
-        /// </summary>
-        /// <param name="histogram">A histogram of the original data.</param>
-        /// <param name="originalData">The original data values.</param>
-        /// <returns>Returns the variance of the data set as a single floating point value.</returns>
-        public static double Variance(this Histogram histogram, double[] originalData)
-        {
-            return Math.Variance(histogram, originalData);
-        }
+            for (var index = 0; index < histogram.BucketCount; index++)
+            {
+                var bucket = histogram[index];
+                result += index * bucket.Count;
+            }
 
-        /// <summary>
-        /// This method calculates the standard deviation of a data set (probability distribution). That is the square 
-        /// root of the variance of the data set.
-        /// </summary>
-        /// <param name="histogram">A histogram of the original data.</param>
-        /// <param name="originalData">The original data values.</param>
-        /// <returns>Returns the standard deviation of the data set as a single floating point value.</returns>
-        public static double StandardDeviation(this Histogram histogram, double[] originalData)
-        {
-            return Math.StandardDeviation(histogram, originalData);
+            result /= histogram.DataCount;
+
+            return result;
         }
 
         /// <summary>

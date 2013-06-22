@@ -327,7 +327,7 @@ namespace Nonlinearities.Gui
             _eigenvaluesGraphs.Add(graph);
 
             graph = PlotEigenvalues(2, Brushes.Red);
-            _eigenvaluesGraphs.Add(graph);
+               _eigenvaluesGraphs.Add(graph);
 
             graph = PlotEigenvalues(3, Brushes.Green);
             _eigenvaluesGraphs.Add(graph);
@@ -355,7 +355,9 @@ namespace Nonlinearities.Gui
             if (_histogramGraphs != null && _histogramGraphs.Count > 0)
             {
                 _histogramGraphs[0].Visibility = BoolToVisibility(HistogramForRawStimuliCheckBox.IsChecked);
-                _histogramGraphs[1].Visibility = BoolToVisibility(HistogramForSpikeTriggeredStimuliCheckBox.IsChecked);
+                _histogramGraphs[1].Visibility = BoolToVisibility(HistogramForRawStimuliCheckBox.IsChecked);
+                _histogramGraphs[2].Visibility = BoolToVisibility(HistogramForSpikeTriggeredStimuliCheckBox.IsChecked);
+                _histogramGraphs[3].Visibility = BoolToVisibility(HistogramForSpikeTriggeredStimuliCheckBox.IsChecked);
             }
         }
 
@@ -552,11 +554,11 @@ namespace Nonlinearities.Gui
             ClearSTAResponseHistogramGraphs();
             GetSTAResponseHistogramPlotData(out rawStimuliSTAResponseHistogram, out rawStimuliSTAMatchValues, out spikeTriggeredStimuliSTAResponseHistogram, out spikeTriggeredStimuliSTAMatchValues, out nonlinearity, recalcData);
 
-            //PlotHistogram(rawStimuliSTAResponseHistogram, "Match Values Histogram for raw Stimuli", Constants.COLOR_MatchValuesForRawStimuliHistogram);
-            PlotNormalDistribution(rawStimuliSTAMatchValues, rawStimuliSTAResponseHistogram, "Normal Curve - Raw Stimuli", Constants.COLOR_MatchValuesForRawStimuliHistogram);
+            PlotHistogram(rawStimuliSTAResponseHistogram, "Match Values Histogram - raw Stimuli", Constants.COLOR_MatchValuesForRawStimuliHistogram);
+            PlotNormalDistribution(rawStimuliSTAMatchValues, rawStimuliSTAResponseHistogram, "N(mean, std) - Raw Stimuli", Constants.COLOR_MatchValuesForRawStimuliHistogram);
             
-            //PlotHistogram(spikeTriggeredStimuliSTAResponseHistogram, "Match Values Histogram for Spike-triggered Stimuli", Constants.COLOR_MatchValuesForSpikeTriggeredStimuliHistogram);
-            // TODO: Plot Gaussian normal curve for spike-triggered stimuli STA response histogram here!
+            PlotHistogram(spikeTriggeredStimuliSTAResponseHistogram, "Match Values Histogram - Spike-triggered Stimuli", Constants.COLOR_MatchValuesForSpikeTriggeredStimuliHistogram);
+            PlotNormalDistribution(spikeTriggeredStimuliSTAMatchValues, spikeTriggeredStimuliSTAResponseHistogram, "N(mean, std) - Spike-triggered Stimuli", Constants.COLOR_MatchValuesForSpikeTriggeredStimuliHistogram);
 
             PlotNonlinearity(nonlinearity, "Nonlinearity (Bayes rule)", Constants.COLOR_NonlinearityHistogram);
             // TODO: Plot Gaussian normal curve for nonlinearity here!
@@ -699,23 +701,17 @@ namespace Nonlinearities.Gui
             if (data == null || histogram == null)
                 return;
 
-            // Prepare data in arrays.
-            var xValues = new double[data.Length];
-            var yValues = new double[data.Length];
-            var stepWidth = (histogram.UpperBound - histogram.LowerBound) / data.Length;
-            var mean = histogram.Mean();
-            var variance = histogram.Variance(data);
-            var PI = StdMath.PI;
-            var E = StdMath.E;
+            var points = 2000;
+            var normalDistribution = new NormalDistribution(data.Average(), Math.Variance(data));
+            var densityCurve = normalDistribution.CalculateDensityCurve(points, histogram.LowerBound, histogram.UpperBound);
 
-            for (var index = 0; index < data.Length; index++)
+            var xValues = new double[points];
+            var yValues = new double[points];
+
+            for (var index = 0; index < points; index++)
             {
-                var x = histogram.LowerBound + index * stepWidth;
-                var px = (1 / StdMath.Sqrt(2 * PI * variance)) *
-                         StdMath.Pow(E, (-StdMath.Pow(x - mean, 2)) / 2 * variance);
-
-                xValues[index] = x;
-                yValues[index] = px;
+                xValues[index] = densityCurve[index, 0];
+                yValues[index] = densityCurve[index, 1];
             }
 
             // Add data sources.
