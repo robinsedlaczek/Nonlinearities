@@ -7,83 +7,83 @@
 	xmlns:gui="clr-namespace:Nonlinearities.Gui"
 	xmlns:d3="clr-namespace:Microsoft.Research.DynamicDataDisplay;assembly=DynamicDataDisplay" mc:Ignorable="d" x:Class="Nonlinearities.Gui.MainWindow"
 	Title="MainWindow" Height="792" Width="1200" WindowStartupLocation="CenterScreen" Icon="Resources/Icon.png" SizeChanged="OnSizeChanged" Loaded="OnLoaded" LocationChanged="OnLocationChanged">
-	<Window.Resources>
-		<DataTemplate x:Key="KernelListItemDataTemplate" DataType="gui:Kernel">
-			<Grid MinHeight="75" MaxHeight="100" MinWidth="250" MaxWidth="250">
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="Auto"/>
-					<ColumnDefinition/>
-				</Grid.ColumnDefinitions>
+    <Window.Resources>
+        <DataTemplate x:Key="KernelListItemDataTemplate" DataType="gui:Kernel">
+            <Grid MinHeight="75" MaxHeight="100" MinWidth="250" MaxWidth="250">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
 
-				<Image Grid.Column="0" Margin="5" MaxWidth="75" MaxHeight="75" VerticalAlignment="Center">
-					<Image.Source>
-						<BitmapImage UriSource="{Binding Path=Image}" />
-					</Image.Source>
-				</Image>
-				
-				<StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
-					<TextBlock Text="{Binding Path=Name}" FontWeight="Bold" Margin="5,5,5,0" MaxWidth="300" FontSize="10" />
-					<TextBlock Text="{Binding Path=Description}" Margin="5,0,5,5" TextWrapping="Wrap" MaxWidth="300" FontSize="10" />
-				</StackPanel>
+                <Image Grid.Column="0" Margin="5" MaxWidth="75" MaxHeight="75" VerticalAlignment="Center">
+                    <Image.Source>
+                        <BitmapImage UriSource="{Binding Path=Image}" />
+                    </Image.Source>
+                </Image>
 
-			</Grid>
-		</DataTemplate>
-	</Window.Resources>
-		
-	<Grid Background="DarkGray">
-		<Grid.RowDefinitions>
-			<RowDefinition/>
-		</Grid.RowDefinitions>
+                <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Path=Name}" FontWeight="Bold" Margin="5,5,5,0" MaxWidth="300" FontSize="10" />
+                    <TextBlock Text="{Binding Path=Description}" Margin="5,0,5,5" TextWrapping="Wrap" MaxWidth="300" FontSize="10" />
+                </StackPanel>
 
-		<TabControl Grid.Row="1">
-			<TabItem x:Name="StimuliTabItem" Header="Stimuli" GotFocus="OnStimuliTabItemGotFocus" Padding="20,5">
-				<Grid Background="#FFE5E5E5">
-					<Grid.RowDefinitions>
-						<RowDefinition/>
-						<RowDefinition Height="30"/>
-					</Grid.RowDefinitions>
-					<Grid x:Name="StimuliDisplayGrid" Grid.Row="0"/>
+            </Grid>
+        </DataTemplate>
+    </Window.Resources>
 
-					<Grid Background="#FFE5E5E5" Grid.Row="1">
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="Auto"/>
-							<ColumnDefinition Width="Auto"/>
-							<ColumnDefinition/>
-						</Grid.ColumnDefinitions>
+    <Grid Background="DarkGray">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
 
-						<Button x:Name="PlayButton" Grid.Column="0" Content="Play" HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="5,3,0,0" Padding="5,0" Click="OnPlayClick"/>
-						<Button x:Name="StopButton" Grid.Column="1" Content="Stop" HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="5,3,0,0" Padding="5,0" Click="OnStopClick"  />
-						<Slider x:Name="StimuliSlider" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" ValueChanged="OnStimuliSliderValueChanged" Margin="10,0,0,0"/>
-					</Grid>
-				</Grid>
-			</TabItem>
-			<TabItem x:Name="ReceptiveFieldTabItem" Header="Receptive Field" GotFocus="OnReceptiveFieldTabItemGotFocus" Padding="20,5">
+        <TabControl Grid.Row="1">
+            <TabItem x:Name="StimuliTabItem" Header="Stimuli" GotFocus="OnStimuliTabItemGotFocus" Padding="20,5">
+                <Grid Background="#FFE5E5E5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition Height="30"/>
+                    </Grid.RowDefinitions>
+                    <Grid x:Name="StimuliDisplayGrid" Grid.Row="0"/>
+
+                    <Grid Background="#FFE5E5E5" Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button x:Name="PlayButton" Grid.Column="0" Content="Play" HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="5,3,0,0" Padding="5,0" Click="OnPlayClick"/>
+                        <Button x:Name="StopButton" Grid.Column="1" Content="Stop" HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="5,3,0,0" Padding="5,0" Click="OnStopClick"  />
+                        <Slider x:Name="StimuliSlider" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" ValueChanged="OnStimuliSliderValueChanged" Margin="10,0,0,0"/>
+                    </Grid>
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="ReceptiveFieldTabItem" Header="Receptive Field" GotFocus="OnReceptiveFieldTabItemGotFocus" Padding="20,5">
                 <Grid x:Name="ReceptiveFieldTabItemGrid" Background="#FFE5E5E5">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="Auto"/>
-						<ColumnDefinition/>
-					</Grid.ColumnDefinitions>
-					<Grid.RowDefinitions>
-						<RowDefinition Height="Auto"/>
-						<RowDefinition/>
-					</Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
 
-					<StackPanel x:Name="StaOptionsPanel" Orientation="Horizontal" Grid.Column="0" Grid.Row="0">
+                    <StackPanel x:Name="StaOptionsPanel" Orientation="Horizontal" Grid.Column="0" Grid.Row="0">
                         <Border BorderThickness="1" BorderBrush="DarkGray"  Margin="5,5,5,5">
                             <StackPanel Orientation="Vertical" Background="#FFFBFBFB">
-							    <CheckBox x:Name="Cell1CheckBox" Content="Cell 1" Margin="10,10,60,0" Click="OnCell1CheckBoxClicked" IsChecked="True" />
-							    <CheckBox x:Name="Cell2CheckBox" Content="Cell 2" Margin="10,5,60,0" Click="OnCell2CheckBoxClicked"/>
-							    <CheckBox x:Name="Cell3CheckBox" Content="Cell 3" Margin="10,5,60,0" Click="OnCell3CheckBoxClicked"/>
-							    <CheckBox x:Name="Cell4CheckBox" Content="Cell 4" Margin="10,5,60,15" Click="OnCell4CheckBoxClicked"/>
-						    </StackPanel>
+                                <CheckBox x:Name="Cell1CheckBox" Content="Cell 1" Margin="10,10,60,0" Click="OnCell1CheckBoxClicked" IsChecked="True" />
+                                <CheckBox x:Name="Cell2CheckBox" Content="Cell 2" Margin="10,5,60,0" Click="OnCell2CheckBoxClicked"/>
+                                <CheckBox x:Name="Cell3CheckBox" Content="Cell 3" Margin="10,5,60,0" Click="OnCell3CheckBoxClicked"/>
+                                <CheckBox x:Name="Cell4CheckBox" Content="Cell 4" Margin="10,5,60,15" Click="OnCell4CheckBoxClicked"/>
+                            </StackPanel>
                         </Border>
                         <Border BorderThickness="1" BorderBrush="DarkGray" Margin="0,5,5,5">
                             <StackPanel Orientation="Vertical" Width="75" Background="#FFFBFBFB" >
-							    <Label Content="Offset:" Padding="10,10,0,0" Margin="0,0,0,0"/>
+                                <Label Content="Offset:" Padding="10,10,0,0" Margin="0,0,0,0"/>
                                 <TextBox x:Name="OffsetTextbox" Margin="10,0,10,0" Text="16" TextChanged="OnOffsetTextboxTextChanged"/>
                                 <Label Content="Time:" Padding="10,0,0,0" Margin="0,0,0,0"/>
-							    <TextBox x:Name="TimeTextbox" Text="16" Margin="10,0,10,0" TextChanged="OnTimeTextboxTextChanged"/>
-						    </StackPanel>
+                                <TextBox x:Name="TimeTextbox" Text="16" Margin="10,0,10,0" TextChanged="OnTimeTextboxTextChanged"/>
+                            </StackPanel>
                         </Border>
                         <Border BorderThickness="1" BorderBrush="DarkGray" Margin="0,5,5,5">
                             <StackPanel Orientation="Vertical" Background="#FFFBFBFB">
@@ -101,51 +101,43 @@
                     <StackPanel Orientation="Horizontal" Grid.Column="2" Grid.Row="0">
                         <Border BorderThickness="1" BorderBrush="DarkGray" Margin="10,5,5,5">
                             <StackPanel Orientation="Vertical" Background="#FFFBFBFB" Margin="0,0,0,0" >
-                                <CheckBox x:Name="HistogramForRawStimuliCheckBox" Content="Histogram for raw Stimuli" Margin="10,10,0,0" IsChecked="True" Foreground="DarkBlue" Click="OnMatchesForRawStimuliCheckBoxClick" />
+                                <CheckBox x:Name="HistogramForRawStimuliCheckBox" Content="Histogram for raw Stimuli" Margin="10,10,0,0" IsChecked="True" Click="OnMatchesForRawStimuliCheckBoxClick" />
                                 <Label Content="Buckets:" Padding="30,5,20,1" Margin="0,0,0,0" IsEnabled="{Binding IsChecked, ElementName=HistogramForRawStimuliCheckBox}"/>
                                 <StackPanel Orientation="Horizontal" Margin="30,0,0,0">
-                                    <wpfx:IntegerUpDown x:Name="MatchValuesForRawStimuliBucketsUpDown" Margin="0,0,10,0" Padding="20,0,0,0" MinWidth="75" MaxWidth="75" Minimum="1" Maximum="1000" DefaultValue="200" Text="200" IsEnabled="{Binding IsChecked, ElementName=HistogramForRawStimuliCheckBox}" ValueChanged="OnBucketsUpDownValueChanged"/>
+                                    <wpfx:IntegerUpDown x:Name="MatchValuesForRawStimuliBucketsUpDown" Margin="0,0,10,0" Padding="20,0,0,0" MinWidth="75" MaxWidth="75" DefaultValue="50" Text="50" IsEnabled="{Binding IsChecked, ElementName=HistogramForRawStimuliCheckBox}" ValueChanged="OnBucketsUpDownValueChanged"/>
                                     <Label x:Name="TotalMatchValuesForRawStimuliLabel" Content="(max. 0)" Padding="0" Margin="0,0,10,0" IsEnabled="{Binding IsChecked, ElementName=HistogramForRawStimuliCheckBox}"/>
                                 </StackPanel>
 
-                                <CheckBox x:Name="HistogramForSpikeTriggeredStimuliCheckBox" Content="Histogram for spike-triggered Stimuli" Margin="10,20,10,0" IsChecked="True" Foreground="DarkRed" Click="OnMatchesForSpikeTriggeredStimuliCheckBoxClick"/>
+                                <CheckBox x:Name="HistogramForSpikeTriggeredStimuliCheckBox" Content="Histogram for spike-triggered Stimuli" Margin="10,20,10,0" IsChecked="True" Click="OnMatchesForSpikeTriggeredStimuliCheckBoxClick"/>
                                 <Label Content="Buckets:" Padding="30,5,20,1" Margin="0,0,0,0" IsEnabled="{Binding IsChecked, ElementName=HistogramForSpikeTriggeredStimuliCheckBox}"/>
                                 <StackPanel Orientation="Horizontal" Margin="30,0,0,10">
-                                    <wpfx:IntegerUpDown x:Name="MatchValuesForSpikeTriggeredStimuliBucketsUpDown" Margin="0,0,10,0" Padding="20,0,0,0" MinWidth="75" MaxWidth="75" Minimum="1" Maximum="1000" DefaultValue="200" Text="200" IsEnabled="{Binding IsChecked, ElementName=HistogramForSpikeTriggeredStimuliCheckBox}" ValueChanged="OnBucketsUpDownValueChanged"/>
+                                    <wpfx:IntegerUpDown x:Name="MatchValuesForSpikeTriggeredStimuliBucketsUpDown" Margin="0,0,10,0" Padding="20,0,0,0" MinWidth="75" MaxWidth="75" DefaultValue="50" Text="50" IsEnabled="{Binding IsChecked, ElementName=HistogramForSpikeTriggeredStimuliCheckBox}" ValueChanged="OnBucketsUpDownValueChanged"/>
                                     <Label x:Name="TotalMatchValuesForSpikeTriggeredStimuliLabel" Content="(max. 0)" Padding="0" Margin="0,0,10,0" IsEnabled="{Binding IsChecked, ElementName=HistogramForSpikeTriggeredStimuliCheckBox}"/>
                                 </StackPanel>
                             </StackPanel>
                         </Border>
                     </StackPanel>
 
-                    <Grid Grid.Column="1" Grid.Row="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        
-                        <d3:ChartPlotter Grid.Row="0" x:Name="MatchValuePlotter" Margin="10,5,5,5"/>
-                        <d3:ChartPlotter Grid.Row="1"  x:Name="NonlinearityPlotter" Margin="10,5,5,5"/>
-                    </Grid>
-				</Grid>
-			</TabItem>
-			<TabItem x:Name="PrincipalComponentsAnalysisTabItem" Header="Principal Components Analysis" GotFocus="OnPrincipalComponentsAnalysisTabItemGotFocus" Padding="20,5">
-				<Grid Background="#FFE5E5E5">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="Auto"/>
-						<ColumnDefinition/>
-					</Grid.ColumnDefinitions>
+                    <d3:ChartPlotter Grid.Column="1" Grid.Row="1" x:Name="ChartPlotter" Margin="10,5,5,5"/>
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="PrincipalComponentsAnalysisTabItem" Header="Principal Components Analysis" GotFocus="OnPrincipalComponentsAnalysisTabItemGotFocus" Padding="20,5">
+                <Grid Background="#FFE5E5E5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
 
-					<StackPanel Orientation="Vertical" Margin="10,0,10,0">
-						<CheckBox x:Name="PCACell1CheckBox" Content="Cell 1" Margin="0,15,30,5" Click="OnPCACellCheckBoxClicked" IsChecked="True" />
-						<CheckBox x:Name="PCACell2CheckBox" Content="Cell 2" Margin="0,0,30,5" Click="OnPCACellCheckBoxClicked"/>
-						<CheckBox x:Name="PCACell3CheckBox" Content="Cell 3" Margin="0,0,30,5" Click="OnPCACellCheckBoxClicked"/>
-						<CheckBox x:Name="PCACell4CheckBox" Content="Cell 4" Margin="0,0,30,5" Click="OnPCACellCheckBoxClicked"/>
-					</StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="10,0,10,0">
+                        <CheckBox x:Name="PCACell1CheckBox" Content="Cell 1" Margin="0,15,30,5" Click="OnPCACellCheckBoxClicked" IsChecked="True" />
+                        <CheckBox x:Name="PCACell2CheckBox" Content="Cell 2" Margin="0,0,30,5" Click="OnPCACellCheckBoxClicked"/>
+                        <CheckBox x:Name="PCACell3CheckBox" Content="Cell 3" Margin="0,0,30,5" Click="OnPCACellCheckBoxClicked"/>
+                        <CheckBox x:Name="PCACell4CheckBox" Content="Cell 4" Margin="0,0,30,5" Click="OnPCACellCheckBoxClicked"/>
+                    </StackPanel>
 
-					<d3:ChartPlotter x:Name="EigenvaluePlotter" Grid.Column="1"/>
-				</Grid>
-			</TabItem>
-		</TabControl>
-	</Grid>
+                    <d3:ChartPlotter x:Name="EigenvaluePlotter" Grid.Column="1"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
 </Window>

@@ -179,23 +179,6 @@ namespace Nonlinearities.Analysis
             histogram = Math.CalculateHistogram(matchValues, buckets);
         }
 
-        // TODO: Documentation.
-        public static double[] CalculateNonlinearity(Histogram rawStimuliResponseHistogram, Histogram spikeTriggeredStimuliResponseHistogram)
-        {
-            var buckets = System.Math.Min(rawStimuliResponseHistogram.BucketCount, spikeTriggeredStimuliResponseHistogram.BucketCount);
-            var nonlinearity = new double[(int)buckets];
-
-            for (var index = 0; index < buckets; index++)
-            {
-                if (System.Math.Abs(rawStimuliResponseHistogram[index].Count - 0) > double.Epsilon)
-                    nonlinearity[index] = spikeTriggeredStimuliResponseHistogram[index].Count / rawStimuliResponseHistogram[index].Count;
-                else
-                    nonlinearity[index] = 0;
-            }
-
-            return nonlinearity;
-        }
-
         /// <summary>
         /// This service calculates the spike-triggered covariance for given stimuli data and response spikes data.
         /// </summary>
