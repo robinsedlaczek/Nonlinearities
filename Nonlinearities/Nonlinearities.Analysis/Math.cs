@@ -206,42 +206,21 @@ namespace Nonlinearities.Analysis
         }
 
         /// <summary>
-        /// This method calculates the mean (center of distribution; expected value of random variable X) of an histogram.
-        /// This is a weighted average of the class marks, with the relative frequencies as the weight factors.
-        /// </summary>
-        /// <param name="histogram">The histogram for which the mean will be calculated.</param>
-        /// <returns>Returns the mean value of the histogram as a single floating point value.</returns>
-        public static double Mean(Histogram histogram)
-        {
-            var result = 0d;
-
-            for (var index = 0; index < histogram.BucketCount; index++)
-            {
-                var bucket = histogram[index];
-                result += index * bucket.Count;
-            }
-
-            result /= histogram.DataCount;
-
-            return result;
-        }
-
-        /// <summary>
         /// This method calculates the variance of a data set (probability distribution). That is the arithmetic average 
         /// of the squared differences between data values and the mean.
         /// </summary>
-        /// <param name="histogram">A histogram of the original data.</param>
-        /// <param name="originalData">The original data values.</param>
+        /// <param name="data">The original data values.</param>
         /// <returns>Returns the variance of the data set as a single floating point value.</returns>
-        public static double Variance(Histogram histogram, double[] originalData)
+        public static double Variance(double[] data)
         {
-            var mean = histogram.Mean();
-            var squaredDifferences = new double[originalData.Length];
+            var mean = data.Average();
+            var squaredDifferencesSum = 0d;
 
-            for (var index = 0; index < originalData.Length; index++)
-                squaredDifferences[index] = System.Math.Pow(originalData[index] - mean, 2);
+            for (var index = 0; index < data.Length; index++)
+                squaredDifferencesSum += System.Math.Pow(data[index] - mean, 2);
 
-            var result = squaredDifferences.Average();
+            var result = squaredDifferencesSum / data.Length;
+
             return result;
         }
 
@@ -249,12 +228,11 @@ namespace Nonlinearities.Analysis
         /// This method calculates the standard deviation of a data set (probability distribution). That is the square 
         /// root of the variance of the data set.
         /// </summary>
-        /// <param name="histogram">A histogram of the original data.</param>
         /// <param name="originalData">The original data values.</param>
         /// <returns>Returns the standard deviation of the data set as a single floating point value.</returns>
-        public static double StandardDeviation(Histogram histogram, double[] originalData)
+        public static double StandardDeviation(double[] originalData)
         {
-            var variance = histogram.Variance(originalData);
+            var variance = Variance( originalData);
             var result = System.Math.Sqrt(variance);
 
             return result;
