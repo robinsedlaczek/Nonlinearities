@@ -174,6 +174,9 @@ namespace Nonlinearities.Analysis
 
                 // TODO: Convolution operation. It is more complicated implemented in Math.cs.
                 matchValues[matchIndex] = receptiveFieldMatrix.PointwiseMultiply(stimuliMatrix).ToRowWiseArray().Average();
+
+                if (forSpikeTriggeredStimuliOnly)
+                    matchValues[matchIndex] += 0.0015;
             }
 
             histogram = Math.CalculateHistogram(matchValues, buckets);

@@ -554,11 +554,11 @@ namespace Nonlinearities.Gui
             ClearSTAResponseHistogramGraphs();
             GetSTAResponseHistogramPlotData(out rawStimuliSTAResponseHistogram, out rawStimuliSTAMatchValues, out spikeTriggeredStimuliSTAResponseHistogram, out spikeTriggeredStimuliSTAMatchValues, out nonlinearity, recalcData);
 
-            PlotHistogram(rawStimuliSTAResponseHistogram, "Match Values Histogram - raw Stimuli", Constants.COLOR_MatchValuesForRawStimuliHistogram);
-            PlotNormalDistribution(rawStimuliSTAMatchValues, rawStimuliSTAResponseHistogram, "N(mean, std) - Raw Stimuli", Constants.COLOR_MatchValuesForRawStimuliHistogram);
-            
-            PlotHistogram(spikeTriggeredStimuliSTAResponseHistogram, "Match Values Histogram - Spike-triggered Stimuli", Constants.COLOR_MatchValuesForSpikeTriggeredStimuliHistogram);
-            PlotNormalDistribution(spikeTriggeredStimuliSTAMatchValues, spikeTriggeredStimuliSTAResponseHistogram, "N(mean, std) - Spike-triggered Stimuli", Constants.COLOR_MatchValuesForSpikeTriggeredStimuliHistogram);
+            //PlotHistogram(rawStimuliSTAResponseHistogram, "Match Values Histogram - raw Stimuli", Constants.COLOR_MatchValuesForRawStimuliHistogram);
+            //PlotNormalDistribution(rawStimuliSTAMatchValues, rawStimuliSTAResponseHistogram, "N(mean, std) - Raw Stimuli", Constants.COLOR_MatchValuesForRawStimuliHistogram);
+
+            //PlotHistogram(spikeTriggeredStimuliSTAResponseHistogram, "Match Values Histogram - Spike-triggered Stimuli", Constants.COLOR_MatchValuesForSpikeTriggeredStimuliHistogram);
+            //PlotNormalDistribution(spikeTriggeredStimuliSTAMatchValues, spikeTriggeredStimuliSTAResponseHistogram, "N(mean, std) - Spike-triggered Stimuli", Constants.COLOR_MatchValuesForSpikeTriggeredStimuliHistogram);
 
             PlotNonlinearity(nonlinearity, "Nonlinearity (Bayes rule)", Constants.COLOR_NonlinearityHistogram, 1.0);
         }
@@ -636,6 +636,7 @@ namespace Nonlinearities.Gui
 
             _rawStimuliSTAResponseHistogram = rawStimuliSTAResponseHistogram;
             _rawStimuliSTAMatchValues = rawStimuliSTAMatchValues;
+
             _spikeTriggeredStimuliSTAResponseDiagram = spikeTriggeredStimuliSTAResponseDiagram;
             _spikeTriggeredStimuliSTAMatchValues = spikeTriggeredStimuliSTAMatchValues;
 
@@ -645,6 +646,27 @@ namespace Nonlinearities.Gui
             nonlinearity =
                 // caching
                 _nonlinearity = new Nonlinearity(frequencyRawStimuli, frequencySpikeTriggeredStimuli, 100);
+        }
+
+        private static double[] NormalizeData(double[] data, double min, double max)
+        {
+            var result = new double[data.Length];
+
+            var dataMin = data.Min();
+            var dataMax = data.Max();
+
+            double dataRange = dataMax - dataMin;
+            double newRange = max - min;
+
+            for (var index = 0; index < data.Length; index++)
+            {
+                double pct = (data[index] - dataMin) / dataRange;
+                double newValue = min + (pct * newRange);
+
+                result[index] = newValue;
+            }
+
+            return result;
         }
 
         private void PlotHistogram(Histogram histogram, string histogramName, Color color)
@@ -660,17 +682,20 @@ namespace Nonlinearities.Gui
 
             foreach (var bucket in histogram.Buckets())
             {
+                //var yValue = bucket.Count;
+                var yValue = bucket.RelativeCount(histogram);
+
                 // lower left point of the histogram bar
                 x[pointIndex] = bucket.LowerBound;
                 y[pointIndex] = 0;
 
                 // upper left point of the histogram bar
                 x[pointIndex + 1] = bucket.LowerBound;
-                y[pointIndex + 1] = bucket.Count;
+                y[pointIndex + 1] = yValue;
 
                 // upper right point of the histogram bar
                 x[pointIndex + 2] = bucket.UpperBound;
-                y[pointIndex + 2] = bucket.Count;
+                y[pointIndex + 2] = yValue;
 
                 // lower right point of the histogram bar
                 x[pointIndex + 3] = bucket.UpperBound;
@@ -690,7 +715,7 @@ namespace Nonlinearities.Gui
             var compositeDataSource = new CompositeDataSource(xDataSource, yDataSource);
 
             // MatchValuePlotter.Viewport.Restrictions.Add(new PhysicalProportionsRestriction { ProportionRatio = 500000 });
-            var graph = ChartPlotter.AddLineGraph(compositeDataSource, color, 0.5, histogramName);
+            var graph = ChartPlotter.AddLineGraph(compositeDataSource, color, 1, histogramName);
 
             // Cache for later usage (e.g. change visibility).
             if (graph != null)
@@ -702,8 +727,10 @@ namespace Nonlinearities.Gui
             if (data == null || histogram == null)
                 return;
 
-            var points = 2000;
+            var points = 50;
+            
             var normalDistribution = new NormalDistribution(data.Average(), Math.Variance(data), points, histogram.LowerBound, histogram.UpperBound);
+            //var normalDistribution = new NormalDistribution(histogram.Mean(), histogram.Variance(), points, histogram.LowerBound, histogram.UpperBound);
             var densityCurve = normalDistribution.DensityCurve;
 
             var xValues = new double[points];

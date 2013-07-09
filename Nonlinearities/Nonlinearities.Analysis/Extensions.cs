@@ -35,19 +35,46 @@ namespace Nonlinearities.Analysis
         /// </summary>
         /// <param name="histogram">The histogram for which the mean will be calculated.</param>
         /// <returns>Returns the mean value of the histogram as a single floating point value.</returns>
-        public static double Mean(Histogram histogram)
+        public static double Mean(this Histogram histogram)
         {
             var result = 0d;
 
             for (var index = 0; index < histogram.BucketCount; index++)
             {
                 var bucket = histogram[index];
-                result += index * bucket.Count;
+                result += index * (bucket.Count / histogram.DataCount);
             }
 
             result /= histogram.DataCount;
 
             return result;
+        }
+
+        /// <summary>
+        /// This method calculates the variance of a data set (probability distribution). That is the arithmetic average 
+        /// of the squared differences between data values and the mean.
+        /// </summary>
+        /// <param name="histogram">The histogram for which variance will be calculated.</param>
+        /// <returns>Returns the variance of the histogram as a single floating point value.</returns>
+        public static double Variance(this Histogram histogram)
+        {
+            var data = new double[histogram.BucketCount];
+
+            for (var index = 0; index < histogram.BucketCount; index++)
+                data[index] = (histogram[index].Count / histogram.DataCount);
+
+            var result = Math.Variance(data);
+
+            return result;
+        }
+
+        // TODO: [RS] Documentation
+        public static double RelativeCount(this Bucket bucket, Histogram histogram)
+        {
+            if (histogram.DataCount == 0)
+                return 0;
+
+            return bucket.Count / histogram.DataCount;
         }
 
         /// <summary>
