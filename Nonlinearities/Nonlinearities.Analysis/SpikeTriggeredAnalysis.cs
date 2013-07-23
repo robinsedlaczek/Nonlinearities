@@ -168,12 +168,39 @@ namespace Nonlinearities.Analysis
             {
                 var stimuliData = new double[dimension][];
                 for (var index = 0; index < dimension; index++)
-                    stimuliData[index] = stimuli[dimension - index - 1 + matchIndex];
+                {
+                    var stimulusIndex = 0;
 
-                var stimuliMatrix = (new DenseMatrix(1)).OfArray(stimuliData);
+                    //if (forSpikeTriggeredStimuliOnly)
+                    //{
+                        var offset = 32;
+                        //stimulusIndex = dimension - index - 1 + matchIndex + offset;
+                        stimulusIndex = index + matchIndex + offset;
 
-                // TODO: Convolution operation. It is more complicated implemented in Math.cs.
-                matchValues[matchIndex] = receptiveFieldMatrix.PointwiseMultiply(stimuliMatrix).ToRowWiseArray().Average();
+                        if (stimulusIndex > 0 && stimulusIndex < stimuli.Length)
+                            stimuliData[index] = stimuli[stimulusIndex];
+                    //}
+                    //else
+                    //{
+                    //    //stimulusIndex = dimension - index - 1 + matchIndex;
+                    //    stimulusIndex = index + matchIndex;
+
+                    //    if (stimulusIndex > 0 && stimulusIndex < stimuli.Length)
+                    //        stimuliData[index] = stimuli[stimulusIndex];
+                    //}
+                }
+
+                var nulls = (from data in stimuliData
+                             where data == null
+                             select data).Count();
+
+                if (nulls == 0)
+                {
+                    var stimuliMatrix = (new DenseMatrix(1)).OfArray(stimuliData);
+
+                    // TODO: Convolution operation. It is more complicated implemented in Math.cs.
+                    matchValues[matchIndex] = receptiveFieldMatrix.PointwiseMultiply(stimuliMatrix).ToRowWiseArray().Average();
+                }
             }
 
             histogram = Math.CalculateHistogram(matchValues, buckets);

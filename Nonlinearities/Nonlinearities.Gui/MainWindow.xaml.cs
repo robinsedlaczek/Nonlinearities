@@ -618,11 +618,11 @@ namespace Nonlinearities.Gui
 
             int offset;
             if (!int.TryParse(OffsetTextbox.Text, out offset))
-                offset = 16;
+                offset = 13;
 
             int maxTime;
             if (!int.TryParse(TimeTextbox.Text, out maxTime))
-                maxTime = 16;
+                maxTime = 13;
 
             var rawStimuliHistogramBuckets = MatchValuesForRawStimuliBucketsUpDown.Value != null ? MatchValuesForRawStimuliBucketsUpDown.Value.Value : 200;
             var spikeTriggeredStimuliHistogramBuckets = MatchValuesForSpikeTriggeredStimuliBucketsUpDown.Value != null ? MatchValuesForSpikeTriggeredStimuliBucketsUpDown.Value.Value : 200;
