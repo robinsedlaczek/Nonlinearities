@@ -42,7 +42,7 @@ namespace Nonlinearities.Analysis
             for (var index = 0; index < histogram.BucketCount; index++)
             {
                 var bucket = histogram[index];
-                result += index * (bucket.Count / histogram.DataCount);
+                result += bucket.Width * (bucket.Count / histogram.DataCount);
             }
 
             result /= histogram.DataCount;

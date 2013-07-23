@@ -554,13 +554,13 @@ namespace Nonlinearities.Gui
             ClearSTAResponseHistogramGraphs();
             GetSTAResponseHistogramPlotData(out rawStimuliSTAResponseHistogram, out rawStimuliSTAMatchValues, out spikeTriggeredStimuliSTAResponseHistogram, out spikeTriggeredStimuliSTAMatchValues, out nonlinearity, recalcData);
 
-            //PlotHistogram(rawStimuliSTAResponseHistogram, "Match Values Histogram - raw Stimuli", Constants.COLOR_MatchValuesForRawStimuliHistogram);
+            PlotHistogram(rawStimuliSTAResponseHistogram, "Match Values Histogram - raw Stimuli", Constants.COLOR_MatchValuesForRawStimuliHistogram);
             //PlotNormalDistribution(rawStimuliSTAMatchValues, rawStimuliSTAResponseHistogram, "N(mean, std) - Raw Stimuli", Constants.COLOR_MatchValuesForRawStimuliHistogram);
 
-            //PlotHistogram(spikeTriggeredStimuliSTAResponseHistogram, "Match Values Histogram - Spike-triggered Stimuli", Constants.COLOR_MatchValuesForSpikeTriggeredStimuliHistogram);
+            PlotHistogram(spikeTriggeredStimuliSTAResponseHistogram, "Match Values Histogram - Spike-triggered Stimuli", Constants.COLOR_MatchValuesForSpikeTriggeredStimuliHistogram);
             //PlotNormalDistribution(spikeTriggeredStimuliSTAMatchValues, spikeTriggeredStimuliSTAResponseHistogram, "N(mean, std) - Spike-triggered Stimuli", Constants.COLOR_MatchValuesForSpikeTriggeredStimuliHistogram);
 
-            PlotNonlinearity(nonlinearity, "Nonlinearity (Bayes rule)", Constants.COLOR_NonlinearityHistogram, 1.0);
+            //PlotNonlinearity(nonlinearity, "Nonlinearity (Bayes rule)", Constants.COLOR_NonlinearityHistogram, 1.0);
         }
         
         private void ClearSTAResponseHistogramGraphs()
@@ -730,7 +730,9 @@ namespace Nonlinearities.Gui
             var points = 50;
             
             var normalDistribution = new NormalDistribution(data.Average(), Math.Variance(data), points, histogram.LowerBound, histogram.UpperBound);
+            
             //var normalDistribution = new NormalDistribution(histogram.Mean(), histogram.Variance(), points, histogram.LowerBound, histogram.UpperBound);
+            
             var densityCurve = normalDistribution.DensityCurve;
 
             var xValues = new double[points];
